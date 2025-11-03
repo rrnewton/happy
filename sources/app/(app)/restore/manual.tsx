@@ -80,29 +80,45 @@ export default function Restore() {
         }
 
         try {
+            console.log('[Restore] Starting authentication with secret key...');
+            console.log('[Restore] Input key (first 20 chars):', trimmedKey.substring(0, 20) + '...');
+
             // Normalize the key (handles both base64url and formatted input)
             const normalizedKey = normalizeSecretKey(trimmedKey);
+            console.log('[Restore] Normalized to base64url (first 20 chars):', normalizedKey.substring(0, 20) + '...');
 
             // Validate the secret key format
             const secretBytes = decodeBase64(normalizedKey, 'base64url');
+            console.log('[Restore] Decoded to bytes, length:', secretBytes.length);
+
             if (secretBytes.length !== 32) {
-                throw new Error('Invalid secret key length');
+                throw new Error(`Invalid secret key length: expected 32 bytes, got ${secretBytes.length}`);
             }
 
             // Get token from secret
+            console.log('[Restore] Calling authGetToken...');
             const token = await authGetToken(secretBytes);
+            console.log('[Restore] Received token:', token ? 'yes (length: ' + token.length + ')' : 'no');
+
             if (!token) {
                 throw new Error('Failed to authenticate with provided key');
             }
 
             // Login with new credentials
+            console.log('[Restore] Logging in with credentials...');
             await auth.login(token, normalizedKey);
+
+            console.log('[Restore] ✓ Authentication successful!');
 
             // Dismiss
             router.back();
 
         } catch (error) {
-            console.error('Restore error:', error);
+            console.error('[Restore] ✗ Authentication failed:', error);
+            console.error('[Restore] Error details:', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : undefined,
+            });
             Modal.alert(t('common.error'), t('connect.invalidSecretKey'));
         }
     };

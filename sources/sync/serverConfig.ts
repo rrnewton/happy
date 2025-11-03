@@ -20,9 +20,22 @@ function getDefaultServerUrl(): string {
 }
 
 export function getServerUrl(): string {
-    return serverConfigStorage.getString(SERVER_KEY) ||
-           process.env.EXPO_PUBLIC_HAPPY_SERVER_URL ||
-           getDefaultServerUrl();
+    const storedUrl = serverConfigStorage.getString(SERVER_KEY);
+    const envUrl = process.env.EXPO_PUBLIC_HAPPY_SERVER_URL;
+    const defaultUrl = getDefaultServerUrl();
+
+    const finalUrl = storedUrl || envUrl || defaultUrl;
+
+    // Debug logging to help diagnose server URL issues
+    if (Platform.OS === 'web') {
+        console.log('[ServerConfig] URL Resolution:');
+        console.log('  - Stored in localStorage:', storedUrl || 'none');
+        console.log('  - Environment variable:', envUrl || 'none');
+        console.log('  - Auto-detected default:', defaultUrl);
+        console.log('  - Final server URL:', finalUrl);
+    }
+
+    return finalUrl;
 }
 
 export function setServerUrl(url: string | null): void {
