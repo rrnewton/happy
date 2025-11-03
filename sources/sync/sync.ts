@@ -305,6 +305,10 @@ class Sync {
             sentFrom,
             permissionMode: permissionMode || 'default'
         });
+
+        // Aggressively sync messages - invalidate to force a fresh fetch
+        // This ensures the client gets the latest messages immediately, even if it fell behind
+        this.onSessionVisible(sessionId);
     }
 
     applySettings = (delta: Partial<Settings>) => {
