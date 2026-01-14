@@ -537,6 +537,31 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
         sendMessageWithTextRef.current = sendMessageWithText;
     }, [sendMessageWithText]);
 
+    // Handle "/" key to focus input on web (only when input is not already focused)
+    React.useEffect(() => {
+        if (Platform.OS !== 'web') return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Only handle "/" without any modifiers
+            if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                // Check if the event target is not already an input/textarea
+                const target = e.target as HTMLElement;
+                const isInputFocused = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+                if (!isInputFocused) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    inputRef.current?.focus();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const input = (
         <AgentInput
             ref={inputRef}
