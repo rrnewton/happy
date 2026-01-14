@@ -96,6 +96,8 @@ export const ru: TranslationStructure = {
         appearanceSubtitle: 'Настройка внешнего вида приложения',
         voiceAssistant: 'Голосовой ассистент',
         voiceAssistantSubtitle: 'Настройка предпочтений голосового взаимодействия',
+        aiSettings: 'Настройки ИИ',
+        aiSettingsSubtitle: 'Пользовательские системные инструкции и поведение ИИ',
         featuresTitle: 'Возможности',
         featuresSubtitle: 'Включить или отключить функции приложения',
         developer: 'Разработчик',
@@ -588,6 +590,15 @@ export const ru: TranslationStructure = {
         file: 'Файл',
         fileEmpty: 'Файл пустой',
         noChanges: 'Нет изменений для отображения',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Пользовательская системная инструкция',
+        systemPromptDescription: 'Добавьте пользовательские инструкции, которые будут прикрепляться к каждому отправляемому сообщению. Это полезно для установки предпочтений, стиля кода или контекста проекта.',
+        systemPromptLabel: 'Системная инструкция',
+        systemPromptPlaceholder: 'напр., Всегда используй строгий режим TypeScript. Предпочитай функциональные компоненты классовым.',
+        systemPromptHint: 'Ваша пользовательская инструкция объединяется с системной инструкцией Happy по умолчанию. Изменения применяются ко всем будущим сообщениям.',
     },
 
     settingsVoice: {

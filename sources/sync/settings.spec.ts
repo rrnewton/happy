@@ -116,6 +116,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             };
             const delta: Partial<Settings> = {
@@ -152,6 +153,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             };
             const delta: Partial<Settings> = {};
@@ -186,6 +188,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             };
             const delta: Partial<Settings> = {
@@ -222,6 +225,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             };
             expect(applySettings(currentSettings, {})).toEqual({
@@ -270,6 +274,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             };
             const delta: any = {
@@ -327,6 +332,7 @@ describe('settings', () => {
                 lastUsedModelMode: null,
                 openaiApiKey: null,
                 whisperVocabulary: null,
+                customSystemPrompt: null,
                 sessionLastReadAt: {},
             });
         });

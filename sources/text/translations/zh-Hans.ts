@@ -116,6 +116,8 @@ export const zhHans: TranslationStructure = {
         appearanceSubtitle: '自定义应用外观',
         voiceAssistant: '语音助手',
         voiceAssistantSubtitle: '配置语音交互偏好',
+        aiSettings: 'AI 设置',
+        aiSettingsSubtitle: '自定义系统提示词和 AI 行为',
         featuresTitle: '功能',
         featuresSubtitle: '启用或禁用应用功能',
         developer: '开发者',
@@ -580,6 +582,15 @@ export const zhHans: TranslationStructure = {
         file: '文件',
         fileEmpty: '文件为空',
         noChanges: '没有要显示的更改',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: '自定义系统提示词',
+        systemPromptDescription: '添加自定义指令，这些指令将附加到您发送的每条消息中。这对于设置偏好、编码风格或项目特定上下文非常有用。',
+        systemPromptLabel: '系统提示词',
+        systemPromptPlaceholder: '例如：始终使用 TypeScript 严格模式。优先使用函数式组件而非类组件。',
+        systemPromptHint: '您的自定义提示词会与 Happy 默认系统提示词合并。更改将应用于所有未来消息。',
     },
 
     settingsVoice: {

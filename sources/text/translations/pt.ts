@@ -114,6 +114,8 @@ export const pt: TranslationStructure = {
         appearanceSubtitle: 'Personalize a aparência do aplicativo',
         voiceAssistant: 'Assistente de voz',
         voiceAssistantSubtitle: 'Configure as preferências de interação por voz',
+        aiSettings: 'Configurações de IA',
+        aiSettingsSubtitle: 'Prompt de sistema personalizado e comportamento da IA',
         featuresTitle: 'Recursos',
         featuresSubtitle: 'Ativar ou desativar recursos do aplicativo',
         developer: 'Desenvolvedor',
@@ -578,6 +580,15 @@ export const pt: TranslationStructure = {
         file: 'Arquivo',
         fileEmpty: 'Arquivo está vazio',
         noChanges: 'Nenhuma alteração para exibir',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Prompt de sistema personalizado',
+        systemPromptDescription: 'Adicione instruções personalizadas que serão anexadas a cada mensagem enviada. Isso é útil para definir preferências, estilo de código ou contexto específico do projeto.',
+        systemPromptLabel: 'Prompt de sistema',
+        systemPromptPlaceholder: 'ex.: Sempre use o modo strict do TypeScript. Prefira componentes funcionais em vez de componentes de classe.',
+        systemPromptHint: 'Seu prompt personalizado é combinado com o prompt de sistema padrão do Happy. As alterações se aplicam a todas as mensagens futuras.',
     },
 
     settingsVoice: {

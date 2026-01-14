@@ -125,6 +125,8 @@ export const pl: TranslationStructure = {
         appearanceSubtitle: 'Dostosuj wygląd aplikacji',
         voiceAssistant: 'Asystent głosowy',
         voiceAssistantSubtitle: 'Konfiguruj preferencje interakcji głosowej',
+        aiSettings: 'Ustawienia AI',
+        aiSettingsSubtitle: 'Niestandardowe polecenia systemowe i zachowanie AI',
         featuresTitle: 'Funkcje',
         featuresSubtitle: 'Włącz lub wyłącz funkcje aplikacji',
         developer: 'Deweloper',
@@ -588,6 +590,15 @@ export const pl: TranslationStructure = {
         file: 'Plik',
         fileEmpty: 'Plik jest pusty',
         noChanges: 'Brak zmian do wyświetlenia',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Niestandardowe polecenie systemowe',
+        systemPromptDescription: 'Dodaj niestandardowe instrukcje, które będą dołączane do każdej wysyłanej wiadomości. Jest to przydatne do ustawiania preferencji, stylu kodowania lub kontekstu specyficznego dla projektu.',
+        systemPromptLabel: 'Polecenie systemowe',
+        systemPromptPlaceholder: 'np. Zawsze używaj trybu strict TypeScript. Preferuj komponenty funkcyjne nad klasowymi.',
+        systemPromptHint: 'Twoje niestandardowe polecenie jest łączone z domyślnym poleceniem systemowym Happy. Zmiany dotyczą wszystkich przyszłych wiadomości.',
     },
 
     settingsVoice: {

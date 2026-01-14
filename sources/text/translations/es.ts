@@ -114,6 +114,8 @@ export const es: TranslationStructure = {
         appearanceSubtitle: 'Personaliza como se ve la app',
         voiceAssistant: 'Asistente de voz',
         voiceAssistantSubtitle: 'Configura las preferencias de voz',
+        aiSettings: 'Configuración de IA',
+        aiSettingsSubtitle: 'Indicaciones del sistema personalizadas y comportamiento de la IA',
         featuresTitle: 'Características',
         featuresSubtitle: 'Habilitar o deshabilitar funciones de la aplicación',
         developer: 'Desarrollador',
@@ -578,6 +580,15 @@ export const es: TranslationStructure = {
         file: 'Archivo',
         fileEmpty: 'El archivo está vacío',
         noChanges: 'No hay cambios que mostrar',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Indicación del sistema personalizada',
+        systemPromptDescription: 'Añade instrucciones personalizadas que se adjuntarán a cada mensaje que envíes. Esto es útil para establecer preferencias, estilo de código o contexto específico del proyecto.',
+        systemPromptLabel: 'Indicación del sistema',
+        systemPromptPlaceholder: 'p. ej., Usa siempre el modo estricto de TypeScript. Prefiere componentes funcionales sobre componentes de clase.',
+        systemPromptHint: 'Tu indicación personalizada se combina con la indicación del sistema por defecto de Happy. Los cambios se aplican a todos los mensajes futuros.',
     },
 
     settingsVoice: {

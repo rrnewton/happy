@@ -114,6 +114,8 @@ export const ca: TranslationStructure = {
         appearanceSubtitle: 'Personalitza l\'aspecte de l\'aplicació',
         voiceAssistant: 'Assistent de veu',
         voiceAssistantSubtitle: 'Configura les preferències d\'interacció per veu',
+        aiSettings: 'Configuració d\'IA',
+        aiSettingsSubtitle: 'Indicacions del sistema personalitzades i comportament de l\'IA',
         featuresTitle: 'Funcions',
         featuresSubtitle: 'Activa o desactiva les funcions de l\'aplicació',
         developer: 'Desenvolupador',
@@ -578,6 +580,15 @@ export const ca: TranslationStructure = {
         file: 'Fitxer',
         fileEmpty: 'El fitxer està buit',
         noChanges: 'No hi ha canvis a mostrar',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Indicació del sistema personalitzada',
+        systemPromptDescription: 'Afegeix instruccions personalitzades que s\'adjuntaran a cada missatge que enviïs. Això és útil per establir preferències, estil de codi o context específic del projecte.',
+        systemPromptLabel: 'Indicació del sistema',
+        systemPromptPlaceholder: 'p. ex., Utilitza sempre el mode estricte de TypeScript. Prefereix components funcionals sobre components de classe.',
+        systemPromptHint: 'La teva indicació personalitzada es combina amb la indicació del sistema per defecte de Happy. Els canvis s\'apliquen a tots els missatges futurs.',
     },
 
     settingsVoice: {
