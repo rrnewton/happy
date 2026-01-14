@@ -29,7 +29,18 @@ import { gitStatusSync } from './gitStatusSync';
 import { projectManager } from './projectManager';
 import { Message } from './typesMessage';
 import { EncryptionCache } from './encryption/encryptionCache';
-import { systemPrompt } from './prompt/systemPrompt';
+import { systemPrompt as baseSystemPrompt } from './prompt/systemPrompt';
+
+/**
+ * Builds the combined system prompt from base prompt and user's custom prompt
+ */
+function buildSystemPrompt(): string {
+    const customPrompt = storage.getState().settings.customSystemPrompt;
+    if (customPrompt && customPrompt.trim()) {
+        return baseSystemPrompt + '\n\n' + customPrompt.trim();
+    }
+    return baseSystemPrompt;
+}
 import { fetchArtifact, fetchArtifacts, createArtifact, updateArtifact } from './apiArtifacts';
 import { DecryptedArtifact, Artifact, ArtifactCreateRequest, ArtifactUpdateRequest } from './artifactTypes';
 import { ArtifactEncryption } from './encryption/artifactEncryption';
@@ -285,7 +296,7 @@ class Sync {
                 permissionMode,
                 model,
                 fallbackModel,
-                appendSystemPrompt: systemPrompt,
+                appendSystemPrompt: buildSystemPrompt(),
                 ...(displayText && { displayText }) // Add displayText if provided
             }
         };
@@ -452,7 +463,7 @@ class Sync {
                 permissionMode,
                 model,
                 fallbackModel,
-                appendSystemPrompt: systemPrompt,
+                appendSystemPrompt: buildSystemPrompt(),
             }
         };
 

@@ -114,6 +114,8 @@ export const en = {
         appearanceSubtitle: 'Customize how the app looks',
         voiceAssistant: 'Voice Assistant',
         voiceAssistantSubtitle: 'Configure voice interaction preferences',
+        aiSettings: 'AI Settings',
+        aiSettingsSubtitle: 'Custom system prompt and AI behavior',
         featuresTitle: 'Features',
         featuresSubtitle: 'Enable or disable app features',
         developer: 'Developer',
@@ -578,6 +580,15 @@ export const en = {
         file: 'File',
         fileEmpty: 'File is empty',
         noChanges: 'No changes to display',
+    },
+
+    settingsAI: {
+        // AI settings screen
+        systemPromptTitle: 'Custom System Prompt',
+        systemPromptDescription: 'Add custom instructions that will be appended to every message you send. This is useful for setting preferences, coding style, or project-specific context.',
+        systemPromptLabel: 'System Prompt',
+        systemPromptPlaceholder: 'e.g., Always use TypeScript strict mode. Prefer functional components over class components.',
+        systemPromptHint: 'Your custom prompt is combined with the default Happy system prompt. Changes apply to all future messages.',
     },
 
     settingsVoice: {
