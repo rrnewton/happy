@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ActivityIndicator, Pressable, Text, TextInput, type TextInput as TextInputType } from 'react-native';
+import { View, ActivityIndicator, Pressable, Text, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData, type TextInput as TextInputType } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Header } from './navigation/Header';
 import { SessionsList } from './SessionsList';
@@ -256,6 +256,14 @@ export const SessionsListWrapper = React.memo(() => {
         };
     }, [registerFocusCallback, unregisterFocusCallback]);
 
+    // Handle ESC key to blur search input on web
+    const handleKeyPress = React.useCallback((e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+        if (e.nativeEvent.key === 'Escape') {
+            e.preventDefault();
+            searchInputRef.current?.blur();
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={{ backgroundColor: theme.colors.groupped.background }}>
@@ -293,6 +301,7 @@ export const SessionsListWrapper = React.memo(() => {
                                 placeholderTextColor={theme.colors.textSecondary}
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
+                                onKeyPress={handleKeyPress}
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 spellCheck={false}

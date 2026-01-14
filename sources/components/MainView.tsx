@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ActivityIndicator, TextInput, type TextInput as TextInputType } from 'react-native';
+import { View, ActivityIndicator, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData, type TextInput as TextInputType } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useVisibleSessionListViewData } from '@/hooks/useVisibleSessionListViewData';
 import { useIsTablet } from '@/utils/responsive';
@@ -97,6 +97,14 @@ export const MainView = React.memo(({ variant }: MainViewProps) => {
         };
     }, [variant, registerFocusCallback, unregisterFocusCallback]);
 
+    // Handle ESC key to blur search input on web
+    const handleSearchKeyPress = React.useCallback((e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+        if (e.nativeEvent.key === 'Escape') {
+            e.preventDefault();
+            searchInputRef.current?.blur();
+        }
+    }, []);
+
     const handleNewSession = React.useCallback(() => {
         router.push('/new');
     }, [router]);
@@ -136,6 +144,7 @@ export const MainView = React.memo(({ variant }: MainViewProps) => {
                         placeholderTextColor={theme.colors.textSecondary}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
+                        onKeyPress={handleSearchKeyPress}
                         autoCapitalize="none"
                         autoCorrect={false}
                         spellCheck={false}

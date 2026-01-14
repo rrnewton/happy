@@ -497,6 +497,12 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
             return true;
         }
 
+        // Handle Escape to blur input on web when no suggestions and no abort
+        if (event.key === 'Escape' && Platform.OS === 'web' && suggestions.length === 0) {
+            inputRef.current?.blur();
+            return true;
+        }
+
         // Handle Enter key for sending messages (works on all platforms)
         if (event.key === 'Enter') {
             // Determine if this key combo should send
