@@ -192,6 +192,41 @@ export default function EnvironmentPickerScreen() {
         setCustomVars(newVars);
     }, [customVars]);
 
+    // Merge a preset's variables into custom vars (overwrites existing keys)
+    const handleMergePreset = useCallback((envSet: EnvironmentSet) => {
+        const presetVars = Object.entries(envSet.variables);
+        if (presetVars.length === 0) return;
+
+        // Build a map of existing custom vars by key
+        const existingByKey = new Map<string, number>();
+        customVars.forEach((v, i) => {
+            if (v.key.trim()) {
+                existingByKey.set(v.key.trim(), i);
+            }
+        });
+
+        // Start with current custom vars
+        const newVars = [...customVars];
+
+        // Merge preset vars, overwriting existing keys
+        presetVars.forEach(([key, value]) => {
+            const existingIndex = existingByKey.get(key);
+            if (existingIndex !== undefined) {
+                // Overwrite existing
+                newVars[existingIndex] = { key, value };
+            } else {
+                // Add new
+                newVars.push({ key, value });
+            }
+        });
+
+        // Remove empty entries that might exist
+        const cleanedVars = newVars.filter(v => v.key.trim() || v.value.trim());
+
+        setCustomVars(cleanedVars.length > 0 ? cleanedVars : [{ key: '', value: '' }]);
+        setShowCustomVars(true);
+    }, [customVars]);
+
     const handleConfirm = useCallback(() => {
         // Convert custom vars to object
         const customVarsObj: Record<string, string> = {};
@@ -318,19 +353,32 @@ export default function EnvironmentPickerScreen() {
                                         title={envSet.name}
                                         subtitle={formatVariables(envSet.variables)}
                                         leftElement={
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                                <Ionicons
-                                                    name={isSelected ? "checkmark-circle" : "ellipse-outline"}
-                                                    size={20}
-                                                    color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
-                                                />
+                                            <Ionicons
+                                                name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                                                size={20}
+                                                color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
+                                            />
+                                        }
+                                        rightElement={
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                                 {envSet.isDefault && (
                                                     <Ionicons
                                                         name="star"
-                                                        size={14}
+                                                        size={16}
                                                         color="#FFD700"
                                                     />
                                                 )}
+                                                <Pressable
+                                                    onPress={() => handleMergePreset(envSet)}
+                                                    hitSlop={8}
+                                                    style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
+                                                >
+                                                    <Ionicons
+                                                        name="copy-outline"
+                                                        size={18}
+                                                        color={theme.colors.textSecondary}
+                                                    />
+                                                </Pressable>
                                             </View>
                                         }
                                         onPress={() => handleSelectSet(envSet.id)}
