@@ -76,9 +76,22 @@ export default function FileScreen() {
     const encodedPath = searchParams.path as string;
     let filePath = '';
     
-    // Decode base64 path with error handling
+    // Decode base64 path with proper UTF-8 handling
     try {
-        filePath = encodedPath ? atob(encodedPath) : '';
+        if (encodedPath) {
+            // First decode base64 to binary string
+            const binaryString = atob(encodedPath);
+            // Then convert binary string to proper UTF-8
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            // Use TextDecoder to properly decode UTF-8
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+            filePath = decoder.decode(bytes);
+        } else {
+            filePath = '';
+        }
     } catch (error) {
         console.error('Failed to decode file path:', error);
         filePath = encodedPath || ''; // Fallback to original path if decoding fails
@@ -217,7 +230,17 @@ export default function FileScreen() {
                         // Decode base64 content to UTF-8 string
                         let decodedContent: string;
                         try {
-                            decodedContent = atob(response.content);
+                            // First decode base64 to binary string
+                            const binaryString = atob(response.content);
+                            // Then convert binary string to proper UTF-8
+                            // This handles special characters and Unicode correctly
+                            const bytes = new Uint8Array(binaryString.length);
+                            for (let i = 0; i < binaryString.length; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+                            // Use TextDecoder to properly decode UTF-8
+                            const decoder = new TextDecoder('utf-8', { fatal: false });
+                            decodedContent = decoder.decode(bytes);
                         } catch (decodeError) {
                             // If base64 decode fails, treat as binary
                             setFileContent({
