@@ -40,10 +40,14 @@ export const callbacks = {
 }
 
 // Type for recent machine paths with environment settings
+// Note: envSetId can be:
+// - undefined: user never explicitly selected an env for this path (use default)
+// - null: user explicitly selected "None" (no env set)
+// - string: user selected a specific env set
 type RecentMachinePath = {
     machineId: string;
     path: string;
-    envSetId?: string;
+    envSetId?: string | null;
     customEnvVars?: Record<string, string>;
 };
 
@@ -96,13 +100,24 @@ const getRecentEnvForPath = (
     // Find matching recent entry for this machine+path
     const recentEntry = recentPaths.find(rp => rp.machineId === machineId && rp.path === path);
     if (recentEntry) {
+        // Check if user explicitly selected an env (including "None" which is null)
+        // vs never having selected one (undefined)
+        if (recentEntry.envSetId !== undefined) {
+            return {
+                envSetId: recentEntry.envSetId,  // Could be null (explicit "None") or string
+                customEnvVars: recentEntry.customEnvVars || {},
+            };
+        }
+        // envSetId is undefined - user has used this path but never explicitly selected env
+        // Fall through to default logic below, but preserve any custom vars
+        const defaultSet = environmentSets.find(s => s.isDefault);
         return {
-            envSetId: recentEntry.envSetId || null,
+            envSetId: defaultSet?.id || null,
             customEnvVars: recentEntry.customEnvVars || {},
         };
     }
 
-    // Fallback to default environment set
+    // No recent entry - use default environment set
     const defaultSet = environmentSets.find(s => s.isDefault);
     return {
         envSetId: defaultSet?.id || null,
@@ -115,14 +130,18 @@ const updateRecentMachinePaths = (
     currentPaths: RecentMachinePath[],
     machineId: string,
     path: string,
-    envSetId?: string | null,
+    envSetId: string | null | undefined,
     customEnvVars?: Record<string, string>
 ): RecentMachinePath[] => {
     // Remove any existing entry for this machine+path combination
     const filtered = currentPaths.filter(rp => !(rp.machineId === machineId && rp.path === path));
     // Add new entry at the beginning
     const newEntry: RecentMachinePath = { machineId, path };
-    if (envSetId) newEntry.envSetId = envSetId;
+    // Always save envSetId if it was explicitly set (including null for "None")
+    // undefined means "use default", null means "explicitly chose None", string means specific set
+    if (envSetId !== undefined) {
+        newEntry.envSetId = envSetId;
+    }
     if (customEnvVars && Object.keys(customEnvVars).length > 0) newEntry.customEnvVars = customEnvVars;
     const updated = [newEntry, ...filtered];
     // Keep only the last 10 entries
@@ -700,13 +719,21 @@ function NewSessionScreen() {
                 handleAgentClick();
                 return;
             }
+
+            // Cmd+Shift+E - Open environment picker
+            if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEnvironmentClick();
+                return;
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [selectedMachineId, router, handleMachineClick, handleAgentClick]);
+    }, [selectedMachineId, router, handleMachineClick, handleAgentClick, handleEnvironmentClick]);
 
     // Create
     const doCreate = React.useCallback(async (overrideInput?: string) => {

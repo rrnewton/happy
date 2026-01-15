@@ -245,14 +245,27 @@ export default function EnvironmentPickerScreen() {
         });
     }, [selectedSetId, customVars, router]);
 
+    // Check if we're actively searching
+    const isSearching = searchQuery.trim().length > 0;
+
     // Handle keyboard events
     const handleKeyPress = useCallback((event: { key: string; shiftKey: boolean }) => {
         if (event.key === 'Enter') {
             handleConfirm();
             return true;
         }
+
+        // Tab - Autocomplete with first filtered result
+        if (event.key === 'Tab' && !event.shiftKey) {
+            if (filteredSets.length > 0) {
+                setSelectedSetId(filteredSets[0].id);
+                setSearchQuery('');
+                return true; // Handled - prevent default tab behavior
+            }
+        }
+
         return false;
-    }, [handleConfirm]);
+    }, [handleConfirm, filteredSets]);
 
     return (
         <>
@@ -325,23 +338,25 @@ export default function EnvironmentPickerScreen() {
 
                         {/* Environment Sets */}
                         <ItemGroup title={t('environmentPicker.savedSets')}>
-                            {/* None option */}
-                            <Item
-                                title={t('environmentPicker.none')}
-                                subtitle={t('environmentPicker.noneDescription')}
-                                leftElement={
-                                    <Ionicons
-                                        name={selectedSetId === null ? "checkmark-circle" : "ellipse-outline"}
-                                        size={20}
-                                        color={selectedSetId === null ? theme.colors.textLink : theme.colors.textSecondary}
-                                    />
-                                }
-                                onPress={() => handleSelectSet(null)}
-                                selected={selectedSetId === null}
-                                showChevron={false}
-                                pressableStyle={selectedSetId === null ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
-                                showDivider={filteredSets.length > 0}
-                            />
+                            {/* None option - hidden when searching */}
+                            {!isSearching && (
+                                <Item
+                                    title={t('environmentPicker.none')}
+                                    subtitle={t('environmentPicker.noneDescription')}
+                                    leftElement={
+                                        <Ionicons
+                                            name={selectedSetId === null ? "checkmark-circle" : "ellipse-outline"}
+                                            size={20}
+                                            color={selectedSetId === null ? theme.colors.textLink : theme.colors.textSecondary}
+                                        />
+                                    }
+                                    onPress={() => handleSelectSet(null)}
+                                    selected={selectedSetId === null}
+                                    showChevron={false}
+                                    pressableStyle={selectedSetId === null ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
+                                    showDivider={filteredSets.length > 0}
+                                />
+                            )}
 
                             {filteredSets.map((envSet, index) => {
                                 const isSelected = selectedSetId === envSet.id;

@@ -35,7 +35,8 @@ export const SettingsSchema = z.object({
     recentMachinePaths: z.array(z.object({
         machineId: z.string(),
         path: z.string(),
-        envSetId: z.string().optional(),
+        // null = user explicitly selected "None", undefined = use default, string = specific set
+        envSetId: z.string().nullish(),
         customEnvVars: z.record(z.string(), z.string()).optional(),
     })).describe('Last 10 machine-path combinations with environment settings'),
     lastUsedAgent: z.string().nullable().describe('Last selected agent type for new sessions'),
