@@ -363,10 +363,6 @@ const styles = StyleSheet.create((theme) => ({
         alignItems: 'center',
         gap: 6,
         paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        borderRadius: 6,
         alignSelf: 'flex-start',
     },
     addVariableText: {
