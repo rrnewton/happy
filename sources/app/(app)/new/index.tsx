@@ -739,6 +739,11 @@ function NewSessionScreen() {
 
     // Create
     const doCreate = React.useCallback(async (overrideInput?: string) => {
+        // Prevent duplicate sends
+        if (isSending) {
+            return;
+        }
+
         if (!selectedMachineId) {
             Modal.alert(t('common.error'), t('newSession.noMachineSelected'));
             return;
@@ -748,7 +753,7 @@ function NewSessionScreen() {
             return;
         }
 
-        // Clear input immediately for better UX (matches SessionView behavior)
+        // Save input before clearing - will restore on failure
         const currentInput = overrideInput ?? input;
         setInput('');
 
@@ -761,14 +766,16 @@ function NewSessionScreen() {
                 const worktreeResult = await createWorktree(selectedMachineId, selectedPath, worktreeName);
                 
                 if (!worktreeResult.success) {
+                    // Restore input on failure
+                    setInput(currentInput);
                     if (worktreeResult.error === 'Not a Git repository') {
                         Modal.alert(
-                            t('common.error'), 
+                            t('common.error'),
                             t('newSession.worktree.notGitRepo')
                         );
                     } else {
                         Modal.alert(
-                            t('common.error'), 
+                            t('common.error'),
                             t('newSession.worktree.failed', { error: worktreeResult.error || 'Unknown error' })
                         );
                     }
@@ -880,6 +887,9 @@ function NewSessionScreen() {
         } catch (error) {
             console.error('Failed to start session', error);
 
+            // Restore input on failure so user doesn't lose their work
+            setInput(currentInput);
+
             let errorMessage = 'Failed to start session. Make sure the daemon is running on the target machine.';
             if (error instanceof Error) {
                 if (error.message.includes('timeout')) {
@@ -893,7 +903,7 @@ function NewSessionScreen() {
         } finally {
             setIsSending(false);
         }
-    }, [agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments, selectedEnvSetId, customEnvVars, environmentSets]);
+    }, [isSending, agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments, selectedEnvSetId, customEnvVars, environmentSets]);
 
     // Keep doCreateRef updated for auto-send mode
     React.useEffect(() => {
