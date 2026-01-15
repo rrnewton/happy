@@ -60,6 +60,7 @@ export const pt: TranslationStructure = {
         retry: 'Tentar novamente',
         showMore: 'Mostrar mais',
         showLess: 'Mostrar menos',
+        delete: 'Excluir',
     },
 
     profile: {
@@ -108,6 +109,8 @@ export const pt: TranslationStructure = {
         machines: 'Máquinas',
         features: 'Recursos',
         social: 'Social',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
         account: 'Conta',
         accountSubtitle: 'Gerencie os detalhes da sua conta',
         appearance: 'Aparência',
@@ -1012,7 +1015,38 @@ export const pt: TranslationStructure = {
         output: 'Saída',
         expandAll: 'Expandir tudo',
         collapseAll: 'Recolher tudo',
-    }
+    },
+
+    settingsEnvironments: {
+        title: 'Conjuntos de Ambiente',
+        description: 'Crie conjuntos nomeados de variáveis de ambiente para usar ao iniciar novas sessões. Útil para alternar entre provedores de API ou configurações.',
+        empty: 'Nenhum conjunto de ambiente configurado',
+        addNew: 'Adicionar Conjunto de Ambiente',
+        edit: 'Editar Conjunto de Ambiente',
+        name: 'Nome',
+        namePlaceholder: 'ex.: Z.AI Produção',
+        nameRequired: 'Por favor, insira um nome para este conjunto de ambiente',
+        variables: 'Variáveis',
+        addVariable: 'Adicionar Variável',
+        noVariables: 'Nenhuma variável definida',
+        deleteTitle: 'Excluir Conjunto de Ambiente',
+        deleteConfirm: ({ name }: { name: string }) => `Tem certeza de que deseja excluir "${name}"?`,
+        helpText: 'Toque na estrela para definir como padrão. Toque em um conjunto de ambiente para editar ou excluir.',
+        tipText: 'Os conjuntos de ambiente são aplicados ao iniciar novas sessões. Variáveis como ANTHROPIC_BASE_URL e ANTHROPIC_AUTH_TOKEN podem ser usadas para conectar a diferentes provedores de API.',
+    },
+
+    environmentPicker: {
+        title: 'Selecionar Ambiente',
+        search: 'Buscar',
+        searchPlaceholder: 'Buscar conjuntos de ambiente...',
+        savedSets: 'Conjuntos de Ambiente Salvos',
+        none: 'Nenhum',
+        noneDescription: 'Usar ambiente padrão',
+        noSets: 'Nenhum conjunto de ambiente configurado. Adicione em Configurações > Variáveis de Ambiente.',
+        customForSession: 'Personalizado para Esta Sessão',
+        addCustomVariable: 'Adicionar Variável Personalizada',
+        customOnly: ({ count }: { count: number }) => `${count} variável${count !== 1 ? 's' : ''} personalizada${count !== 1 ? 's' : ''}`,
+    },
 } as const;
 
 export type TranslationsPt = typeof pt;

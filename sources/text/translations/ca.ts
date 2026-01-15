@@ -60,6 +60,7 @@ export const ca: TranslationStructure = {
         retry: 'Torna-ho a provar',
         showMore: 'Mostra més',
         showLess: 'Mostra menys',
+        delete: 'Elimina',
     },
 
     profile: {
@@ -108,6 +109,8 @@ export const ca: TranslationStructure = {
         machines: 'Màquines',
         features: 'Funcions',
         social: 'Social',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
         account: 'Compte',
         accountSubtitle: 'Gestiona els detalls del teu compte',
         appearance: 'Aparença',
@@ -1002,6 +1005,37 @@ export const ca: TranslationStructure = {
         toggleVoiceRecording: 'Alternar gravació de veu',
         archiveSession: 'Arxivar sessió',
         deleteSession: 'Eliminar sessió',
+    },
+
+    settingsEnvironments: {
+        title: 'Conjunts d\'entorn',
+        description: 'Crea conjunts nomenats de variables d\'entorn per usar quan s\'inicia noves sessions. Útil per canviar entre proveïdors d\'API o configuracions.',
+        empty: 'Cap conjunt d\'entorn configurat',
+        addNew: 'Afegir conjunt d\'entorn',
+        edit: 'Editar conjunt d\'entorn',
+        name: 'Nom',
+        namePlaceholder: 'p. ex., Z.AI Producció',
+        nameRequired: 'Si us plau, introdueix un nom per a aquest conjunt d\'entorn',
+        variables: 'Variables',
+        addVariable: 'Afegir variable',
+        noVariables: 'Cap variable definida',
+        deleteTitle: 'Eliminar conjunt d\'entorn',
+        deleteConfirm: ({ name }: { name: string }) => `Estàs segur que vols eliminar "${name}"?`,
+        helpText: 'Toca l\'estrella per establecer com a predeterminat. Toca un conjunt d\'entorn per editar-lo o eliminar-lo.',
+        tipText: 'Els conjunts d\'entorn s\'apliquen quan s\'inicia noves sessions. Variables com ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN es poden usar per connectar a diferents proveïdors d\'API.',
+    },
+
+    environmentPicker: {
+        title: 'Selecciona entorn',
+        search: 'Cercar',
+        searchPlaceholder: 'Cercar conjunts d\'entorn...',
+        savedSets: 'Conjunts d\'entorn desats',
+        none: 'Cap',
+        noneDescription: 'Usa l\'entorn per defecte',
+        noSets: 'Cap conjunt d\'entorn configurat. Afegeix-los a Configuració > Variables d\'entorn.',
+        customForSession: 'Personalitzat per a aquesta sessió',
+        addCustomVariable: 'Afegir variable personalitzada',
+        customOnly: ({ count }: { count: number }) => `${count} variable personalitzada${count !== 1 ? 's' : ''}`,
     },
 
     debug: {

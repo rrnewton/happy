@@ -152,7 +152,7 @@ function EditEnvironmentSetModal({
                 {/* Delete button on the left (only for existing sets) */}
                 {!isNew && onDelete ? (
                     <Pressable onPress={onDelete} style={styles.modalButton}>
-                        <Text style={[styles.modalButtonText, { color: theme.colors.destructive }]}>
+                        <Text style={[styles.modalButtonText, { color: theme.colors.textDestructive }]}>
                             {t('common.delete')}
                         </Text>
                     </Pressable>

@@ -71,6 +71,7 @@ export const pl: TranslationStructure = {
         retry: 'Ponów',
         showMore: 'Pokaż więcej',
         showLess: 'Pokaż mniej',
+        delete: 'Usuń',
     },
 
     profile: {
@@ -119,6 +120,8 @@ export const pl: TranslationStructure = {
         machines: 'Maszyny',
         features: 'Funkcje',
         social: 'Społeczność',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
         account: 'Konto',
         accountSubtitle: 'Zarządzaj szczegółami konta',
         appearance: 'Wygląd',
@@ -1036,6 +1039,37 @@ export const pl: TranslationStructure = {
         output: 'Dane wyjściowe',
         expandAll: 'Rozwiń wszystkie',
         collapseAll: 'Zwiń wszystkie',
+    },
+
+    settingsEnvironments: {
+        title: 'Zestawy Zmiennych Środowiskowych',
+        description: 'Utwórz nazwane zestawy zmiennych środowiskowych do użytku przy uruchamianiu nowych sesji. Przydatne do przełączania między dostawcami API lub konfiguracjami.',
+        empty: 'Brak skonfigurowanych zestawów zmiennych środowiskowych',
+        addNew: 'Dodaj Zestaw Zmiennych Środowiskowych',
+        edit: 'Edytuj Zestaw Zmiennych Środowiskowych',
+        name: 'Nazwa',
+        namePlaceholder: 'np. Z.AI Produkcja',
+        nameRequired: 'Proszę wpisać nazwę dla tego zestawu zmiennych środowiskowych',
+        variables: 'Zmienne',
+        addVariable: 'Dodaj Zmienną',
+        noVariables: 'Brak zdefiniowanych zmiennych',
+        deleteTitle: 'Usuń Zestaw Zmiennych Środowiskowych',
+        deleteConfirm: ({ name }: { name: string }) => `Czy na pewno chcesz usunąć "${name}"?`,
+        helpText: 'Dotknij gwiazdki, aby ustawić jako domyślną. Dotknij zestawu zmiennych środowiskowych, aby go edytować lub usunąć.',
+        tipText: 'Zestawy zmiennych środowiskowych są stosowane przy uruchamianiu nowych sesji. Zmienne takie jak ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN można użyć do połączenia z różnymi dostawcami API.',
+    },
+
+    environmentPicker: {
+        title: 'Wybierz Środowisko',
+        search: 'Wyszukiwanie',
+        searchPlaceholder: 'Wyszukaj zestawy zmiennych środowiskowych...',
+        savedSets: 'Zapisane Zestawy Zmiennych Środowiskowych',
+        none: 'Brak',
+        noneDescription: 'Użyj domyślnego środowiska',
+        noSets: 'Brak skonfigurowanych zestawów zmiennych środowiskowych. Dodaj je w Ustawienia > Zmienne Środowiskowe.',
+        customForSession: 'Niestandardowe dla Tej Sesji',
+        addCustomVariable: 'Dodaj Zmienną Niestandardową',
+        customOnly: ({ count }: { count: number }) => `${count} niestandardowa ${plural({ count, one: 'zmienna', few: 'zmienne', many: 'zmiennych' })}`,
     }
 } as const;
 

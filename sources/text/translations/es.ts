@@ -60,6 +60,7 @@ export const es: TranslationStructure = {
         retry: 'Reintentar',
         showMore: 'Mostrar más',
         showLess: 'Mostrar menos',
+        delete: 'Eliminar',
     },
 
     profile: {
@@ -108,6 +109,8 @@ export const es: TranslationStructure = {
         machines: 'Máquinas',
         features: 'Características',
         social: 'Social',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
         account: 'Cuenta',
         accountSubtitle: 'Gestiona los detalles de tu cuenta',
         appearance: 'Apariencia',
@@ -589,6 +592,39 @@ export const es: TranslationStructure = {
         systemPromptLabel: 'Indicación del sistema',
         systemPromptPlaceholder: 'p. ej., Usa siempre el modo estricto de TypeScript. Prefiere componentes funcionales sobre componentes de clase.',
         systemPromptHint: 'Tu indicación personalizada se combina con la indicación del sistema por defecto de Happy. Los cambios se aplican a todos los mensajes futuros.',
+    },
+
+    settingsEnvironments: {
+        // Environment variables settings screen
+        title: 'Conjuntos de variables de entorno',
+        description: 'Crea conjuntos nombrados de variables de entorno para usar al iniciar nuevas sesiones. Útil para cambiar entre diferentes proveedores de API o configuraciones.',
+        empty: 'Sin conjuntos de variables de entorno configurados',
+        addNew: 'Agregar conjunto de variables',
+        edit: 'Editar conjunto de variables',
+        name: 'Nombre',
+        namePlaceholder: 'p. ej., Z.AI Producción',
+        nameRequired: 'Por favor, ingresa un nombre para este conjunto de variables',
+        variables: 'Variables',
+        addVariable: 'Agregar variable',
+        noVariables: 'Sin variables definidas',
+        deleteTitle: 'Eliminar conjunto de variables',
+        deleteConfirm: ({ name }: { name: string }) => `¿Estás seguro de que quieres eliminar "${name}"?`,
+        helpText: 'Toca la estrella para establecer como predeterminado. Toca un conjunto de variables para editarlo o eliminarlo.',
+        tipText: 'Los conjuntos de variables se aplican al iniciar nuevas sesiones. Variables como ANTHROPIC_BASE_URL y ANTHROPIC_AUTH_TOKEN se pueden usar para conectarse a diferentes proveedores de API.',
+    },
+
+    environmentPicker: {
+        // Environment picker in new session screen
+        title: 'Seleccionar variables de entorno',
+        search: 'Buscar',
+        searchPlaceholder: 'Buscar conjuntos de variables de entorno...',
+        savedSets: 'Conjuntos de variables guardados',
+        none: 'Ninguno',
+        noneDescription: 'Usar variables de entorno predeterminadas',
+        noSets: 'Sin conjuntos de variables de entorno configurados. Agrégalos en Configuración > Variables de entorno.',
+        customForSession: 'Personalizado para esta sesión',
+        addCustomVariable: 'Agregar variable personalizada',
+        customOnly: ({ count }: { count: number }) => `${count} variable${count !== 1 ? 's' : ''} personalizada${count !== 1 ? 's' : ''}`,
     },
 
     settingsVoice: {

@@ -71,6 +71,7 @@ export const ru: TranslationStructure = {
         retry: 'Повторить',
         showMore: 'Показать больше',
         showLess: 'Показать меньше',
+        delete: 'Удалить',
     },
 
     connect: {
@@ -90,6 +91,8 @@ export const ru: TranslationStructure = {
         machines: 'Машины',
         features: 'Функции',
         social: 'Социальное',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
         account: 'Аккаунт',
         accountSubtitle: 'Управление учётной записью',
         appearance: 'Внешний вид',
@@ -1035,6 +1038,37 @@ export const ru: TranslationStructure = {
         output: 'Выходные данные',
         expandAll: 'Развернуть все',
         collapseAll: 'Свернуть все',
+    },
+
+    settingsEnvironments: {
+        title: 'Наборы переменных окружения',
+        description: 'Создавайте именованные наборы переменных окружения для использования при запуске новых сессий. Полезно для переключения между поставщиками API или конфигурациями.',
+        empty: 'Наборы переменных окружения не настроены',
+        addNew: 'Добавить набор переменных',
+        edit: 'Редактировать набор переменных',
+        name: 'Имя',
+        namePlaceholder: 'например, Z.AI Production',
+        nameRequired: 'Пожалуйста, введите имя для этого набора переменных',
+        variables: 'Переменные',
+        addVariable: 'Добавить переменную',
+        noVariables: 'Переменные не определены',
+        deleteTitle: 'Удалить набор переменных',
+        deleteConfirm: ({ name }: { name: string }) => `Вы уверены, что хотите удалить "${name}"?`,
+        helpText: 'Нажмите на звезду, чтобы установить как стандартный. Нажмите на набор переменных, чтобы редактировать или удалить его.',
+        tipText: 'Наборы переменных применяются при запуске новых сессий. Переменные вроде ANTHROPIC_BASE_URL и ANTHROPIC_AUTH_TOKEN могут использоваться для подключения к другим поставщикам API.',
+    },
+
+    environmentPicker: {
+        title: 'Выберите окружение',
+        search: 'Поиск',
+        searchPlaceholder: 'Поиск наборов переменных...',
+        savedSets: 'Сохранённые наборы переменных',
+        none: 'Нет',
+        noneDescription: 'Использовать окружение по умолчанию',
+        noSets: 'Наборы переменных не настроены. Добавьте их в Настройки > Переменные окружения.',
+        customForSession: 'Особое для этой сессии',
+        addCustomVariable: 'Добавить переменную для сессии',
+        customOnly: ({ count }: { count: number }) => `${count} переменная${count === 1 ? '' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? 'е' : ''}`,
     }
 } as const;
 
