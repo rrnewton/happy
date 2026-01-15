@@ -1,12 +1,16 @@
 import React from 'react';
-import { View, Text, Pressable, Platform } from 'react-native';
+import { View, Text, Pressable, Platform, TextInput } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/constants/Typography';
 import { t } from '@/text';
+import { Ionicons } from '@expo/vector-icons';
+import { generateWorktreeName } from '@/utils/generateWorktreeName';
 
 interface SessionTypeSelectorProps {
     value: 'simple' | 'worktree';
     onChange: (value: 'simple' | 'worktree') => void;
+    worktreeName: string;
+    onWorktreeNameChange: (name: string) => void;
 }
 
 const stylesheet = StyleSheet.create((theme) => ({
@@ -76,9 +80,35 @@ const stylesheet = StyleSheet.create((theme) => ({
         backgroundColor: theme.colors.divider,
         marginLeft: 48,
     },
+    worktreeNameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        paddingLeft: 48,
+        gap: 8,
+    },
+    worktreeNameInput: {
+        flex: 1,
+        backgroundColor: theme.colors.input.background,
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        fontSize: 14,
+        color: theme.colors.input.text,
+        ...Typography.default('regular'),
+    },
+    refreshButton: {
+        padding: 8,
+    },
 }));
 
-export const SessionTypeSelector: React.FC<SessionTypeSelectorProps> = ({ value, onChange }) => {
+export const SessionTypeSelector: React.FC<SessionTypeSelectorProps> = ({
+    value,
+    onChange,
+    worktreeName,
+    onWorktreeNameChange,
+}) => {
     const { theme } = useUnistyles();
     const styles = stylesheet;
 
@@ -86,10 +116,14 @@ export const SessionTypeSelector: React.FC<SessionTypeSelectorProps> = ({ value,
         onChange(type);
     };
 
+    const handleRefreshName = () => {
+        onWorktreeNameChange(generateWorktreeName());
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{t('newSession.sessionType.title')}</Text>
-            
+
             <Pressable
                 onPress={() => handlePress('simple')}
                 style={({ pressed }) => [
@@ -137,6 +171,35 @@ export const SessionTypeSelector: React.FC<SessionTypeSelectorProps> = ({ value,
                     </Text>
                 </View>
             </Pressable>
+
+            {/* Worktree name input - shown when worktree is selected */}
+            {value === 'worktree' && (
+                <View style={styles.worktreeNameContainer}>
+                    <TextInput
+                        style={styles.worktreeNameInput}
+                        value={worktreeName}
+                        onChangeText={onWorktreeNameChange}
+                        placeholder={t('newSession.sessionType.worktreeNamePlaceholder')}
+                        placeholderTextColor={theme.colors.input.placeholder}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                    <Pressable
+                        onPress={handleRefreshName}
+                        style={({ pressed }) => [
+                            styles.refreshButton,
+                            { opacity: pressed ? 0.5 : 1 }
+                        ]}
+                        hitSlop={8}
+                    >
+                        <Ionicons
+                            name="refresh"
+                            size={20}
+                            color={theme.colors.textSecondary}
+                        />
+                    </Pressable>
+                </View>
+            )}
         </View>
     );
 };

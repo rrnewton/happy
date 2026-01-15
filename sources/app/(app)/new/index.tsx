@@ -17,6 +17,7 @@ import { Modal } from '@/modal';
 import { sync } from '@/sync/sync';
 import { SessionTypeSelector } from '@/components/SessionTypeSelector';
 import { createWorktree } from '@/utils/createWorktree';
+import { generateWorktreeName } from '@/utils/generateWorktreeName';
 import { getTempData, type NewSessionData } from '@/utils/tempDataStore';
 import { linkTaskToSession } from '@/-zen/model/taskSessionLink';
 import { PermissionMode, ModelMode } from '@/components/PermissionModeSelector';
@@ -178,6 +179,7 @@ function NewSessionScreen() {
     });
     const [isSending, setIsSending] = React.useState(false);
     const [sessionType, setSessionType] = React.useState<'simple' | 'worktree'>('simple');
+    const [worktreeName, setWorktreeName] = React.useState(() => generateWorktreeName());
     const [manualResumeSessionId, setManualResumeSessionId] = React.useState(resumeClaudeSessionId || '');
     const ref = React.useRef<MultiTextInputHandle>(null);
 
@@ -756,7 +758,7 @@ function NewSessionScreen() {
             
             // Handle worktree creation if selected
             if (sessionType === 'worktree') {
-                const worktreeResult = await createWorktree(selectedMachineId, selectedPath);
+                const worktreeResult = await createWorktree(selectedMachineId, selectedPath, worktreeName);
                 
                 if (!worktreeResult.success) {
                     if (worktreeResult.error === 'Not a Git repository') {
@@ -923,6 +925,8 @@ function NewSessionScreen() {
                         <SessionTypeSelector
                             value={sessionType}
                             onChange={setSessionType}
+                            worktreeName={worktreeName}
+                            onWorktreeNameChange={setWorktreeName}
                         />
                     </View>
                 </View>

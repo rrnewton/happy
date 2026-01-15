@@ -303,6 +303,7 @@ export const pl: TranslationStructure = {
             simple: 'Prosta',
             worktree: 'Worktree',
             comingSoon: 'Wkrótce dostępne',
+            worktreeNamePlaceholder: 'Nazwa gałęzi (np. feature-login)',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `Tworzenie worktree '${name}'...`,

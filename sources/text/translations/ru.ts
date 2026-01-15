@@ -274,6 +274,7 @@ export const ru: TranslationStructure = {
             simple: 'Простая',
             worktree: 'Worktree',
             comingSoon: 'Скоро будет доступно',
+            worktreeNamePlaceholder: 'Название ветки (напр. feature-login)',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `Создание worktree '${name}'...`,

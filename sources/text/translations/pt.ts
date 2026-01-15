@@ -292,6 +292,7 @@ export const pt: TranslationStructure = {
             simple: 'Simples',
             worktree: 'Worktree',
             comingSoon: 'Em breve',
+            worktreeNamePlaceholder: 'Nome da branch (ex. feature-login)',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `Criando worktree '${name}'...`,

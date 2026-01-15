@@ -292,6 +292,7 @@ export const ca: TranslationStructure = {
             simple: 'Simple',
             worktree: 'Worktree',
             comingSoon: 'Properament',
+            worktreeNamePlaceholder: 'Nom de la branca (p. ex. feature-login)',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `Creant worktree '${name}'...`,

@@ -292,6 +292,7 @@ export const en = {
             simple: 'Simple',
             worktree: 'Worktree',
             comingSoon: 'Coming soon',
+            worktreeNamePlaceholder: 'Branch name (e.g. feature-login)',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `Creating worktree '${name}'...`,

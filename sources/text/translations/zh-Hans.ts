@@ -294,6 +294,7 @@ export const zhHans: TranslationStructure = {
             simple: '简单',
             worktree: 'Worktree',
             comingSoon: '即将推出',
+            worktreeNamePlaceholder: '分支名称（例如 feature-login）',
         },
         worktree: {
             creating: ({ name }: { name: string }) => `正在创建 worktree '${name}'...`,
