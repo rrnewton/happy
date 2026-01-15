@@ -194,7 +194,7 @@ function EnvironmentsSettingsScreen() {
     }, [environmentSets, setEnvironmentSets]);
 
     const handleEdit = useCallback((envSet: EnvironmentSet) => {
-        const modalRef = Modal.show({
+        const modalId = Modal.show({
             component: EditEnvironmentSetModal,
             props: {
                 envSet,
@@ -212,7 +212,7 @@ function EnvironmentsSettingsScreen() {
 
                     if (confirmed) {
                         setEnvironmentSets(environmentSets.filter(e => e.id !== envSet.id));
-                        modalRef.close();
+                        Modal.hide(modalId);
                     }
                 },
             }
