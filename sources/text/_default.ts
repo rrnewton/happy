@@ -609,7 +609,7 @@ export const en = {
         noVariables: 'No variables defined',
         deleteTitle: 'Delete Environment Set',
         deleteConfirm: ({ name }: { name: string }) => `Are you sure you want to delete "${name}"?`,
-        helpText: 'Long press an environment set to delete it. Tap the star to set as default.',
+        helpText: 'Tap the star to set as default. Tap an environment set to edit or delete it.',
         tipText: 'Environment sets are applied when starting new sessions. Variables like ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN can be used to connect to different API providers.',
     },
 
