@@ -445,12 +445,6 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         } as any);
     }, [commandPaletteEnabled]);
 
-    // Handler for open zen shortcut (⌘⇧E)
-    const handleOpenZen = useCallback(() => {
-        if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
-        router.push('/zen');
-    }, [router, commandPaletteEnabled]);
-
     // Handler for toggle sidebar shortcut (⌘B)
     const handleToggleSidebar = useCallback(() => {
         if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
@@ -468,9 +462,8 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         onNextSession: handleNextSession,
         onFocusSearch: handleFocusSearch,
         onShowKeyboardShortcuts: handleShowKeyboardShortcuts,
-        onOpenZen: handleOpenZen,
         onToggleSidebar: handleToggleSidebar,
-    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleToggleVoiceRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleOpenZen, handleToggleSidebar]);
+    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleToggleVoiceRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleToggleSidebar]);
 
     // Set up global keyboard handler only if feature is enabled
     useGlobalKeyboard(
