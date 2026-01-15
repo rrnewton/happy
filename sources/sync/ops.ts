@@ -142,6 +142,8 @@ export interface SpawnSessionOptions {
     token?: string;
     agent?: 'codex' | 'claude';
     resumeClaudeSessionId?: string;
+    /** Environment variables to pass to the spawned session */
+    environmentVariables?: Record<string, string>;
 }
 
 // Exported session operation functions
@@ -151,7 +153,7 @@ export interface SpawnSessionOptions {
  */
 export async function machineSpawnNewSession(options: SpawnSessionOptions): Promise<SpawnSessionResult> {
 
-    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, resumeClaudeSessionId } = options;
+    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, resumeClaudeSessionId, environmentVariables } = options;
 
     try {
         const result = await apiSocket.machineRPC<SpawnSessionResult, {
@@ -160,11 +162,12 @@ export async function machineSpawnNewSession(options: SpawnSessionOptions): Prom
             approvedNewDirectoryCreation?: boolean,
             token?: string,
             agent?: 'codex' | 'claude',
-            resumeClaudeSessionId?: string
+            resumeClaudeSessionId?: string,
+            environmentVariables?: Record<string, string>
         }>(
             machineId,
             'spawn-happy-session',
-            { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, resumeClaudeSessionId }
+            { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, resumeClaudeSessionId, environmentVariables }
         );
         return result;
     } catch (error) {

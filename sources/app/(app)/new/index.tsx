@@ -39,8 +39,16 @@ export const callbacks = {
     }
 }
 
+// Type for recent machine paths with environment settings
+type RecentMachinePath = {
+    machineId: string;
+    path: string;
+    envSetId?: string;
+    customEnvVars?: Record<string, string>;
+};
+
 // Helper function to get the most recent path for a machine from settings or sessions
-const getRecentPathForMachine = (machineId: string | null, recentPaths: Array<{ machineId: string; path: string }>): string => {
+const getRecentPathForMachine = (machineId: string | null, recentPaths: RecentMachinePath[]): string => {
     if (!machineId) return '/home/';
 
     // First check recent paths from settings
@@ -76,16 +84,47 @@ const getRecentPathForMachine = (machineId: string | null, recentPaths: Array<{ 
     return pathsWithTimestamps[0]?.path || defaultPath;
 };
 
+// Helper function to get last used environment for a machine+path combination
+const getRecentEnvForPath = (
+    machineId: string | null,
+    path: string,
+    recentPaths: RecentMachinePath[],
+    environmentSets: Array<{ id: string; isDefault?: boolean }>
+): { envSetId: string | null; customEnvVars: Record<string, string> } => {
+    if (!machineId) return { envSetId: null, customEnvVars: {} };
+
+    // Find matching recent entry for this machine+path
+    const recentEntry = recentPaths.find(rp => rp.machineId === machineId && rp.path === path);
+    if (recentEntry) {
+        return {
+            envSetId: recentEntry.envSetId || null,
+            customEnvVars: recentEntry.customEnvVars || {},
+        };
+    }
+
+    // Fallback to default environment set
+    const defaultSet = environmentSets.find(s => s.isDefault);
+    return {
+        envSetId: defaultSet?.id || null,
+        customEnvVars: {},
+    };
+};
+
 // Helper function to update recent machine paths
 const updateRecentMachinePaths = (
-    currentPaths: Array<{ machineId: string; path: string }>,
+    currentPaths: RecentMachinePath[],
     machineId: string,
-    path: string
-): Array<{ machineId: string; path: string }> => {
-    // Remove any existing entry for this machine
-    const filtered = currentPaths.filter(rp => rp.machineId !== machineId);
+    path: string,
+    envSetId?: string | null,
+    customEnvVars?: Record<string, string>
+): RecentMachinePath[] => {
+    // Remove any existing entry for this machine+path combination
+    const filtered = currentPaths.filter(rp => !(rp.machineId === machineId && rp.path === path));
     // Add new entry at the beginning
-    const updated = [{ machineId, path }, ...filtered];
+    const newEntry: RecentMachinePath = { machineId, path };
+    if (envSetId) newEntry.envSetId = envSetId;
+    if (customEnvVars && Object.keys(customEnvVars).length > 0) newEntry.customEnvVars = customEnvVars;
+    const updated = [newEntry, ...filtered];
     // Keep only the last 10 entries
     return updated.slice(0, 10);
 };
@@ -94,12 +133,14 @@ function NewSessionScreen() {
     const { theme } = useUnistyles();
     const router = useRouter();
     const maxWidth = useResponsiveMaxWidth();
-    const { prompt, dataId, selectedMachineId: selectedMachineIdParam, selectedPathParam, resumeClaudeSessionId } = useLocalSearchParams<{
+    const { prompt, dataId, selectedMachineId: selectedMachineIdParam, selectedPathParam, resumeClaudeSessionId, selectedEnvSetId: selectedEnvSetIdParam, customEnvVarsJson } = useLocalSearchParams<{
         prompt?: string;
         dataId?: string;
         selectedMachineId?: string;
         selectedPathParam?: string;
         resumeClaudeSessionId?: string;
+        selectedEnvSetId?: string;
+        customEnvVarsJson?: string;
     }>();
 
     // Try to get data from temporary store first, fallback to direct prompt parameter
@@ -281,6 +322,30 @@ function NewSessionScreen() {
     const lastUsedAgent = useSetting('lastUsedAgent');
     const lastUsedPermissionMode = useSetting('lastUsedPermissionMode');
     const lastUsedModelMode = useSetting('lastUsedModelMode');
+    const environmentSets = useSetting('environmentSets');
+
+    //
+    // Environment selection state
+    //
+    const [selectedEnvSetId, setSelectedEnvSetId] = React.useState<string | null>(() => {
+        // Check if env set was provided in URL params
+        if (selectedEnvSetIdParam) {
+            return selectedEnvSetIdParam || null;
+        }
+        // Otherwise, find default environment set
+        const defaultSet = environmentSets.find(s => s.isDefault);
+        return defaultSet?.id || null;
+    });
+    const [customEnvVars, setCustomEnvVars] = React.useState<Record<string, string>>(() => {
+        if (customEnvVarsJson) {
+            try {
+                return JSON.parse(customEnvVarsJson);
+            } catch {
+                return {};
+            }
+        }
+        return {};
+    });
 
     //
     // Machines state
@@ -386,6 +451,35 @@ function NewSessionScreen() {
         router.navigate('/new/pick/machine');
     }, []);
 
+    const handleEnvironmentClick = React.useCallback(() => {
+        router.navigate({
+            pathname: '/new/pick/environment',
+            params: {
+                selectedEnvSetId: selectedEnvSetId || '',
+                customEnvVarsJson: Object.keys(customEnvVars).length > 0 ? JSON.stringify(customEnvVars) : '',
+            }
+        });
+    }, [selectedEnvSetId, customEnvVars, router]);
+
+    // Get display name for selected environment
+    const selectedEnvDisplayName = React.useMemo(() => {
+        if (!selectedEnvSetId && Object.keys(customEnvVars).length === 0) {
+            return t('environmentPicker.none');
+        }
+        const selectedSet = environmentSets.find(s => s.id === selectedEnvSetId);
+        if (selectedSet) {
+            const customCount = Object.keys(customEnvVars).length;
+            if (customCount > 0) {
+                return `${selectedSet.name} +${customCount}`;
+            }
+            return selectedSet.name;
+        }
+        if (Object.keys(customEnvVars).length > 0) {
+            return t('environmentPicker.customOnly', { count: Object.keys(customEnvVars).length });
+        }
+        return t('environmentPicker.none');
+    }, [selectedEnvSetId, customEnvVars, environmentSets]);
+
     //
     // Agent selection
     //
@@ -484,6 +578,29 @@ function NewSessionScreen() {
             router.navigate(`/new/pick/path?machineId=${selectedMachineId}`);
         }
     }, [selectedMachineId, router]);
+
+    // Handle environment selection from navigation params
+    React.useEffect(() => {
+        if (selectedEnvSetIdParam !== undefined) {
+            setSelectedEnvSetId(selectedEnvSetIdParam || null);
+        }
+        if (customEnvVarsJson) {
+            try {
+                setCustomEnvVars(JSON.parse(customEnvVarsJson));
+            } catch {
+                setCustomEnvVars({});
+            }
+        }
+    }, [selectedEnvSetIdParam, customEnvVarsJson]);
+
+    // Update environment selection when path changes (restore last used env for this path)
+    React.useEffect(() => {
+        if (selectedMachineId && selectedPath && !selectedEnvSetIdParam && !customEnvVarsJson) {
+            const envInfo = getRecentEnvForPath(selectedMachineId, selectedPath, recentMachinePaths, environmentSets);
+            setSelectedEnvSetId(envInfo.envSetId);
+            setCustomEnvVars(envInfo.customEnvVars);
+        }
+    }, [selectedMachineId, selectedPath, recentMachinePaths, environmentSets, selectedEnvSetIdParam, customEnvVarsJson]);
 
     // Get selected machine name
     const selectedMachine = React.useMemo(() => {
@@ -634,9 +751,26 @@ function NewSessionScreen() {
                 actualPath = worktreeResult.worktreePath;
             }
 
-            // Save the machine-path combination to settings before sending
-            const updatedPaths = updateRecentMachinePaths(recentMachinePaths, selectedMachineId, selectedPath);
+            // Save the machine-path-env combination to settings before sending
+            const updatedPaths = updateRecentMachinePaths(
+                recentMachinePaths,
+                selectedMachineId,
+                selectedPath,
+                selectedEnvSetId,
+                customEnvVars
+            );
             sync.applySettings({ recentMachinePaths: updatedPaths });
+
+            // Merge environment variables: global set + custom overrides
+            let mergedEnvVars: Record<string, string> = {};
+            if (selectedEnvSetId) {
+                const selectedSet = environmentSets.find(s => s.id === selectedEnvSetId);
+                if (selectedSet) {
+                    mergedEnvVars = { ...selectedSet.variables };
+                }
+            }
+            // Custom vars override global set vars
+            mergedEnvVars = { ...mergedEnvVars, ...customEnvVars };
 
             const result = await machineSpawnNewSession({
                 machineId: selectedMachineId,
@@ -644,7 +778,9 @@ function NewSessionScreen() {
                 // For now we assume you already have a path to start in
                 approvedNewDirectoryCreation: true,
                 agent: agentType,
-                resumeClaudeSessionId: manualResumeSessionId || resumeClaudeSessionId
+                resumeClaudeSessionId: manualResumeSessionId || resumeClaudeSessionId,
+                // Pass merged environment variables
+                environmentVariables: Object.keys(mergedEnvVars).length > 0 ? mergedEnvVars : undefined,
             });
 
             // Use sessionId to check for success for backwards compatibility
@@ -728,7 +864,7 @@ function NewSessionScreen() {
         } finally {
             setIsSending(false);
         }
-    }, [agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments]);
+    }, [agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments, selectedEnvSetId, customEnvVars, environmentSets]);
 
     // Keep doCreateRef updated for auto-send mode
     React.useEffect(() => {
@@ -833,6 +969,44 @@ function NewSessionScreen() {
                                 ...Typography.default('semiBold'),
                             }}>
                                 {selectedPath}
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
+
+                {/* Environment picker */}
+                <View style={[
+                    { paddingHorizontal: screenWidth > 700 ? 16 : 8, flexDirection: 'row', justifyContent: 'center' }
+                ]}>
+                    <View style={[
+                        { maxWidth, flex: 1 }
+                    ]}>
+                        <Pressable
+                            onPress={handleEnvironmentClick}
+                            style={(p) => ({
+                                backgroundColor: theme.colors.input.background,
+                                borderRadius: Platform.select({ default: 16, android: 20 }),
+                                paddingHorizontal: 12,
+                                paddingVertical: 10,
+                                marginBottom: 8,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                opacity: p.pressed ? 0.7 : 1,
+                            })}
+                        >
+                            <Ionicons
+                                name="key-outline"
+                                size={14}
+                                color={selectedEnvSetId || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint}
+                            />
+                            <Text style={{
+                                fontSize: 13,
+                                color: selectedEnvSetId || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint,
+                                fontWeight: '600',
+                                marginLeft: 6,
+                                ...Typography.default('semiBold'),
+                            }}>
+                                {selectedEnvDisplayName}
                             </Text>
                         </Pressable>
                     </View>

@@ -118,6 +118,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                environmentSets: [],
             };
             const delta: Partial<Settings> = {
                 viewInline: true
@@ -155,6 +156,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                environmentSets: [],
             };
             const delta: Partial<Settings> = {};
             expect(applySettings(currentSettings, delta)).toEqual({
@@ -190,6 +192,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                environmentSets: [],
             };
             const delta: Partial<Settings> = {
                 viewInline: false
@@ -227,6 +230,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                environmentSets: [],
             };
             expect(applySettings(currentSettings, {})).toEqual({
                 ...settingsDefaults,
@@ -276,6 +280,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                environmentSets: [],
             };
             const delta: any = {
                 viewInline: false,

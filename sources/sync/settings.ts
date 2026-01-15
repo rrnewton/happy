@@ -4,6 +4,16 @@ import * as z from 'zod';
 // Schema
 //
 
+// Environment variable set schema
+const EnvironmentSetSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    variables: z.record(z.string(), z.string()),
+    isDefault: z.boolean().optional(),
+});
+
+export type EnvironmentSet = z.infer<typeof EnvironmentSetSchema>;
+
 export const SettingsSchema = z.object({
     viewInline: z.boolean().describe('Whether to view inline tool calls'),
     inferenceOpenAIKey: z.string().nullish().describe('OpenAI API key for inference'),
@@ -24,8 +34,10 @@ export const SettingsSchema = z.object({
     preferredLanguage: z.string().nullable().describe('Preferred UI language (null for auto-detect from device locale)'),
     recentMachinePaths: z.array(z.object({
         machineId: z.string(),
-        path: z.string()
-    })).describe('Last 10 machine-path combinations, ordered by most recent first'),
+        path: z.string(),
+        envSetId: z.string().optional(),
+        customEnvVars: z.record(z.string(), z.string()).optional(),
+    })).describe('Last 10 machine-path combinations with environment settings'),
     lastUsedAgent: z.string().nullable().describe('Last selected agent type for new sessions'),
     lastUsedPermissionMode: z.string().nullable().describe('Last selected permission mode for new sessions'),
     lastUsedModelMode: z.string().nullable().describe('Last selected model mode for new sessions'),
@@ -37,6 +49,8 @@ export const SettingsSchema = z.object({
     // Session read tracking - keyed by sessionId, value is timestamp when last viewed
     // Used for unread indicators, synced across devices
     sessionLastReadAt: z.record(z.string(), z.number()).describe('Last read timestamp per session for unread indicators'),
+    // Environment variable sets for session configuration
+    environmentSets: z.array(EnvironmentSetSchema).describe('Named sets of environment variables for sessions'),
 });
 
 //
@@ -84,6 +98,7 @@ export const settingsDefaults: Settings = {
     whisperVocabulary: null,
     customSystemPrompt: null,
     sessionLastReadAt: {},
+    environmentSets: [],
 };
 Object.freeze(settingsDefaults);
 

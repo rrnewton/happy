@@ -60,6 +60,7 @@ export const en = {
         retry: 'Retry',
         showMore: 'Show more',
         showLess: 'Show less',
+        delete: 'Delete',
     },
 
     profile: {
@@ -138,6 +139,8 @@ export const en = {
         exchangingTokens: 'Exchanging tokens...',
         usage: 'Usage',
         usageSubtitle: 'View your API usage and costs',
+        environments: 'Environment Variables',
+        environmentsSubtitle: 'Configure environment variable sets',
 
         // Dynamic settings messages
         accountConnected: ({ service }: { service: string }) => `${service} account connected`,
@@ -589,6 +592,39 @@ export const en = {
         systemPromptLabel: 'System Prompt',
         systemPromptPlaceholder: 'e.g., Always use TypeScript strict mode. Prefer functional components over class components.',
         systemPromptHint: 'Your custom prompt is combined with the default Happy system prompt. Changes apply to all future messages.',
+    },
+
+    settingsEnvironments: {
+        // Environment variables settings screen
+        title: 'Environment Sets',
+        description: 'Create named sets of environment variables to use when starting new sessions. Useful for switching between API providers or configurations.',
+        empty: 'No environment sets configured',
+        addNew: 'Add Environment Set',
+        edit: 'Edit Environment Set',
+        name: 'Name',
+        namePlaceholder: 'e.g., Z.AI Production',
+        nameRequired: 'Please enter a name for this environment set',
+        variables: 'Variables',
+        addVariable: 'Add Variable',
+        noVariables: 'No variables defined',
+        deleteTitle: 'Delete Environment Set',
+        deleteConfirm: ({ name }: { name: string }) => `Are you sure you want to delete "${name}"?`,
+        helpText: 'Long press an environment set to delete it. Tap the star to set as default.',
+        tipText: 'Environment sets are applied when starting new sessions. Variables like ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN can be used to connect to different API providers.',
+    },
+
+    environmentPicker: {
+        // Environment picker in new session screen
+        title: 'Select Environment',
+        search: 'Search',
+        searchPlaceholder: 'Search environment sets...',
+        savedSets: 'Saved Environment Sets',
+        none: 'None',
+        noneDescription: 'Use default environment',
+        noSets: 'No environment sets configured. Add them in Settings > Environment Variables.',
+        customForSession: 'Custom for This Session',
+        addCustomVariable: 'Add Custom Variable',
+        customOnly: ({ count }: { count: number }) => `${count} custom variable${count !== 1 ? 's' : ''}`,
     },
 
     settingsVoice: {
