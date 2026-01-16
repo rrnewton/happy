@@ -169,7 +169,9 @@ export const lightTheme = {
 
         // Message View colors
         userMessageBackground: '#f0eee6',
+        userMessageBackgroundHighContrast: '#FFE066', // Vibrant yellow for high contrast mode
         userMessageText: '#000000',
+        userMessageTextHighContrast: '#000000',
         agentMessageText: '#000000',
         agentEventText: '#666666',
         thinkingBackground: '#F5F0FF',
@@ -395,8 +397,10 @@ export const darkTheme = {
         },
 
         // Message View colors
-        userMessageBackground: '#2C2C2E',
+        userMessageBackground: '#3A352E',
+        userMessageBackgroundHighContrast: '#1E5AA8', // Vibrant blue for high contrast mode in dark theme
         userMessageText: '#FFFFFF',
+        userMessageTextHighContrast: '#FFFFFF',
         agentMessageText: '#FFFFFF',
         agentEventText: '#8E8E93',
         thinkingBackground: '#2A2440',

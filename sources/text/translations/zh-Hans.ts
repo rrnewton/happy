@@ -193,6 +193,8 @@ export const zhHans: TranslationStructure = {
         compactSessionViewDescription: '以更紧凑的布局显示活跃会话',
         wideContentView: '宽内容视图',
         wideContentViewDescription: '使用全宽显示内容而不是受限容器。表格和宽内容将有更多空间。',
+        highContrastMessages: '高对比度消息',
+        highContrastMessagesDescription: '使用鲜艳的颜色使您发送的消息更加醒目',
     },
 
     settingsFeatures: {

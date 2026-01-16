@@ -191,6 +191,8 @@ export const ca: TranslationStructure = {
         compactSessionViewDescription: 'Mostra les sessions actives en un disseny més compacte',
         wideContentView: 'Vista ampla de contingut',
         wideContentViewDescription: "Utilitza l'amplada completa per al contingut en lloc d'un contenidor restringit. Les taules i el contingut ample tindran més espai.",
+        highContrastMessages: "Missatges d'alt contrast",
+        highContrastMessagesDescription: "Utilitza colors més vius perquè els teus missatges enviats destaquin més",
     },
 
     settingsFeatures: {

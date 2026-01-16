@@ -191,6 +191,8 @@ export const pt: TranslationStructure = {
         compactSessionViewDescription: 'Mostrar sessões ativas em um layout mais compacto',
         wideContentView: 'Visualização ampla de conteúdo',
         wideContentViewDescription: 'Usar largura total para o conteúdo em vez de contêiner restrito. Tabelas e conteúdo largo terão mais espaço.',
+        highContrastMessages: 'Mensagens de alto contraste',
+        highContrastMessagesDescription: 'Usar cores vibrantes para que suas mensagens enviadas se destaquem mais',
     },
 
     settingsFeatures: {

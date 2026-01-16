@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View, Text } from "react-native";
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { MarkdownView } from "./markdown/MarkdownView";
 import { t } from '@/text';
 import { Message, UserTextMessage, AgentTextMessage, ToolCallMessage, ThinkingMessage, SubAgentInvocation } from "@/sync/typesMessage";
@@ -11,6 +11,7 @@ import { AgentEvent } from "@/sync/typesRaw";
 import { sync } from '@/sync/sync';
 import { Option } from './markdown/MarkdownView';
 import { MessageImage } from './MessageImage';
+import { useSetting } from '@/sync/storage';
 
 export const MessageView = React.memo((props: {
   message: Message;
@@ -95,6 +96,9 @@ function UserTextBlock(props: {
   sessionId: string;
   onOptionEdit?: (text: string) => void;
 }) {
+  const { theme } = useUnistyles();
+  const highContrastMessages = useSetting('highContrastMessages');
+
   const handleOptionPress = React.useCallback((option: Option) => {
     sync.sendMessage(props.sessionId, option.title);
   }, [props.sessionId]);
@@ -106,9 +110,16 @@ function UserTextBlock(props: {
   const hasImages = props.message.images && props.message.images.length > 0;
   const hasText = props.message.text.length > 0;
 
+  const bubbleStyle = React.useMemo(() => [
+    styles.userMessageBubble,
+    highContrastMessages && {
+      backgroundColor: theme.colors.userMessageBackgroundHighContrast,
+    }
+  ], [highContrastMessages, theme.colors.userMessageBackgroundHighContrast]);
+
   return (
     <View style={styles.userMessageContainer}>
-      <View style={styles.userMessageBubble}>
+      <View style={bubbleStyle}>
         {hasText && (
           <MarkdownView markdown={props.message.displayText || props.message.text} onOptionPress={handleOptionPress} onOptionEdit={handleOptionEdit} />
         )}

@@ -173,6 +173,8 @@ export const ru: TranslationStructure = {
         compactSessionViewDescription: 'Отображать активные сессии в более компактном виде',
         wideContentView: 'Широкий вид контента',
         wideContentViewDescription: 'Использовать полную ширину для контента вместо ограниченного контейнера. Таблицы и широкий контент будут иметь больше места.',
+        highContrastMessages: 'Контрастные сообщения',
+        highContrastMessagesDescription: 'Использовать яркие цвета для ваших сообщений, чтобы они лучше выделялись',
     },
 
     settingsFeatures: {

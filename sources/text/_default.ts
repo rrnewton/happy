@@ -191,6 +191,8 @@ export const en = {
         compactSessionViewDescription: 'Show active sessions in a more compact layout',
         wideContentView: 'Wide Content View',
         wideContentViewDescription: 'Use full width for content instead of constrained container. Tables and wide content will have more space.',
+        highContrastMessages: 'High Contrast Messages',
+        highContrastMessagesDescription: 'Use vibrant colors to make your sent messages more visually distinct',
     },
 
     settingsFeatures: {
