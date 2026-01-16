@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 const serverConfigStorage = new MMKV({ id: 'server-config' });
 
 const SERVER_KEY = 'custom-server-url';
-const PRODUCTION_SERVER_URL = 'https://happy-server.reily.app';
+const PRODUCTION_SERVER_URL = 'https://happy-server.innopals.com';
 
 // Default server port when running locally (used for local development)
 // This can be overridden at runtime via URL hash parameter
