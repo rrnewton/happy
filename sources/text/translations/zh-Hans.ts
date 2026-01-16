@@ -1051,5 +1051,6 @@ export const zhHans: TranslationStructure = {
         customForSession: '此会话的自定义变量',
         addCustomVariable: '添加自定义变量',
         customOnly: ({ count }: { count: number }) => `${count} 个自定义变量`,
+        selected: '已选择',
     }
 } as const;

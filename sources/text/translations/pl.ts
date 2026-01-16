@@ -1073,6 +1073,7 @@ export const pl: TranslationStructure = {
         customForSession: 'Niestandardowe dla Tej Sesji',
         addCustomVariable: 'Dodaj Zmienną Niestandardową',
         customOnly: ({ count }: { count: number }) => `${count} niestandardowa ${plural({ count, one: 'zmienna', few: 'zmienne', many: 'zmiennych' })}`,
+        selected: 'Wybrano',
     }
 } as const;
 

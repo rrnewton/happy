@@ -361,7 +361,6 @@ export default function EnvironmentPickerScreen() {
                         <ItemGroup title={t('environmentPicker.savedSets')}>
                             {filteredSets.map((envSet, index) => {
                                 const isSelected = selectedSetIds.includes(envSet.id);
-                                const selectionOrder = isSelected ? selectedSetIds.indexOf(envSet.id) + 1 : null;
                                 const isLast = index === filteredSets.length - 1;
 
                                 return (
@@ -370,32 +369,11 @@ export default function EnvironmentPickerScreen() {
                                         title={envSet.name}
                                         subtitle={formatVariables(envSet.variables)}
                                         leftElement={
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                                <Ionicons
-                                                    name={isSelected ? "checkbox" : "square-outline"}
-                                                    size={20}
-                                                    color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
-                                                />
-                                                {selectionOrder !== null && (
-                                                    <View style={{
-                                                        backgroundColor: theme.colors.textLink,
-                                                        borderRadius: 10,
-                                                        minWidth: 20,
-                                                        height: 20,
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                        paddingHorizontal: 6,
-                                                    }}>
-                                                        <Text style={{
-                                                            color: '#fff',
-                                                            fontSize: 12,
-                                                            fontWeight: '600',
-                                                        }}>
-                                                            {selectionOrder}
-                                                        </Text>
-                                                    </View>
-                                                )}
-                                            </View>
+                                            <Ionicons
+                                                name={isSelected ? "checkbox" : "square-outline"}
+                                                size={20}
+                                                color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
+                                            />
                                         }
                                         rightElement={
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -432,6 +410,27 @@ export default function EnvironmentPickerScreen() {
                                 <View style={{ padding: 16, alignItems: 'center' }}>
                                     <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
                                         {t('environmentPicker.noSets')}
+                                    </Text>
+                                </View>
+                            )}
+
+                            {/* Selection order summary */}
+                            {selectedSetIds.length > 0 && (
+                                <View style={{
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 12,
+                                    borderTopWidth: 0.5,
+                                    borderTopColor: theme.colors.divider,
+                                }}>
+                                    <Text style={{
+                                        ...Typography.default(),
+                                        fontSize: 13,
+                                        color: theme.colors.textSecondary,
+                                    }}>
+                                        {t('environmentPicker.selected')}: {selectedSetIds.map(id => {
+                                            const set = environmentSets.find(s => s.id === id);
+                                            return set?.name;
+                                        }).filter(Boolean).join(', ')}
                                     </Text>
                                 </View>
                             )}

@@ -628,6 +628,7 @@ export const es: TranslationStructure = {
         customForSession: 'Personalizado para esta sesión',
         addCustomVariable: 'Agregar variable personalizada',
         customOnly: ({ count }: { count: number }) => `${count} variable${count !== 1 ? 's' : ''} personalizada${count !== 1 ? 's' : ''}`,
+        selected: 'Seleccionado',
     },
 
     settingsVoice: {

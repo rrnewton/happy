@@ -628,6 +628,7 @@ export const en = {
         customForSession: 'Custom for This Session',
         addCustomVariable: 'Add Custom Variable',
         customOnly: ({ count }: { count: number }) => `${count} custom variable${count !== 1 ? 's' : ''}`,
+        selected: 'Selected',
     },
 
     settingsVoice: {

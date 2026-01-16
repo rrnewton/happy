@@ -1072,6 +1072,7 @@ export const ru: TranslationStructure = {
         customForSession: 'Особое для этой сессии',
         addCustomVariable: 'Добавить переменную для сессии',
         customOnly: ({ count }: { count: number }) => `${count} переменная${count === 1 ? '' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? 'е' : ''}`,
+        selected: 'Выбрано',
     }
 } as const;
 

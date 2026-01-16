@@ -1049,6 +1049,7 @@ export const pt: TranslationStructure = {
         customForSession: 'Personalizado para Esta Sessão',
         addCustomVariable: 'Adicionar Variável Personalizada',
         customOnly: ({ count }: { count: number }) => `${count} variável${count !== 1 ? 's' : ''} personalizada${count !== 1 ? 's' : ''}`,
+        selected: 'Selecionado',
     },
 } as const;
 
