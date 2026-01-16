@@ -1058,8 +1058,8 @@ export const pl: TranslationStructure = {
         noVariables: 'Brak zdefiniowanych zmiennych',
         deleteTitle: 'Usuń Zestaw Zmiennych Środowiskowych',
         deleteConfirm: ({ name }: { name: string }) => `Czy na pewno chcesz usunąć "${name}"?`,
-        helpText: 'Dotknij gwiazdki, aby ustawić jako domyślną. Dotknij zestawu zmiennych środowiskowych, aby go edytować lub usunąć.',
-        tipText: 'Zestawy zmiennych środowiskowych są stosowane przy uruchamianiu nowych sesji. Zmienne takie jak ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN można użyć do połączenia z różnymi dostawcami API.',
+        helpText: 'Dotknij gwiazdki, aby stosować domyślnie. Kilka zestawów może być oznaczonych jako domyślne. Dotknij zestawu zmiennych środowiskowych, aby go edytować lub usunąć.',
+        tipText: 'Zestawy zmiennych środowiskowych są stosowane przy uruchamianiu nowych sesji. Można wybrać kilka zestawów do połączenia (późniejsze zestawy nadpisują wcześniejsze). Zmienne takie jak ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN można użyć do połączenia z różnymi dostawcami API.',
     },
 
     environmentPicker: {

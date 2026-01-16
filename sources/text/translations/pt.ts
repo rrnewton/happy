@@ -1034,8 +1034,8 @@ export const pt: TranslationStructure = {
         noVariables: 'Nenhuma variável definida',
         deleteTitle: 'Excluir Conjunto de Ambiente',
         deleteConfirm: ({ name }: { name: string }) => `Tem certeza de que deseja excluir "${name}"?`,
-        helpText: 'Toque na estrela para definir como padrão. Toque em um conjunto de ambiente para editar ou excluir.',
-        tipText: 'Os conjuntos de ambiente são aplicados ao iniciar novas sessões. Variáveis como ANTHROPIC_BASE_URL e ANTHROPIC_AUTH_TOKEN podem ser usadas para conectar a diferentes provedores de API.',
+        helpText: 'Toque na estrela para aplicar por padrão. Vários conjuntos podem ser marcados como padrão. Toque em um conjunto de ambiente para editar ou excluir.',
+        tipText: 'Os conjuntos de ambiente são aplicados ao iniciar novas sessões. Vários conjuntos podem ser selecionados e mesclados (conjuntos posteriores sobrescrevem anteriores). Variáveis como ANTHROPIC_BASE_URL e ANTHROPIC_AUTH_TOKEN podem ser usadas para conectar a diferentes provedores de API.',
     },
 
     environmentPicker: {

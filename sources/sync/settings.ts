@@ -9,7 +9,9 @@ const EnvironmentSetSchema = z.object({
     id: z.string(),
     name: z.string(),
     variables: z.record(z.string(), z.string()),
-    isDefault: z.boolean().optional(),
+    // If true, this set is automatically selected when opening a new folder
+    // Multiple sets can have this flag set to true
+    applyByDefault: z.boolean().optional(),
 });
 
 export type EnvironmentSet = z.infer<typeof EnvironmentSetSchema>;
@@ -36,8 +38,10 @@ export const SettingsSchema = z.object({
     recentMachinePaths: z.array(z.object({
         machineId: z.string(),
         path: z.string(),
-        // null = user explicitly selected "None", undefined = use default, string = specific set
-        envSetId: z.string().nullish(),
+        // Ordered array of selected environment set IDs
+        // Empty array = user explicitly selected no environment sets
+        // undefined = use defaults (all sets with applyByDefault=true)
+        envSetIds: z.array(z.string()).optional(),
         customEnvVars: z.record(z.string(), z.string()).optional(),
     })).describe('Last 10 machine-path combinations with environment settings'),
     lastUsedAgent: z.string().nullable().describe('Last selected agent type for new sessions'),

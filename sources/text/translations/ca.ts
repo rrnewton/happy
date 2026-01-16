@@ -1024,8 +1024,8 @@ export const ca: TranslationStructure = {
         noVariables: 'Cap variable definida',
         deleteTitle: 'Eliminar conjunt d\'entorn',
         deleteConfirm: ({ name }: { name: string }) => `Estàs segur que vols eliminar "${name}"?`,
-        helpText: 'Toca l\'estrella per establecer com a predeterminat. Toca un conjunt d\'entorn per editar-lo o eliminar-lo.',
-        tipText: 'Els conjunts d\'entorn s\'apliquen quan s\'inicia noves sessions. Variables com ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN es poden usar per connectar a diferents proveïdors d\'API.',
+        helpText: 'Toca l\'estrella per aplicar per defecte. Es poden marcar diversos conjunts com a predeterminats. Toca un conjunt d\'entorn per editar-lo o eliminar-lo.',
+        tipText: 'Els conjunts d\'entorn s\'apliquen quan s\'inicia noves sessions. Es poden seleccionar diversos conjunts i combinar-los (els conjunts posteriors sobreescriuen els anteriors). Variables com ANTHROPIC_BASE_URL i ANTHROPIC_AUTH_TOKEN es poden usar per connectar a diferents proveïdors d\'API.',
     },
 
     environmentPicker: {

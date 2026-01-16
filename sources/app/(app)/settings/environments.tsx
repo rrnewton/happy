@@ -70,7 +70,7 @@ function EditEnvironmentSetModal({
             id: envSet?.id || generateId(),
             name: name.trim(),
             variables: variablesObj,
-            isDefault: envSet?.isDefault,
+            applyByDefault: envSet?.applyByDefault,
         });
         onClose();
     };
@@ -220,9 +220,10 @@ function EnvironmentsSettingsScreen() {
     }, [environmentSets, setEnvironmentSets]);
 
     const handleToggleDefault = useCallback((envSet: EnvironmentSet) => {
+        // Multiple sets can have applyByDefault=true
         setEnvironmentSets(environmentSets.map(e => ({
             ...e,
-            isDefault: e.id === envSet.id ? !e.isDefault : false, // Only one can be default
+            applyByDefault: e.id === envSet.id ? !e.applyByDefault : e.applyByDefault,
         })));
     }, [environmentSets, setEnvironmentSets]);
 
@@ -255,9 +256,9 @@ function EnvironmentsSettingsScreen() {
                             leftElement={
                                 <Pressable onPress={() => handleToggleDefault(envSet)} hitSlop={8}>
                                     <Ionicons
-                                        name={envSet.isDefault ? "star" : "star-outline"}
+                                        name={envSet.applyByDefault ? "star" : "star-outline"}
                                         size={20}
-                                        color={envSet.isDefault ? "#FFD700" : theme.colors.textSecondary}
+                                        color={envSet.applyByDefault ? "#FFD700" : theme.colors.textSecondary}
                                     />
                                 </Pressable>
                             }

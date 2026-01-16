@@ -1036,8 +1036,8 @@ export const zhHans: TranslationStructure = {
         noVariables: '未定义任何变量',
         deleteTitle: '删除环境变量集',
         deleteConfirm: ({ name }: { name: string }) => `确定要删除"${name}"吗？`,
-        helpText: '点击星标以设为默认。点击环境变量集可编辑或删除。',
-        tipText: '环境变量集在启动新会话时应用。可以使用 ANTHROPIC_BASE_URL 和 ANTHROPIC_AUTH_TOKEN 等变量连接到不同的 API 提供商。',
+        helpText: '点击星标以设为默认应用。可以将多个集合标记为默认。点击环境变量集可编辑或删除。',
+        tipText: '环境变量集在启动新会话时应用。可以选择多个集合并合并使用（后面的集合会覆盖前面的）。可以使用 ANTHROPIC_BASE_URL 和 ANTHROPIC_AUTH_TOKEN 等变量连接到不同的 API 提供商。',
     },
 
     environmentPicker: {

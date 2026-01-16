@@ -41,14 +41,13 @@ export const callbacks = {
 }
 
 // Type for recent machine paths with environment settings
-// Note: envSetId can be:
-// - undefined: user never explicitly selected an env for this path (use default)
-// - null: user explicitly selected "None" (no env set)
-// - string: user selected a specific env set
+// Note: envSetIds can be:
+// - undefined: user never explicitly selected envs for this path (use defaults with applyByDefault=true)
+// - string[]: ordered array of selected environment set IDs (empty array = explicitly no envs)
 type RecentMachinePath = {
     machineId: string;
     path: string;
-    envSetId?: string | null;
+    envSetIds?: string[];
     customEnvVars?: Record<string, string>;
 };
 
@@ -90,38 +89,44 @@ const getRecentPathForMachine = (machineId: string | null, recentPaths: RecentMa
 };
 
 // Helper function to get last used environment for a machine+path combination
+// Returns an ordered array of environment set IDs
 const getRecentEnvForPath = (
     machineId: string | null,
     path: string,
     recentPaths: RecentMachinePath[],
-    environmentSets: Array<{ id: string; isDefault?: boolean }>
-): { envSetId: string | null; customEnvVars: Record<string, string> } => {
-    if (!machineId) return { envSetId: null, customEnvVars: {} };
+    environmentSets: Array<{ id: string; applyByDefault?: boolean }>
+): { envSetIds: string[]; customEnvVars: Record<string, string> } => {
+    if (!machineId) return { envSetIds: [], customEnvVars: {} };
+
+    // Build a set of existing environment set IDs for validation
+    const existingSetIds = new Set(environmentSets.map(s => s.id));
 
     // Find matching recent entry for this machine+path
     const recentEntry = recentPaths.find(rp => rp.machineId === machineId && rp.path === path);
     if (recentEntry) {
-        // Check if user explicitly selected an env (including "None" which is null)
-        // vs never having selected one (undefined)
-        if (recentEntry.envSetId !== undefined) {
+        // Check if user explicitly selected envs (including empty array for "no envs")
+        // vs never having selected (undefined)
+        if (recentEntry.envSetIds !== undefined) {
+            // Filter out any deleted environment sets
+            const validIds = recentEntry.envSetIds.filter(id => existingSetIds.has(id));
             return {
-                envSetId: recentEntry.envSetId,  // Could be null (explicit "None") or string
+                envSetIds: validIds,
                 customEnvVars: recentEntry.customEnvVars || {},
             };
         }
-        // envSetId is undefined - user has used this path but never explicitly selected env
+        // envSetIds is undefined - user has used this path but never explicitly selected envs
         // Fall through to default logic below, but preserve any custom vars
-        const defaultSet = environmentSets.find(s => s.isDefault);
+        const defaultIds = environmentSets.filter(s => s.applyByDefault).map(s => s.id);
         return {
-            envSetId: defaultSet?.id || null,
+            envSetIds: defaultIds,
             customEnvVars: recentEntry.customEnvVars || {},
         };
     }
 
-    // No recent entry - use default environment set
-    const defaultSet = environmentSets.find(s => s.isDefault);
+    // No recent entry - use all environment sets with applyByDefault=true
+    const defaultIds = environmentSets.filter(s => s.applyByDefault).map(s => s.id);
     return {
-        envSetId: defaultSet?.id || null,
+        envSetIds: defaultIds,
         customEnvVars: {},
     };
 };
@@ -131,18 +136,15 @@ const updateRecentMachinePaths = (
     currentPaths: RecentMachinePath[],
     machineId: string,
     path: string,
-    envSetId: string | null | undefined,
+    envSetIds: string[],
     customEnvVars?: Record<string, string>
 ): RecentMachinePath[] => {
     // Remove any existing entry for this machine+path combination
     const filtered = currentPaths.filter(rp => !(rp.machineId === machineId && rp.path === path));
     // Add new entry at the beginning
     const newEntry: RecentMachinePath = { machineId, path };
-    // Always save envSetId if it was explicitly set (including null for "None")
-    // undefined means "use default", null means "explicitly chose None", string means specific set
-    if (envSetId !== undefined) {
-        newEntry.envSetId = envSetId;
-    }
+    // Always save envSetIds (even empty array means explicit "no envs" selection)
+    newEntry.envSetIds = envSetIds;
     if (customEnvVars && Object.keys(customEnvVars).length > 0) newEntry.customEnvVars = customEnvVars;
     const updated = [newEntry, ...filtered];
     // Keep only the last 10 entries
@@ -153,13 +155,13 @@ function NewSessionScreen() {
     const { theme } = useUnistyles();
     const router = useRouter();
     const maxWidth = useResponsiveMaxWidth();
-    const { prompt, dataId, selectedMachineId: selectedMachineIdParam, selectedPathParam, resumeClaudeSessionId, selectedEnvSetId: selectedEnvSetIdParam, customEnvVarsJson } = useLocalSearchParams<{
+    const { prompt, dataId, selectedMachineId: selectedMachineIdParam, selectedPathParam, resumeClaudeSessionId, selectedEnvSetIdsJson: selectedEnvSetIdsJsonParam, customEnvVarsJson } = useLocalSearchParams<{
         prompt?: string;
         dataId?: string;
         selectedMachineId?: string;
         selectedPathParam?: string;
         resumeClaudeSessionId?: string;
-        selectedEnvSetId?: string;
+        selectedEnvSetIdsJson?: string;
         customEnvVarsJson?: string;
     }>();
 
@@ -346,16 +348,24 @@ function NewSessionScreen() {
     const environmentSets = useSetting('environmentSets');
 
     //
-    // Environment selection state
+    // Environment selection state - multi-select array
     //
-    const [selectedEnvSetId, setSelectedEnvSetId] = React.useState<string | null>(() => {
-        // Check if env set was provided in URL params
-        if (selectedEnvSetIdParam) {
-            return selectedEnvSetIdParam || null;
+    const [selectedEnvSetIds, setSelectedEnvSetIds] = React.useState<string[]>(() => {
+        // Check if env sets were provided in URL params
+        if (selectedEnvSetIdsJsonParam) {
+            try {
+                const parsed = JSON.parse(selectedEnvSetIdsJsonParam);
+                if (Array.isArray(parsed)) {
+                    // Filter out any IDs that no longer exist
+                    const existingIds = new Set(environmentSets.map(s => s.id));
+                    return parsed.filter((id): id is string => typeof id === 'string' && existingIds.has(id));
+                }
+            } catch {
+                // Fall through to defaults
+            }
         }
-        // Otherwise, find default environment set
-        const defaultSet = environmentSets.find(s => s.isDefault);
-        return defaultSet?.id || null;
+        // Otherwise, select all environment sets with applyByDefault=true
+        return environmentSets.filter(s => s.applyByDefault).map(s => s.id);
     });
     const [customEnvVars, setCustomEnvVars] = React.useState<Record<string, string>>(() => {
         if (customEnvVarsJson) {
@@ -476,30 +486,50 @@ function NewSessionScreen() {
         router.navigate({
             pathname: '/new/pick/environment',
             params: {
-                selectedEnvSetId: selectedEnvSetId || '',
+                selectedEnvSetIdsJson: JSON.stringify(selectedEnvSetIds),
                 customEnvVarsJson: Object.keys(customEnvVars).length > 0 ? JSON.stringify(customEnvVars) : '',
             }
         });
-    }, [selectedEnvSetId, customEnvVars, router]);
+    }, [selectedEnvSetIds, customEnvVars, router]);
 
-    // Get display name for selected environment
+    // Get display name for selected environments (multi-select)
     const selectedEnvDisplayName = React.useMemo(() => {
-        if (!selectedEnvSetId && Object.keys(customEnvVars).length === 0) {
+        const customCount = Object.keys(customEnvVars).length;
+
+        if (selectedEnvSetIds.length === 0 && customCount === 0) {
             return t('environmentPicker.none');
         }
-        const selectedSet = environmentSets.find(s => s.id === selectedEnvSetId);
-        if (selectedSet) {
-            const customCount = Object.keys(customEnvVars).length;
+
+        // Get names of selected sets (in order)
+        const selectedSets = selectedEnvSetIds
+            .map(id => environmentSets.find(s => s.id === id))
+            .filter((s): s is NonNullable<typeof s> => s !== undefined);
+
+        if (selectedSets.length === 0) {
+            // Only custom vars
             if (customCount > 0) {
-                return `${selectedSet.name} +${customCount}`;
+                return t('environmentPicker.customOnly', { count: customCount });
             }
-            return selectedSet.name;
+            return t('environmentPicker.none');
         }
-        if (Object.keys(customEnvVars).length > 0) {
-            return t('environmentPicker.customOnly', { count: Object.keys(customEnvVars).length });
+
+        // Build display name from selected set names
+        let displayName: string;
+        if (selectedSets.length === 1) {
+            displayName = selectedSets[0].name;
+        } else if (selectedSets.length === 2) {
+            displayName = `${selectedSets[0].name}, ${selectedSets[1].name}`;
+        } else {
+            displayName = `${selectedSets[0].name}, ${selectedSets[1].name} +${selectedSets.length - 2}`;
         }
-        return t('environmentPicker.none');
-    }, [selectedEnvSetId, customEnvVars, environmentSets]);
+
+        // Add custom var count if any
+        if (customCount > 0) {
+            displayName += ` +${customCount} custom`;
+        }
+
+        return displayName;
+    }, [selectedEnvSetIds, customEnvVars, environmentSets]);
 
     //
     // Agent selection
@@ -602,8 +632,17 @@ function NewSessionScreen() {
 
     // Handle environment selection from navigation params
     React.useEffect(() => {
-        if (selectedEnvSetIdParam !== undefined) {
-            setSelectedEnvSetId(selectedEnvSetIdParam || null);
+        if (selectedEnvSetIdsJsonParam !== undefined) {
+            try {
+                const parsed = JSON.parse(selectedEnvSetIdsJsonParam);
+                if (Array.isArray(parsed)) {
+                    // Filter out any IDs that no longer exist
+                    const existingIds = new Set(environmentSets.map(s => s.id));
+                    setSelectedEnvSetIds(parsed.filter((id): id is string => typeof id === 'string' && existingIds.has(id)));
+                }
+            } catch {
+                // Keep current selection on parse error
+            }
         }
         if (customEnvVarsJson) {
             try {
@@ -612,16 +651,16 @@ function NewSessionScreen() {
                 setCustomEnvVars({});
             }
         }
-    }, [selectedEnvSetIdParam, customEnvVarsJson]);
+    }, [selectedEnvSetIdsJsonParam, customEnvVarsJson, environmentSets]);
 
     // Update environment selection when path changes (restore last used env for this path)
     React.useEffect(() => {
-        if (selectedMachineId && selectedPath && !selectedEnvSetIdParam && !customEnvVarsJson) {
+        if (selectedMachineId && selectedPath && !selectedEnvSetIdsJsonParam && !customEnvVarsJson) {
             const envInfo = getRecentEnvForPath(selectedMachineId, selectedPath, recentMachinePaths, environmentSets);
-            setSelectedEnvSetId(envInfo.envSetId);
+            setSelectedEnvSetIds(envInfo.envSetIds);
             setCustomEnvVars(envInfo.customEnvVars);
         }
-    }, [selectedMachineId, selectedPath, recentMachinePaths, environmentSets, selectedEnvSetIdParam, customEnvVarsJson]);
+    }, [selectedMachineId, selectedPath, recentMachinePaths, environmentSets, selectedEnvSetIdsJsonParam, customEnvVarsJson]);
 
     // Get selected machine name
     const selectedMachine = React.useMemo(() => {
@@ -792,20 +831,21 @@ function NewSessionScreen() {
                 recentMachinePaths,
                 selectedMachineId,
                 selectedPath,
-                selectedEnvSetId,
+                selectedEnvSetIds,
                 customEnvVars
             );
             sync.applySettings({ recentMachinePaths: updatedPaths });
 
-            // Merge environment variables: global set + custom overrides
+            // Merge environment variables: all selected sets in order + custom overrides
+            // Later sets override earlier ones, custom vars override everything
             let mergedEnvVars: Record<string, string> = {};
-            if (selectedEnvSetId) {
-                const selectedSet = environmentSets.find(s => s.id === selectedEnvSetId);
-                if (selectedSet) {
-                    mergedEnvVars = { ...selectedSet.variables };
+            for (const setId of selectedEnvSetIds) {
+                const envSet = environmentSets.find(s => s.id === setId);
+                if (envSet) {
+                    mergedEnvVars = { ...mergedEnvVars, ...envSet.variables };
                 }
             }
-            // Custom vars override global set vars
+            // Custom vars override all preset vars
             mergedEnvVars = { ...mergedEnvVars, ...customEnvVars };
 
             const result = await machineSpawnNewSession({
@@ -903,7 +943,7 @@ function NewSessionScreen() {
         } finally {
             setIsSending(false);
         }
-    }, [isSending, agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments, selectedEnvSetId, customEnvVars, environmentSets]);
+    }, [isSending, agentType, selectedMachineId, selectedPath, input, recentMachinePaths, sessionType, permissionMode, modelMode, imageAttachments, clearImageAttachments, selectedEnvSetIds, customEnvVars, environmentSets]);
 
     // Keep doCreateRef updated for auto-send mode
     React.useEffect(() => {
@@ -1038,11 +1078,11 @@ function NewSessionScreen() {
                             <Ionicons
                                 name="key-outline"
                                 size={14}
-                                color={selectedEnvSetId || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint}
+                                color={selectedEnvSetIds.length > 0 || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint}
                             />
                             <Text style={{
                                 fontSize: 13,
-                                color: selectedEnvSetId || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint,
+                                color: selectedEnvSetIds.length > 0 || Object.keys(customEnvVars).length > 0 ? theme.colors.textLink : theme.colors.button.secondary.tint,
                                 fontWeight: '600',
                                 marginLeft: 6,
                                 ...Typography.default('semiBold'),

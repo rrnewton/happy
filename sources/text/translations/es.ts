@@ -612,8 +612,8 @@ export const es: TranslationStructure = {
         noVariables: 'Sin variables definidas',
         deleteTitle: 'Eliminar conjunto de variables',
         deleteConfirm: ({ name }: { name: string }) => `¿Estás seguro de que quieres eliminar "${name}"?`,
-        helpText: 'Toca la estrella para establecer como predeterminado. Toca un conjunto de variables para editarlo o eliminarlo.',
-        tipText: 'Los conjuntos de variables se aplican al iniciar nuevas sesiones. Variables como ANTHROPIC_BASE_URL y ANTHROPIC_AUTH_TOKEN se pueden usar para conectarse a diferentes proveedores de API.',
+        helpText: 'Toca la estrella para aplicar por defecto. Se pueden marcar varios conjuntos como predeterminados. Toca un conjunto de variables para editarlo o eliminarlo.',
+        tipText: 'Los conjuntos de variables se aplican al iniciar nuevas sesiones. Se pueden seleccionar varios conjuntos y combinarlos (los conjuntos posteriores sobrescriben a los anteriores). Variables como ANTHROPIC_BASE_URL y ANTHROPIC_AUTH_TOKEN se pueden usar para conectarse a diferentes proveedores de API.',
     },
 
     environmentPicker: {

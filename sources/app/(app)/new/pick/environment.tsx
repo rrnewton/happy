@@ -120,14 +120,29 @@ export default function EnvironmentPickerScreen() {
     const styles = stylesheet;
     const router = useRouter();
     const params = useLocalSearchParams<{
-        selectedEnvSetId?: string;
+        selectedEnvSetIdsJson?: string;
         customEnvVarsJson?: string;
     }>();
     const inputRef = useRef<MultiTextInputHandle>(null);
     const environmentSets = useSetting('environmentSets');
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedSetId, setSelectedSetId] = useState<string | null>(params.selectedEnvSetId || null);
+    // Multi-select: array of selected set IDs
+    const [selectedSetIds, setSelectedSetIds] = useState<string[]>(() => {
+        if (params.selectedEnvSetIdsJson) {
+            try {
+                const parsed = JSON.parse(params.selectedEnvSetIdsJson);
+                if (Array.isArray(parsed)) {
+                    // Filter out any IDs that no longer exist
+                    const existingIds = new Set(environmentSets.map(s => s.id));
+                    return parsed.filter((id): id is string => typeof id === 'string' && existingIds.has(id));
+                }
+            } catch {
+                // Fall through to empty array
+            }
+        }
+        return [];
+    });
     const [customVars, setCustomVars] = useState<Array<{ key: string; value: string }>>(() => {
         if (params.customEnvVarsJson) {
             try {
@@ -169,8 +184,17 @@ export default function EnvironmentPickerScreen() {
         return `${keys.slice(0, 3).join(', ')} +${keys.length - 3}`;
     };
 
-    const handleSelectSet = useCallback((setId: string | null) => {
-        setSelectedSetId(setId);
+    // Toggle selection of an environment set (multi-select)
+    const handleToggleSet = useCallback((setId: string) => {
+        setSelectedSetIds(prev => {
+            if (prev.includes(setId)) {
+                // Remove from selection
+                return prev.filter(id => id !== setId);
+            } else {
+                // Add to selection (at the end)
+                return [...prev, setId];
+            }
+        });
     }, []);
 
     const handleAddCustomVar = useCallback(() => {
@@ -239,14 +263,11 @@ export default function EnvironmentPickerScreen() {
         router.dismissTo({
             pathname: '/new',
             params: {
-                selectedEnvSetId: selectedSetId || '',
+                selectedEnvSetIdsJson: JSON.stringify(selectedSetIds),
                 customEnvVarsJson: Object.keys(customVarsObj).length > 0 ? JSON.stringify(customVarsObj) : '',
             }
         });
-    }, [selectedSetId, customVars, router]);
-
-    // Check if we're actively searching
-    const isSearching = searchQuery.trim().length > 0;
+    }, [selectedSetIds, customVars, router]);
 
     // Handle keyboard events
     const handleKeyPress = useCallback((event: { key: string; shiftKey: boolean }) => {
@@ -255,17 +276,17 @@ export default function EnvironmentPickerScreen() {
             return true;
         }
 
-        // Tab - Autocomplete with first filtered result
+        // Tab - Toggle first filtered result
         if (event.key === 'Tab' && !event.shiftKey) {
             if (filteredSets.length > 0) {
-                setSelectedSetId(filteredSets[0].id);
+                handleToggleSet(filteredSets[0].id);
                 setSearchQuery('');
                 return true; // Handled - prevent default tab behavior
             }
         }
 
         return false;
-    }, [handleConfirm, filteredSets]);
+    }, [handleConfirm, filteredSets, handleToggleSet]);
 
     return (
         <>
@@ -336,30 +357,10 @@ export default function EnvironmentPickerScreen() {
                             </View>
                         </ItemGroup>
 
-                        {/* Environment Sets */}
+                        {/* Environment Sets - Multi-select with checkboxes */}
                         <ItemGroup title={t('environmentPicker.savedSets')}>
-                            {/* None option - hidden when searching */}
-                            {!isSearching && (
-                                <Item
-                                    title={t('environmentPicker.none')}
-                                    subtitle={t('environmentPicker.noneDescription')}
-                                    leftElement={
-                                        <Ionicons
-                                            name={selectedSetId === null ? "checkmark-circle" : "ellipse-outline"}
-                                            size={20}
-                                            color={selectedSetId === null ? theme.colors.textLink : theme.colors.textSecondary}
-                                        />
-                                    }
-                                    onPress={() => handleSelectSet(null)}
-                                    selected={selectedSetId === null}
-                                    showChevron={false}
-                                    pressableStyle={selectedSetId === null ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
-                                    showDivider={filteredSets.length > 0}
-                                />
-                            )}
-
                             {filteredSets.map((envSet, index) => {
-                                const isSelected = selectedSetId === envSet.id;
+                                const isSelected = selectedSetIds.includes(envSet.id);
                                 const isLast = index === filteredSets.length - 1;
 
                                 return (
@@ -369,14 +370,14 @@ export default function EnvironmentPickerScreen() {
                                         subtitle={formatVariables(envSet.variables)}
                                         leftElement={
                                             <Ionicons
-                                                name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                                                name={isSelected ? "checkbox" : "square-outline"}
                                                 size={20}
                                                 color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
                                             />
                                         }
                                         rightElement={
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                                {envSet.isDefault && (
+                                                {envSet.applyByDefault && (
                                                     <Ionicons
                                                         name="star"
                                                         size={16}
@@ -396,7 +397,7 @@ export default function EnvironmentPickerScreen() {
                                                 </Pressable>
                                             </View>
                                         }
-                                        onPress={() => handleSelectSet(envSet.id)}
+                                        onPress={() => handleToggleSet(envSet.id)}
                                         selected={isSelected}
                                         showChevron={false}
                                         pressableStyle={isSelected ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
