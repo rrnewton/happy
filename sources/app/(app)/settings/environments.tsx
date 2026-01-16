@@ -23,11 +23,13 @@ function EditEnvironmentSetModal({
     envSet,
     onSave,
     onDelete,
+    onDuplicate,
     onClose
 }: {
     envSet: EnvironmentSet | null;
     onSave: (envSet: EnvironmentSet) => void;
     onDelete?: () => void;
+    onDuplicate?: () => void;
     onClose: () => void;
 }) {
     const { theme } = useUnistyles();
@@ -77,9 +79,16 @@ function EditEnvironmentSetModal({
 
     return (
         <View style={[styles.modalContainer, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                {isNew ? t('settingsEnvironments.addNew') : t('settingsEnvironments.edit')}
-            </Text>
+            <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                    {isNew ? t('settingsEnvironments.addNew') : t('settingsEnvironments.edit')}
+                </Text>
+                {!isNew && onDuplicate && (
+                    <Pressable onPress={onDuplicate} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+                        <Ionicons name="copy-outline" size={20} color={theme.colors.textSecondary} />
+                    </Pressable>
+                )}
+            </View>
 
             <View style={styles.fieldGroup}>
                 <Text style={[styles.fieldLabel, { color: theme.colors.textSecondary }]}>
@@ -215,6 +224,17 @@ function EnvironmentsSettingsScreen() {
                         Modal.hide(modalId);
                     }
                 },
+                onDuplicate: () => {
+                    // Create a duplicate with a new ID and " - Copy" suffix
+                    const duplicatedEnvSet: EnvironmentSet = {
+                        id: generateId(),
+                        name: `${envSet.name} - Copy`,
+                        variables: { ...envSet.variables },
+                        applyByDefault: false, // Don't copy the default flag
+                    };
+                    setEnvironmentSets([...environmentSets, duplicatedEnvSet]);
+                    Modal.hide(modalId);
+                },
             }
         });
     }, [environmentSets, setEnvironmentSets]);
@@ -320,10 +340,15 @@ const styles = StyleSheet.create((theme) => ({
         maxWidth: 400,
         width: '100%',
     },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
     modalTitle: {
         ...Typography.default('semiBold'),
         fontSize: 18,
-        marginBottom: 20,
     },
     fieldGroup: {
         marginBottom: 16,
