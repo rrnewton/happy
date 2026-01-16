@@ -318,6 +318,7 @@ const styles = StyleSheet.create((theme) => ({
         borderRadius: 12,
         minWidth: 320,
         maxWidth: 400,
+        width: '100%',
     },
     modalTitle: {
         ...Typography.default('semiBold'),
@@ -347,6 +348,7 @@ const styles = StyleSheet.create((theme) => ({
     },
     variableKeyInput: {
         flex: 1,
+        minWidth: 0,
         padding: 10,
         borderRadius: 6,
         ...Typography.default(),
@@ -354,6 +356,7 @@ const styles = StyleSheet.create((theme) => ({
     },
     variableValueInput: {
         flex: 2,
+        minWidth: 0,
         padding: 10,
         borderRadius: 6,
         ...Typography.default(),
