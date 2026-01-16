@@ -361,6 +361,7 @@ export default function EnvironmentPickerScreen() {
                         <ItemGroup title={t('environmentPicker.savedSets')}>
                             {filteredSets.map((envSet, index) => {
                                 const isSelected = selectedSetIds.includes(envSet.id);
+                                const selectionOrder = isSelected ? selectedSetIds.indexOf(envSet.id) + 1 : null;
                                 const isLast = index === filteredSets.length - 1;
 
                                 return (
@@ -369,11 +370,32 @@ export default function EnvironmentPickerScreen() {
                                         title={envSet.name}
                                         subtitle={formatVariables(envSet.variables)}
                                         leftElement={
-                                            <Ionicons
-                                                name={isSelected ? "checkbox" : "square-outline"}
-                                                size={20}
-                                                color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
-                                            />
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                                <Ionicons
+                                                    name={isSelected ? "checkbox" : "square-outline"}
+                                                    size={20}
+                                                    color={isSelected ? theme.colors.textLink : theme.colors.textSecondary}
+                                                />
+                                                {selectionOrder !== null && (
+                                                    <View style={{
+                                                        backgroundColor: theme.colors.textLink,
+                                                        borderRadius: 10,
+                                                        minWidth: 20,
+                                                        height: 20,
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        paddingHorizontal: 6,
+                                                    }}>
+                                                        <Text style={{
+                                                            color: '#fff',
+                                                            fontSize: 12,
+                                                            fontWeight: '600',
+                                                        }}>
+                                                            {selectionOrder}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            </View>
                                         }
                                         rightElement={
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
