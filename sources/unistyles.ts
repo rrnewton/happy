@@ -1,5 +1,5 @@
 import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles';
-import { darkTheme, lightTheme } from './theme';
+import { darkTheme, lightTheme, terminalTheme } from './theme';
 import { loadThemePreference } from './sync/persistence';
 import { Appearance } from 'react-native';
 import * as SystemUI from 'expo-system-ui';
@@ -10,7 +10,8 @@ import * as SystemUI from 'expo-system-ui';
 
 const appThemes = {
     light: lightTheme,
-    dark: darkTheme
+    dark: darkTheme,
+    terminal: terminalTheme
 };
 
 const breakpoints = {
@@ -26,10 +27,13 @@ const breakpoints = {
 const themePreference = loadThemePreference();
 
 // Determine initial theme and adaptive settings
-const getInitialTheme = (): 'light' | 'dark' => {
+const getInitialTheme = (): 'light' | 'dark' | 'terminal' => {
     if (themePreference === 'adaptive') {
         const systemTheme = Appearance.getColorScheme();
         return systemTheme === 'dark' ? 'dark' : 'light';
+    }
+    if (themePreference === 'terminal') {
+        return 'terminal';
     }
     return themePreference;
 };
@@ -69,6 +73,10 @@ const setRootBackgroundColor = () => {
     if (themePreference === 'adaptive') {
         const systemTheme = Appearance.getColorScheme();
         const color = systemTheme === 'dark' ? appThemes.dark.colors.groupped.background : appThemes.light.colors.groupped.background;
+        UnistylesRuntime.setRootViewBackgroundColor(color);
+        SystemUI.setBackgroundColorAsync(color);
+    } else if (themePreference === 'terminal') {
+        const color = appThemes.terminal.colors.groupped.background;
         UnistylesRuntime.setRootViewBackgroundColor(color);
         SystemUI.setBackgroundColorAsync(color);
     } else {

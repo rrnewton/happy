@@ -9,7 +9,7 @@ import { useUnistyles, UnistylesRuntime } from 'react-native-unistyles';
 import { Switch } from '@/components/Switch';
 import { Appearance } from 'react-native';
 import * as SystemUI from 'expo-system-ui';
-import { darkTheme, lightTheme } from '@/theme';
+import { darkTheme, lightTheme, terminalTheme } from '@/theme';
 import { t, getLanguageNativeName, SUPPORTED_LANGUAGES } from '@/text';
 import { Platform } from 'react-native';
 
@@ -60,23 +60,42 @@ export default function AppearanceSettingsScreen() {
             <ItemGroup title={t('settingsAppearance.theme')} footer={t('settingsAppearance.themeDescription')}>
                 <Item
                     title={t('settings.appearance')}
-                    subtitle={themePreference === 'adaptive' ? t('settingsAppearance.themeDescriptions.adaptive') : themePreference === 'light' ? t('settingsAppearance.themeDescriptions.light') : t('settingsAppearance.themeDescriptions.dark')}
+                    subtitle={
+                        themePreference === 'adaptive' ? t('settingsAppearance.themeDescriptions.adaptive') :
+                        themePreference === 'light' ? t('settingsAppearance.themeDescriptions.light') :
+                        themePreference === 'terminal' ? t('settingsAppearance.themeDescriptions.terminal') :
+                        t('settingsAppearance.themeDescriptions.dark')
+                    }
                     icon={<Ionicons name="contrast-outline" size={29} color={theme.colors.status.connecting} />}
-                    detail={themePreference === 'adaptive' ? t('settingsAppearance.themeOptions.adaptive') : themePreference === 'light' ? t('settingsAppearance.themeOptions.light') : t('settingsAppearance.themeOptions.dark')}
+                    detail={
+                        themePreference === 'adaptive' ? t('settingsAppearance.themeOptions.adaptive') :
+                        themePreference === 'light' ? t('settingsAppearance.themeOptions.light') :
+                        themePreference === 'terminal' ? t('settingsAppearance.themeOptions.terminal') :
+                        t('settingsAppearance.themeOptions.dark')
+                    }
                     onPress={() => {
-                        const currentIndex = themePreference === 'adaptive' ? 0 : themePreference === 'light' ? 1 : 2;
-                        const nextIndex = (currentIndex + 1) % 3;
-                        const nextTheme = nextIndex === 0 ? 'adaptive' : nextIndex === 1 ? 'light' : 'dark';
-                        
+                        // Cycle: adaptive -> light -> dark -> terminal -> adaptive
+                        const themeOrder: Array<'adaptive' | 'light' | 'dark' | 'terminal'> = ['adaptive', 'light', 'dark', 'terminal'];
+                        const currentIndex = themeOrder.indexOf(themePreference);
+                        const nextIndex = (currentIndex + 1) % 4;
+                        const nextTheme = themeOrder[nextIndex];
+
                         // Update the setting
                         setThemePreference(nextTheme);
-                        
+
                         // Apply the theme change immediately
                         if (nextTheme === 'adaptive') {
                             // Enable adaptive themes and set to system theme
                             UnistylesRuntime.setAdaptiveThemes(true);
                             const systemTheme = Appearance.getColorScheme();
                             const color = systemTheme === 'dark' ? darkTheme.colors.groupped.background : lightTheme.colors.groupped.background;
+                            UnistylesRuntime.setRootViewBackgroundColor(color);
+                            SystemUI.setBackgroundColorAsync(color);
+                        } else if (nextTheme === 'terminal') {
+                            // Disable adaptive themes and set terminal theme
+                            UnistylesRuntime.setAdaptiveThemes(false);
+                            UnistylesRuntime.setTheme('terminal');
+                            const color = terminalTheme.colors.groupped.background;
                             UnistylesRuntime.setRootViewBackgroundColor(color);
                             SystemUI.setBackgroundColorAsync(color);
                         } else {

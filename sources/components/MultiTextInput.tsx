@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, Platform, View, NativeSyntheticEvent, TextInputKeyPressEventData, TextInputSelectionChangeEventData } from 'react-native';
+import { TextInput, Platform, View, Text, NativeSyntheticEvent, TextInputKeyPressEventData, TextInputSelectionChangeEventData } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import { Typography } from '@/constants/Typography';
 
@@ -196,12 +196,26 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
         }
     }), [onChangeText, onStateChange, onSelectionChange]);
 
+    const isTerminal = theme.colors.terminalUI.useMonospace;
+
     return (
-        <View style={{ width: '100%' }}>
+        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-start' }}>
+            {/* Terminal prompt prefix */}
+            {isTerminal && (
+                <Text style={{
+                    paddingTop: props.paddingTop ?? 8,
+                    paddingRight: 8,
+                    ...Typography.mono('semiBold'),
+                    fontSize: 16,
+                    color: theme.colors.text,
+                }}>
+                    $
+                </Text>
+            )}
             <TextInput
                 ref={inputRef}
                 style={{
-                    width: '100%',
+                    flex: 1,
                     fontSize: 16,
                     maxHeight,
                     color: theme.colors.input.text,
@@ -211,7 +225,8 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
                     paddingBottom: props.paddingBottom,
                     paddingLeft: props.paddingLeft,
                     paddingRight: props.paddingRight,
-                    ...Typography.default(),
+                    ...(isTerminal ? Typography.mono() : Typography.default()),
+                    letterSpacing: isTerminal ? 0.5 : undefined,
                 }}
                 placeholder={placeholder}
                 placeholderTextColor={theme.colors.input.placeholder}
@@ -228,6 +243,7 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
                 autoComplete="off"
                 textContentType="none"
                 submitBehavior="newline"
+                selectionColor={isTerminal ? theme.colors.text : undefined}
             />
         </View>
     );

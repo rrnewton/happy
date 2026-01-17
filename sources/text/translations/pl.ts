@@ -169,11 +169,13 @@ export const pl: TranslationStructure = {
             adaptive: 'Adaptacyjny',
             light: 'Jasny',
             dark: 'Ciemny',
+            terminal: 'Terminal',
         },
         themeDescriptions: {
             adaptive: 'Dopasuj do ustawień systemu',
             light: 'Zawsze używaj jasnego motywu',
             dark: 'Zawsze używaj ciemnego motywu',
+            terminal: 'Bursztynowa estetyka terminala hakerskiego',
         },
         display: 'Wyświetlanie',
         displayDescription: 'Kontroluj układ i odstępy',

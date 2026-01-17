@@ -9,7 +9,7 @@ export const LocalSettingsSchema = z.object({
     debugMode: z.boolean().describe('Enable debug logging'),
     devModeEnabled: z.boolean().describe('Enable developer menu in settings'),
     commandPaletteEnabled: z.boolean().describe('Enable CMD+K command palette (web only)'),
-    themePreference: z.enum(['light', 'dark', 'adaptive']).describe('Theme preference: light, dark, or adaptive (follows system)'),
+    themePreference: z.enum(['light', 'dark', 'adaptive', 'terminal']).describe('Theme preference: light, dark, adaptive (follows system), or terminal (hacker aesthetic)'),
     markdownCopyV2: z.boolean().describe('Replace native paragraph selection with long-press modal for full markdown copy'),
     shiftEnterToSend: z.boolean().describe('Use Shift+Enter to send messages (Enter creates new line). Default is Enter to send.'),
     wideContentView: z.boolean().describe('Use full width for content instead of constrained 800px container'),

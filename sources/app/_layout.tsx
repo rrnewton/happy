@@ -28,6 +28,8 @@ import { StatusBarProvider } from '@/components/StatusBarProvider';
 import { monkeyPatchConsoleForRemoteLoggingForFasterAiAutoDebuggingOnlyInLocalBuilds } from '@/utils/remoteLogger';
 import { useUnistyles } from 'react-native-unistyles';
 import { AsyncLock } from '@/utils/lock';
+import { loadThemePreference } from '@/sync/persistence';
+import { BootSequence } from '@/components/BootSequence';
 
 // Configure how notifications are handled when app is in foreground
 // This must be called outside of any component to ensure it's set before any notification arrives
@@ -192,7 +194,9 @@ export default function RootLayout() {
     //
     // Init sequence
     //
-    const [initState, setInitState] = React.useState<{ credentials: AuthCredentials | null } | null>(null);
+    const [initState, setInitState] = React.useState<{ credentials: AuthCredentials | null; isTerminalTheme: boolean } | null>(null);
+    const [showBootSequence, setShowBootSequence] = React.useState(false);
+
     React.useEffect(() => {
         (async () => {
             try {
@@ -204,7 +208,16 @@ export default function RootLayout() {
                     await syncRestore(credentials);
                 }
 
-                setInitState({ credentials });
+                // Check if terminal theme is active
+                const themePreference = loadThemePreference();
+                const isTerminalTheme = themePreference === 'terminal';
+
+                setInitState({ credentials, isTerminalTheme });
+
+                // Show boot sequence overlay for terminal theme
+                if (isTerminalTheme) {
+                    setShowBootSequence(true);
+                }
             } catch (error) {
                 console.error('Error initializing:', error);
             }
@@ -219,6 +232,11 @@ export default function RootLayout() {
         }
     }, [initState]);
 
+    // Handle boot sequence completion - just hide the overlay
+    const handleBootComplete = React.useCallback(() => {
+        setShowBootSequence(false);
+    }, []);
+
 
     // Track the screens
     useTrackScreens()
@@ -232,7 +250,7 @@ export default function RootLayout() {
     }
 
     //
-    // Boot
+    // Boot - app loads in background while boot sequence plays as overlay
     //
 
     let providers = (
@@ -271,6 +289,12 @@ export default function RootLayout() {
         <>
             <FaviconPermissionIndicator />
             {providers}
+            {/* Boot sequence overlay - app loads underneath while this plays */}
+            {showBootSequence && (
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+                    <BootSequence onComplete={handleBootComplete} />
+                </View>
+            )}
         </>
     );
 }

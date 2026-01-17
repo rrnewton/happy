@@ -156,13 +156,15 @@ export const ca: TranslationStructure = {
         themeDescription: 'Tria el teu esquema de colors preferit',
         themeOptions: {
             adaptive: 'Adaptatiu',
-            light: 'Clar', 
+            light: 'Clar',
             dark: 'Fosc',
+            terminal: 'Terminal',
         },
         themeDescriptions: {
             adaptive: 'Segueix la configuració del sistema',
             light: 'Usa sempre el tema clar',
             dark: 'Usa sempre el tema fosc',
+            terminal: 'Estetica de terminal hacker en color ambre',
         },
         display: 'Pantalla',
         displayDescription: 'Controla la disposició i l\'espaiat',

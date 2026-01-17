@@ -158,13 +158,15 @@ export const zhHans: TranslationStructure = {
         themeDescription: '选择您喜欢的配色方案',
         themeOptions: {
             adaptive: '自适应',
-            light: '浅色', 
+            light: '浅色',
             dark: '深色',
+            terminal: '终端',
         },
         themeDescriptions: {
             adaptive: '跟随系统设置',
             light: '始终使用浅色主题',
             dark: '始终使用深色主题',
+            terminal: '琥珀色黑客终端美学',
         },
         display: '显示',
         displayDescription: '控制布局和间距',

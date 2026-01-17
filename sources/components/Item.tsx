@@ -41,77 +41,102 @@ export interface ItemProps {
     copy?: boolean | string;
 }
 
-const stylesheet = StyleSheet.create((theme, runtime) => ({
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        minHeight: Platform.select({ ios: 44, default: 56 }),
-    },
-    containerWithSubtitle: {
-        paddingVertical: Platform.select({ ios: 11, default: 16 }),
-    },
-    containerWithoutSubtitle: {
-        paddingVertical: Platform.select({ ios: 12, default: 16 }),
-    },
-    iconContainer: {
-        marginRight: 12,
-        width: Platform.select({ ios: 29, default: 32 }),
-        height: Platform.select({ ios: 29, default: 32 }),
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    centerContent: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    title: {
-        ...Typography.default('regular'),
-        fontSize: Platform.select({ ios: 17, default: 16 }),
-        lineHeight: Platform.select({ ios: 22, default: 24 }),
-        letterSpacing: Platform.select({ ios: -0.41, default: 0.15 }),
-    },
-    titleNormal: {
-        color: theme.colors.text,
-    },
-    titleSelected: {
-        color: theme.colors.text,
-    },
-    titleDestructive: {
-        color: theme.colors.textDestructive,
-    },
-    subtitle: {
-        ...Typography.default('regular'),
-        color: theme.colors.textSecondary,
-        fontSize: Platform.select({ ios: 15, default: 14 }),
-        lineHeight: 20,
-        letterSpacing: Platform.select({ ios: -0.24, default: 0.1 }),
-        marginTop: Platform.select({ ios: 2, default: 0 }),
-    },
-    rightSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 8,
-    },
-    detail: {
-        ...Typography.default('regular'),
-        color: theme.colors.textSecondary,
-        fontSize: 17,
-        letterSpacing: -0.41,
-    },
-    divider: {
-        height: Platform.select({ ios: 0.33, default: 0 }),
-        backgroundColor: theme.colors.divider,
-    },
-    pressablePressed: {
-        backgroundColor: theme.colors.surfacePressedOverlay,
-    },
-}));
+const stylesheet = StyleSheet.create((theme, runtime) => {
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
+    return {
+        container: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            minHeight: Platform.select({ ios: 44, default: 56 }),
+        },
+        containerWithSubtitle: {
+            paddingVertical: Platform.select({ ios: 11, default: 16 }),
+        },
+        containerWithoutSubtitle: {
+            paddingVertical: Platform.select({ ios: 12, default: 16 }),
+        },
+        iconContainer: {
+            marginRight: 12,
+            width: Platform.select({ ios: 29, default: 32 }),
+            height: Platform.select({ ios: 29, default: 32 }),
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        centerContent: {
+            flex: 1,
+            justifyContent: 'center',
+        },
+        title: {
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            fontSize: Platform.select({ ios: 17, default: 16 }),
+            lineHeight: Platform.select({ ios: 22, default: 24 }),
+            letterSpacing: isTerminal ? 0.5 : Platform.select({ ios: -0.41, default: 0.15 }),
+            // Apply subtle text glow in terminal mode
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius / 2, // Subtler glow for titles
+            } : {}),
+        },
+        titleNormal: {
+            color: theme.colors.text,
+        },
+        titleSelected: {
+            color: theme.colors.text,
+        },
+        titleDestructive: {
+            color: theme.colors.textDestructive,
+        },
+        subtitle: {
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            color: theme.colors.textSecondary,
+            fontSize: Platform.select({ ios: 15, default: 14 }),
+            lineHeight: 20,
+            letterSpacing: isTerminal ? 0.3 : Platform.select({ ios: -0.24, default: 0.1 }),
+            marginTop: Platform.select({ ios: 2, default: 0 }),
+        },
+        rightSection: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 8,
+        },
+        detail: {
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            color: theme.colors.textSecondary,
+            fontSize: isTerminal ? 14 : 17,
+            letterSpacing: isTerminal ? 0.3 : -0.41,
+        },
+        divider: {
+            height: Platform.select({ ios: 0.33, default: 0 }),
+            backgroundColor: isTerminal ? terminalUI.borderColor : theme.colors.divider,
+        },
+        pressablePressed: {
+            backgroundColor: theme.colors.surfacePressedOverlay,
+        },
+        // Terminal-specific prompt prefix for navigation items
+        terminalPrompt: {
+            ...(isTerminal ? Typography.mono('semiBold') : Typography.default('regular')),
+            color: theme.colors.text,
+            fontSize: Platform.select({ ios: 17, default: 16 }),
+            marginRight: 8,
+            // Apply text glow effect
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius,
+            } : {}),
+        },
+    };
+});
 
 export const Item = React.memo<ItemProps>((props) => {
     const { theme } = useUnistyles();
     const styles = stylesheet;
-    
+    const isTerminal = theme.colors.terminalUI.useMonospace;
+
     // Platform-specific measurements
     const isIOS = Platform.OS === 'ios';
     const isAndroid = Platform.OS === 'android';
@@ -216,12 +241,17 @@ export const Item = React.memo<ItemProps>((props) => {
 
                 {/* Center Section */}
                 <View style={styles.centerContent}>
-                    <Text 
-                        style={[styles.title, titleColor, titleStyle]}
-                        numberOfLines={subtitle ? 1 : 2}
-                    >
-                        {title}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {isTerminal && isInteractive && (
+                            <Text style={styles.terminalPrompt}>{'>'}</Text>
+                        )}
+                        <Text
+                            style={[styles.title, titleColor, titleStyle, { flex: 1 }]}
+                            numberOfLines={subtitle ? 1 : 2}
+                        >
+                            {title}
+                        </Text>
+                    </View>
                     {subtitle && (() => {
                         // Allow multiline when requested or when content contains line breaks
                         const effectiveLines = subtitleLines !== undefined

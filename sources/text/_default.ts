@@ -156,13 +156,15 @@ export const en = {
         themeDescription: 'Choose your preferred color scheme',
         themeOptions: {
             adaptive: 'Adaptive',
-            light: 'Light', 
+            light: 'Light',
             dark: 'Dark',
+            terminal: 'Terminal',
         },
         themeDescriptions: {
             adaptive: 'Match system settings',
             light: 'Always use light theme',
             dark: 'Always use dark theme',
+            terminal: 'Amber hacker terminal aesthetic',
         },
         display: 'Display',
         displayDescription: 'Control layout and spacing',

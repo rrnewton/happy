@@ -182,12 +182,27 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
         }
     }), [onChangeText, onStateChange, onSelectionChange]);
 
+    const isTerminal = theme.colors.terminalUI.useMonospace;
+
     return (
-        <View style={{ width: '100%' }}>
+        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-start' }}>
+            {/* Terminal prompt prefix */}
+            {isTerminal && (
+                <span style={{
+                    paddingTop: props.paddingTop ?? 10,
+                    paddingRight: 8,
+                    fontFamily: Typography.mono('semiBold').fontFamily,
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    color: theme.colors.text,
+                }}>
+                    $
+                </span>
+            )}
             <TextareaAutosize
                 ref={textareaRef}
                 style={{
-                    width: '100%',
+                    flex: 1,
                     padding: '0',
                     fontSize: '16px',
                     color: theme.colors.input.text,
@@ -195,13 +210,15 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
                     outline: 'none',
                     resize: 'none' as const,
                     backgroundColor: 'transparent',
-                    fontFamily: Typography.default().fontFamily,
+                    fontFamily: isTerminal ? Typography.mono().fontFamily : Typography.default().fontFamily,
+                    letterSpacing: isTerminal ? '0.5px' : undefined,
                     lineHeight: '1.4',
                     scrollbarWidth: 'none',
                     paddingTop: props.paddingTop,
                     paddingBottom: props.paddingBottom,
                     paddingLeft: props.paddingLeft,
                     paddingRight: props.paddingRight,
+                    caretColor: isTerminal ? theme.colors.text : undefined,
                 }}
                 placeholder={placeholder}
                 value={value}

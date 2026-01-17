@@ -80,20 +80,28 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
         return () => window.removeEventListener('keydown', handleKeyDown, true);
     }, [isConfirm, buttons, handleButtonPress, onClose]);
 
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
     const styles = StyleSheet.create({
         container: {
             backgroundColor: theme.colors.surface,
-            borderRadius: 14,
+            borderRadius: terminalUI.borderRadius,
             width: 270,
             overflow: 'hidden',
-            shadowColor: theme.colors.shadow.color,
-            shadowOffset: {
-                width: 0,
-                height: 2
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
-            elevation: 5
+            ...(terminalUI.useBorders ? {
+                borderWidth: terminalUI.borderWidth,
+                borderColor: terminalUI.borderColor,
+            } : {
+                shadowColor: theme.colors.shadow.color,
+                shadowOffset: {
+                    width: 0,
+                    height: 2
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 5
+            })
         },
         content: {
             paddingHorizontal: 16,
@@ -102,21 +110,35 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
             alignItems: 'center'
         },
         title: {
-            fontSize: 17,
+            fontSize: isTerminal ? 15 : 17,
             textAlign: 'center',
             color: theme.colors.text,
-            marginBottom: 4
+            marginBottom: 4,
+            letterSpacing: isTerminal ? 0.5 : undefined,
+            // Text glow for terminal mode
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius,
+            } : {}),
         },
         message: {
             fontSize: 13,
             textAlign: 'center',
             color: theme.colors.text,
             marginTop: 4,
-            lineHeight: 18
+            lineHeight: 18,
+            letterSpacing: isTerminal ? 0.3 : undefined,
+            // Subtle text glow for terminal mode
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius / 2,
+            } : {}),
         },
         buttonContainer: {
             borderTopWidth: 1,
-            borderTopColor: theme.colors.divider,
+            borderTopColor: isTerminal ? terminalUI.borderColor : theme.colors.divider,
             flexDirection: 'row'
         },
         button: {
@@ -130,11 +152,18 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
         },
         buttonSeparator: {
             width: 1,
-            backgroundColor: theme.colors.divider
+            backgroundColor: isTerminal ? terminalUI.borderColor : theme.colors.divider
         },
         buttonText: {
-            fontSize: 17,
-            color: theme.colors.textLink
+            fontSize: isTerminal ? 13 : 17,
+            color: theme.colors.textLink,
+            letterSpacing: isTerminal ? 0.5 : undefined,
+            // Text glow for terminal mode
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius,
+            } : {}),
         },
         cancelText: {
             fontWeight: '400'
@@ -148,16 +177,16 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
         <BaseModal visible={true} onClose={onClose} closeOnBackdrop={false}>
             <View style={styles.container}>
                 <View style={styles.content}>
-                    <Text style={[styles.title, Typography.default('semiBold')]}>
+                    <Text style={[styles.title, isTerminal ? Typography.mono('semiBold') : Typography.default('semiBold')]}>
                         {config.title}
                     </Text>
                     {config.message && (
-                        <Text style={[styles.message, Typography.default()]}>
+                        <Text style={[styles.message, isTerminal ? Typography.mono() : Typography.default()]}>
                             {config.message}
                         </Text>
                     )}
                 </View>
-                
+
                 <View style={styles.buttonContainer}>
                     {buttons.map((button, index) => (
                         <React.Fragment key={index}>
@@ -173,9 +202,11 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
                                     styles.buttonText,
                                     button.style === 'cancel' && styles.cancelText,
                                     button.style === 'destructive' && styles.destructiveText,
-                                    Typography.default(button.style === 'cancel' ? undefined : 'semiBold')
+                                    isTerminal
+                                        ? Typography.mono(button.style === 'cancel' ? undefined : 'semiBold')
+                                        : Typography.default(button.style === 'cancel' ? undefined : 'semiBold')
                                 ]}>
-                                    {button.text}
+                                    {isTerminal ? `[ ${button.text.toUpperCase()} ]` : button.text}
                                 </Text>
                             </Pressable>
                         </React.Fragment>

@@ -87,24 +87,32 @@ interface AgentInputProps {
 
 const MAX_CONTEXT_SIZE = 190000;
 
-const stylesheet = StyleSheet.create((theme, runtime) => ({
-    container: {
-        alignItems: 'center',
-        paddingBottom: 8,
-        paddingTop: 8,
-    },
-    innerContainer: {
-        width: '100%',
-        position: 'relative',
-    },
-    unifiedPanel: {
-        backgroundColor: theme.colors.input.background,
-        borderRadius: Platform.select({ default: 16, android: 20 }),
-        overflow: 'hidden',
-        paddingVertical: 2,
-        paddingBottom: 8,
-        paddingHorizontal: 8,
-    },
+const stylesheet = StyleSheet.create((theme, runtime) => {
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
+    return {
+        container: {
+            alignItems: 'center',
+            paddingBottom: 8,
+            paddingTop: 8,
+        },
+        innerContainer: {
+            width: '100%',
+            position: 'relative',
+        },
+        unifiedPanel: {
+            backgroundColor: theme.colors.input.background,
+            borderRadius: terminalUI.borderRadius,
+            overflow: 'hidden',
+            paddingVertical: 2,
+            paddingBottom: 8,
+            paddingHorizontal: 8,
+            ...(terminalUI.useBorders ? {
+                borderWidth: terminalUI.borderWidth,
+                borderColor: terminalUI.borderColor,
+            } : {}),
+        },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -285,7 +293,8 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
     sendButtonIcon: {
         color: theme.colors.button.primary.tint,
     },
-}));
+    };
+});
 
 const getContextWarning = (contextSize: number, alwaysShow: boolean = false, theme: Theme) => {
     const percentageUsed = (contextSize / MAX_CONTEXT_SIZE) * 100;

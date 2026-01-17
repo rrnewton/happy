@@ -156,13 +156,15 @@ export const es: TranslationStructure = {
         themeDescription: 'Elige tu esquema de colores preferido',
         themeOptions: {
             adaptive: 'Adaptativo',
-            light: 'Claro', 
+            light: 'Claro',
             dark: 'Oscuro',
+            terminal: 'Terminal',
         },
         themeDescriptions: {
             adaptive: 'Seguir configuración del sistema',
             light: 'Usar siempre tema claro',
             dark: 'Usar siempre tema oscuro',
+            terminal: 'Estética de terminal hacker en color ambar',
         },
         display: 'Pantalla',
         displayDescription: 'Controla diseño y espaciado',

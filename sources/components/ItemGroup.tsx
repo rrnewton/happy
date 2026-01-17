@@ -28,56 +28,67 @@ export interface ItemGroupProps {
     containerStyle?: StyleProp<ViewStyle>;
 }
 
-const stylesheet = StyleSheet.create((theme, runtime) => ({
-    wrapper: {
-        alignItems: 'center',
-    },
-    container: {
-        width: '100%',
-        maxWidth: layout.maxWidth,
-        paddingHorizontal: Platform.select({ ios: 0, default: 4 }),
-    },
-    header: {
-        paddingTop: Platform.select({ ios: 35, default: 16 }),
-        paddingBottom: Platform.select({ ios: 6, default: 8 }),
-        paddingHorizontal: Platform.select({ ios: 32, default: 24 }),
-    },
-    headerNoTitle: {
-        paddingTop: Platform.select({ ios: 20, default: 16 }),
-    },
-    headerText: {
-        ...Typography.default('regular'),
-        color: theme.colors.groupped.sectionTitle,
-        fontSize: Platform.select({ ios: 13, default: 14 }),
-        lineHeight: Platform.select({ ios: 18, default: 20 }),
-        letterSpacing: Platform.select({ ios: -0.08, default: 0.1 }),
-        textTransform: 'uppercase',
-        fontWeight: Platform.select({ ios: 'normal', default: '500' }),
-    },
-    contentContainer: {
-        backgroundColor: theme.colors.surface,
-        marginHorizontal: Platform.select({ ios: 16, default: 12 }),
-        borderRadius: Platform.select({ ios: 10, default: 16 }),
-        overflow: 'hidden',
-        shadowColor: theme.colors.shadow.color,
-        shadowOffset: { width: 0, height: 0.33 },
-        shadowOpacity: theme.colors.shadow.opacity,
-        shadowRadius: 0,
-        elevation: 1
-    },
-    footer: {
-        paddingTop: Platform.select({ ios: 6, default: 8 }),
-        paddingBottom: Platform.select({ ios: 8, default: 16 }),
-        paddingHorizontal: Platform.select({ ios: 32, default: 24 }),
-    },
-    footerText: {
-        ...Typography.default('regular'),
-        color: theme.colors.groupped.sectionTitle,
-        fontSize: Platform.select({ ios: 13, default: 14 }),
-        lineHeight: Platform.select({ ios: 18, default: 20 }),
-        letterSpacing: Platform.select({ ios: -0.08, default: 0 }),
-    },
-}));
+const stylesheet = StyleSheet.create((theme, runtime) => {
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
+    return {
+        wrapper: {
+            alignItems: 'center',
+        },
+        container: {
+            width: '100%',
+            maxWidth: layout.maxWidth,
+            paddingHorizontal: Platform.select({ ios: 0, default: 4 }),
+        },
+        header: {
+            paddingTop: Platform.select({ ios: 35, default: 16 }),
+            paddingBottom: Platform.select({ ios: 6, default: 8 }),
+            paddingHorizontal: Platform.select({ ios: 32, default: 24 }),
+        },
+        headerNoTitle: {
+            paddingTop: Platform.select({ ios: 20, default: 16 }),
+        },
+        headerText: {
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            color: theme.colors.groupped.sectionTitle,
+            fontSize: Platform.select({ ios: 13, default: 14 }),
+            lineHeight: Platform.select({ ios: 18, default: 20 }),
+            letterSpacing: isTerminal ? 1 : Platform.select({ ios: -0.08, default: 0.1 }),
+            textTransform: 'uppercase',
+            fontWeight: Platform.select({ ios: 'normal', default: '500' }),
+        },
+        contentContainer: {
+            backgroundColor: theme.colors.surface,
+            marginHorizontal: Platform.select({ ios: 16, default: 12 }),
+            borderRadius: terminalUI.borderRadius,
+            overflow: 'hidden',
+            // Use borders for terminal, shadows for others
+            ...(terminalUI.useBorders ? {
+                borderWidth: terminalUI.borderWidth,
+                borderColor: terminalUI.borderColor,
+            } : {
+                shadowColor: theme.colors.shadow.color,
+                shadowOffset: { width: 0, height: 0.33 },
+                shadowOpacity: theme.colors.shadow.opacity,
+                shadowRadius: 0,
+                elevation: 1,
+            }),
+        },
+        footer: {
+            paddingTop: Platform.select({ ios: 6, default: 8 }),
+            paddingBottom: Platform.select({ ios: 8, default: 16 }),
+            paddingHorizontal: Platform.select({ ios: 32, default: 24 }),
+        },
+        footerText: {
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            color: theme.colors.groupped.sectionTitle,
+            fontSize: Platform.select({ ios: 13, default: 14 }),
+            lineHeight: Platform.select({ ios: 18, default: 20 }),
+            letterSpacing: isTerminal ? 0.5 : Platform.select({ ios: -0.08, default: 0 }),
+        },
+    };
+});
 
 export const ItemGroup = React.memo<ItemGroupProps>((props) => {
     const { theme } = useUnistyles();

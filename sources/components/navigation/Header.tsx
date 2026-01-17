@@ -193,71 +193,88 @@ export const createHeader = (props: NativeStackHeaderProps) => {
     return <NavigationHeaderComponent {...props} />;
 };
 
-const stylesheet = StyleSheet.create((theme, runtime) => ({
-    container: {
-        position: 'relative',
-        zIndex: 100,
-    },
-    containerTransparent: {
-        backgroundColor: 'transparent',
-    },
-    containerNormal: {
-        backgroundColor: theme.colors.header.background,
-    },
-    contentWrapper: {
-        width: '100%',
-        alignItems: 'center',
-    },
-    content: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: Platform.select({ ios: 8, default: 16 }),
-        width: '100%',
-        // maxWidth is applied dynamically via useResponsiveHeaderMaxWidth
-    },
-    leftContainer: {
-        flexGrow: 0,
-        flexShrink: 0,
-        alignItems: 'flex-start',
-    },
-    centerContainer: {
-        flexGrow: 1,
-        flexBasis: 0,
-        alignSelf: 'stretch',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-start',
-        paddingHorizontal: 12,
-    },
-    rightContainer: {
-        flexGrow: 0,
-        flexShrink: 0,
-        alignItems: 'flex-end',
-    },
-    title: {
-        fontSize: 17,
-        fontWeight: '600',
-        textAlign: 'center',
-        color: theme.colors.header.tint,
-        ...Typography.default('semiBold'),
-    },
-    subtitle: {
-        fontSize: 13,
-        fontWeight: '400',
-        textAlign: Platform.OS === 'ios' ? 'center' : 'left',
-        marginTop: 2,
-        color: theme.colors.header.tint,
-        ...Typography.default('regular'),
-    },
-    shadow: {
-        shadowColor: theme.colors.shadow.color,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: theme.colors.shadow.opacity,
-        shadowRadius: 3,
-        elevation: 4,
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
-    },
-    backButton: {
-        color: theme.colors.header.tint,
-    },
-}));
+const stylesheet = StyleSheet.create((theme, runtime) => {
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
+    return {
+        container: {
+            position: 'relative',
+            zIndex: 100,
+        },
+        containerTransparent: {
+            backgroundColor: 'transparent',
+        },
+        containerNormal: {
+            backgroundColor: theme.colors.header.background,
+            ...(terminalUI.useBorders ? {
+                borderBottomWidth: terminalUI.borderWidth,
+                borderBottomColor: terminalUI.borderColor,
+            } : {}),
+        },
+        contentWrapper: {
+            width: '100%',
+            alignItems: 'center',
+        },
+        content: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: Platform.select({ ios: 8, default: 16 }),
+            width: '100%',
+            // maxWidth is applied dynamically via useResponsiveHeaderMaxWidth
+        },
+        leftContainer: {
+            flexGrow: 0,
+            flexShrink: 0,
+            alignItems: 'flex-start',
+        },
+        centerContainer: {
+            flexGrow: 1,
+            flexBasis: 0,
+            alignSelf: 'stretch',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: Platform.OS === 'ios' ? 'center' : 'flex-start',
+            paddingHorizontal: 12,
+        },
+        rightContainer: {
+            flexGrow: 0,
+            flexShrink: 0,
+            alignItems: 'flex-end',
+        },
+        title: {
+            fontSize: 17,
+            fontWeight: '600',
+            textAlign: 'center',
+            color: theme.colors.header.tint,
+            ...(isTerminal ? Typography.mono('semiBold') : Typography.default('semiBold')),
+            letterSpacing: isTerminal ? 1 : undefined,
+            // Apply text glow effect in terminal mode
+            ...(terminalUI.textGlow.enabled ? {
+                textShadowColor: terminalUI.textGlow.color,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: terminalUI.textGlow.radius,
+            } : {}),
+        },
+        subtitle: {
+            fontSize: 13,
+            fontWeight: '400',
+            textAlign: Platform.OS === 'ios' ? 'center' : 'left',
+            marginTop: 2,
+            color: theme.colors.header.tint,
+            ...(isTerminal ? Typography.mono('regular') : Typography.default('regular')),
+            letterSpacing: isTerminal ? 0.5 : undefined,
+        },
+        shadow: terminalUI.useBorders ? {} : {
+            shadowColor: theme.colors.shadow.color,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: theme.colors.shadow.opacity,
+            shadowRadius: 3,
+            elevation: 4,
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
+        },
+        backButton: {
+            color: theme.colors.header.tint,
+        },
+    };
+});

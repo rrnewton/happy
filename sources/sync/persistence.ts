@@ -61,7 +61,7 @@ export function saveLocalSettings(settings: LocalSettings) {
     mmkv.set('local-settings', JSON.stringify(settings));
 }
 
-export function loadThemePreference(): 'light' | 'dark' | 'adaptive' {
+export function loadThemePreference(): 'light' | 'dark' | 'adaptive' | 'terminal' {
     const localSettings = mmkv.getString('local-settings');
     if (localSettings) {
         try {

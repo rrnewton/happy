@@ -138,13 +138,15 @@ export const ru: TranslationStructure = {
         themeDescription: 'Выберите предпочтительную цветовую схему',
         themeOptions: {
             adaptive: 'Адаптивная',
-            light: 'Светлая', 
+            light: 'Светлая',
             dark: 'Тёмная',
+            terminal: 'Терминал',
         },
         themeDescriptions: {
             adaptive: 'Следовать настройкам системы',
             light: 'Всегда использовать светлую тему',
             dark: 'Всегда использовать тёмную тему',
+            terminal: 'Янтарная эстетика хакерского терминала',
         },
         display: 'Отображение',
         displayDescription: 'Управление макетом и интервалами',

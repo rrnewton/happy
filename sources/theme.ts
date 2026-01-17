@@ -225,6 +225,21 @@ export const lightTheme = {
             plain: '#24292F',            // Default text color
         },
 
+        // Terminal-specific UI properties (disabled for light theme)
+        terminalUI: {
+            borderRadius: Platform.select({ ios: 10, default: 16 }),
+            useMonospace: false,
+            useBorders: false,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            // Text glow effect (disabled for light theme)
+            textGlow: {
+                enabled: false,
+                color: 'transparent',
+                radius: 0,
+            },
+        },
+
     },
 };
 
@@ -452,6 +467,266 @@ export const darkTheme = {
                 stack: '#ABB2BF',        // Gray for stack trace
             },
             plain: '#F8F8F2',            // Default text color
+        },
+
+        // Terminal-specific UI properties (disabled for dark theme)
+        terminalUI: {
+            borderRadius: Platform.select({ ios: 10, default: 16 }),
+            useMonospace: false,
+            useBorders: false,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            // Text glow effect (disabled for dark theme)
+            textGlow: {
+                enabled: false,
+                color: 'transparent',
+                radius: 0,
+            },
+        },
+
+    },
+} satisfies typeof lightTheme;
+
+export const terminalTheme = {
+    dark: true,
+    colors: {
+
+        //
+        // Main colors - Amber terminal aesthetic
+        //
+
+        text: '#ffb000',
+        textDestructive: '#ff4444',
+        textSecondary: '#cc8800',
+        textLink: '#00ccff',
+        warningCritical: '#ff4444',
+        warning: '#ffcc00',
+        success: '#00ff88',
+        surface: '#0a0a0a',
+        surfaceRipple: 'rgba(255, 176, 0, 0.1)',
+        surfacePressed: '#1a1a1a',
+        surfaceSelected: '#2a1800',
+        surfacePressedOverlay: '#1a1200',
+        surfaceHigh: '#121212',
+        surfaceHighest: '#1a1a1a',
+        divider: '#2a2a2a',
+        shadow: {
+            color: '#000000',
+            opacity: 0.3,
+        },
+
+        //
+        // System components
+        //
+
+        header: {
+            background: '#0a0a0a',
+            tint: '#ffb000'
+        },
+        switch: {
+            track: {
+                active: '#ffb000',
+                inactive: '#2a2a2a',
+            },
+            thumb: {
+                active: '#0a0a0a',
+                inactive: '#555555',
+            },
+        },
+        groupped: {
+            background: '#050505',
+            chevron: '#ffb000',
+            sectionTitle: '#cc8800',
+        },
+        fab: {
+            background: '#ffb000',
+            backgroundPressed: '#cc8800',
+            icon: '#0a0a0a',
+        },
+        radio: {
+            active: '#ffb000',
+            inactive: '#3a3a3a',
+            dot: '#ffb000',
+        },
+        modal: {
+            border: 'rgba(255, 176, 0, 0.3)'
+        },
+        button: {
+            primary: {
+                background: '#ffb000',
+                tint: '#0a0a0a',
+                disabled: '#3a3a3a',
+            },
+            secondary: {
+                tint: '#cc8800',
+            }
+        },
+        input: {
+            background: '#121212',
+            text: '#ffb000',
+            placeholder: '#666600',
+        },
+        box: {
+            warning: {
+                background: 'rgba(255, 204, 0, 0.15)',
+                border: '#ffcc00',
+                text: '#ffcc00',
+            },
+            error: {
+                background: 'rgba(255, 68, 68, 0.15)',
+                border: '#ff4444',
+                text: '#ff6666',
+            }
+        },
+
+        //
+        // App components
+        //
+
+        status: {
+            connected: '#00ff88',
+            connecting: '#ffb000',
+            disconnected: '#666600',
+            error: '#ff4444',
+            default: '#cc8800',
+        },
+
+        // Permission mode colors
+        permission: {
+            default: '#cc8800',
+            acceptEdits: '#00ccff',
+            bypass: '#ff9900',
+            plan: '#00ff88',
+            readOnly: '#666600',
+            safeYolo: '#ff6600',
+            yolo: '#ff4444',
+        },
+
+        // Permission button colors
+        permissionButton: {
+            allow: {
+                background: '#00ff88',
+                text: '#0a0a0a',
+            },
+            deny: {
+                background: '#ff4444',
+                text: '#0a0a0a',
+            },
+            allowAll: {
+                background: '#00ccff',
+                text: '#0a0a0a',
+            },
+            inactive: {
+                background: '#1a1a1a',
+                border: '#2a2a2a',
+                text: '#666600',
+            },
+            selected: {
+                background: '#2a1800',
+                border: '#ffb000',
+                text: '#ffb000',
+            },
+        },
+
+
+        // Diff view - amber terminal style
+        diff: {
+            outline: '#2a2a2a',
+            success: '#00ff88',
+            error: '#ff4444',
+            addedBg: '#1a2a1a',
+            addedBorder: '#00ff88',
+            addedText: '#00ff88',
+            removedBg: '#2a1a1a',
+            removedBorder: '#ff4444',
+            removedText: '#ff6666',
+            contextBg: '#0a0a0a',
+            contextText: '#cc8800',
+            lineNumberBg: '#0a0a0a',
+            lineNumberText: '#666600',
+            hunkHeaderBg: '#1a1a1a',
+            hunkHeaderText: '#ffb000',
+            leadingSpaceDot: '#2a2a2a',
+            inlineAddedBg: '#1a3a1a',
+            inlineAddedText: '#00ff88',
+            inlineRemovedBg: '#3a1a1a',
+            inlineRemovedText: '#ff6666',
+        },
+
+        // Message View colors - terminal style
+        userMessageBackground: '#1a1200',
+        userMessageBackgroundHighContrast: '#2a1800',
+        userMessageText: '#ffb000',
+        userMessageTextHighContrast: '#ffcc00',
+        agentMessageText: '#cc8800',
+        agentEventText: '#666600',
+        thinkingBackground: '#121200',
+
+        // Code/Syntax colors - amber terminal palette
+        syntaxKeyword: '#ffcc00',
+        syntaxString: '#00ff88',
+        syntaxComment: '#666600',
+        syntaxNumber: '#00ccff',
+        syntaxFunction: '#ff9900',
+        syntaxBracket1: '#ffb000',
+        syntaxBracket2: '#00ccff',
+        syntaxBracket3: '#00ff88',
+        syntaxBracket4: '#ff9900',
+        syntaxBracket5: '#ff6600',
+        syntaxDefault: '#cc8800',
+
+        // Git status colors
+        gitBranchText: '#cc8800',
+        gitFileCountText: '#666600',
+        gitAddedText: '#00ff88',
+        gitRemovedText: '#ff4444',
+
+        // Terminal/Command colors
+        terminal: {
+            background: '#0a0a0a',
+            prompt: '#ffb000',
+            command: '#ffcc00',
+            stdout: '#cc8800',
+            stderr: '#ff6600',
+            error: '#ff4444',
+            emptyOutput: '#666600',
+        },
+
+        // Debug panel content renderer colors
+        debug: {
+            json: {
+                key: '#ffb000',
+                string: '#00ff88',
+                number: '#00ccff',
+                boolean: '#00ccff',
+                null: '#ff6600',
+                bracket: '#cc8800',
+                punctuation: '#666600',
+            },
+            error: {
+                type: '#ff4444',
+                message: '#ffb000',
+                stack: '#666600',
+            },
+            plain: '#cc8800',
+        },
+
+        // Terminal-specific UI properties
+        terminalUI: {
+            // Keep rounded corners for consistency
+            borderRadius: Platform.select({ ios: 10, default: 16 }),
+            // Use monospace font
+            useMonospace: true,
+            // Border instead of shadow - adds that terminal panel look
+            useBorders: true,
+            borderColor: '#ffb000',
+            borderWidth: 1,
+            // Amber text glow for that phosphor CRT effect
+            textGlow: {
+                enabled: true,
+                color: 'rgba(255, 176, 0, 0.6)',
+                radius: 8,
+            },
         },
 
     },
