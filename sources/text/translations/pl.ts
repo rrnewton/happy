@@ -198,8 +198,6 @@ export const pl: TranslationStructure = {
         },
         showFlavorIcons: 'Pokaż ikony dostawcy AI',
         showFlavorIconsDescription: 'Wyświetlaj ikony dostawcy AI na awatarach sesji',
-        compactSessionView: 'Kompaktowy widok sesji',
-        compactSessionViewDescription: 'Pokazuj aktywne sesje w bardziej zwartym układzie',
         wideContentView: 'Szeroki widok treści',
         wideContentViewDescription: 'Używaj pełnej szerokości dla treści zamiast ograniczonego kontenera. Tabele i szeroka treść będą miały więcej miejsca.',
         highContrastMessages: 'Wysokiego kontrastu wiadomości',

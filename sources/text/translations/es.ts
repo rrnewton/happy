@@ -187,8 +187,6 @@ export const es: TranslationStructure = {
         },
         showFlavorIcons: 'Mostrar íconos de proveedor de IA',
         showFlavorIconsDescription: 'Mostrar íconos del proveedor de IA en los avatares de sesión',
-        compactSessionView: 'Vista compacta de sesiones',
-        compactSessionViewDescription: 'Mostrar sesiones activas en un diseño más compacto',
         wideContentView: 'Vista de contenido amplia',
         wideContentViewDescription: 'Usar el ancho completo para el contenido en lugar de un contenedor restringido. Las tablas y el contenido amplio tendrán más espacio.',
         highContrastMessages: 'Mensajes de alto contraste',

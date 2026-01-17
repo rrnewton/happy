@@ -2,10 +2,9 @@ import React from 'react';
 import { View, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/StyledText';
 import { usePathname } from 'expo-router';
-import { SessionListViewItem, useSetting } from '@/sync/storage';
+import { SessionListViewItem } from '@/sync/storage';
 import { sessionMatchesSearch } from '@/utils/sessionSearch';
 import { ActiveSessionsGroup, FlatSessionRow } from './ActiveSessionsGroup';
-import { ActiveSessionsGroupCompact } from './ActiveSessionsGroupCompact';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useVisibleSessionListViewData } from '@/hooks/useVisibleSessionListViewData';
 import { Typography } from '@/constants/Typography';
@@ -72,7 +71,6 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
     const rawData = useVisibleSessionListViewData({ showAllSessions: isSearching });
     const pathname = usePathname();
     const isTablet = useIsTablet();
-    const compactSessionView = useSetting('compactSessionView');
     const selectable = isTablet;
 
     // Pull-to-refresh state
@@ -172,9 +170,8 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                     selectedId = parts[2]; // parts[0] is empty, parts[1] is 'session', parts[2] is the ID
                 }
 
-                const ActiveComponent = compactSessionView ? ActiveSessionsGroupCompact : ActiveSessionsGroup;
                 return (
-                    <ActiveComponent
+                    <ActiveSessionsGroup
                         sessions={item.sessions}
                         selectedSessionId={selectedId}
                     />
@@ -200,7 +197,7 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                     />
                 );
         }
-    }, [pathname, dataWithSelected, compactSessionView]);
+    }, [pathname, dataWithSelected]);
 
 
     // Remove this section as we'll use FlatList for all items now
