@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Avatar } from '@/components/Avatar';
 import { Typography } from '@/constants/Typography';
 import { useHeaderHeight } from '@/utils/responsive';
 import { useResponsiveHeaderMaxWidth } from '@/components/layout';
@@ -13,12 +12,9 @@ interface ChatHeaderViewProps {
     title: string;
     subtitle?: string;
     onBackPress?: () => void;
-    onAvatarPress?: () => void;
-    avatarId?: string;
+    onInfoPress?: () => void;
     backgroundColor?: string;
     tintColor?: string;
-    isConnected?: boolean;
-    flavor?: string | null;
     onDebugPress?: () => void;
     isDebugActive?: boolean;
 }
@@ -27,10 +23,7 @@ export const ChatHeaderView: React.FC<ChatHeaderViewProps> = ({
     title,
     subtitle,
     onBackPress,
-    onAvatarPress,
-    avatarId,
-    isConnected = true,
-    flavor,
+    onInfoPress,
     onDebugPress,
     isDebugActive,
 }) => {
@@ -105,17 +98,16 @@ export const ChatHeaderView: React.FC<ChatHeaderViewProps> = ({
                         />
                     </Pressable>
                 )}
-                {avatarId && onAvatarPress && (
+                {onInfoPress && (
                     <Pressable
-                        onPress={onAvatarPress}
+                        onPress={onInfoPress}
                         hitSlop={15}
-                        style={styles.avatarButton}
+                        style={styles.infoButton}
                     >
-                        <Avatar
-                            id={avatarId}
-                            size={32}
-                            monochrome={!isConnected}
-                            flavor={flavor}
+                        <Ionicons
+                            name="ellipsis-horizontal"
+                            size={22}
+                            color={theme.colors.header.tint}
                         />
                     </Pressable>
                 )}
@@ -164,7 +156,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         lineHeight: 14,
     },
-    avatarButton: {
+    infoButton: {
         width: 44,
         height: 44,
         alignItems: 'center',

@@ -5,7 +5,6 @@ import { Text } from '@/components/StyledText';
 import { useAuth } from '@/auth/AuthContext';
 import { getUserProfile, sendFriendRequest, removeFriend } from '@/sync/apiFriends';
 import { UserProfile, getDisplayName } from '@/sync/friendTypes';
-import { Avatar } from '@/components/Avatar';
 import { ItemList } from '@/components/ItemList';
 import { ItemGroup } from '@/components/ItemGroup';
 import { Item } from '@/components/Item';
@@ -108,7 +107,6 @@ export default function UserProfileScreen() {
     }
 
     const displayName = getDisplayName(userProfile);
-    const avatarUrl = userProfile.avatar?.url;
 
     // Determine friend actions based on status
     const getFriendActions = () => {
@@ -163,13 +161,16 @@ export default function UserProfileScreen() {
             {/* User Info Header */}
             <View style={styles.headerContainer}>
                 <View style={styles.profileCard}>
-                    <View style={{ marginBottom: 16 }}>
-                        <Avatar
-                            id={userProfile.id}
-                            size={90}
-                            imageUrl={avatarUrl}
-                            thumbhash={userProfile.avatar?.thumbhash}
-                        />
+                    <View style={{
+                        width: 90,
+                        height: 90,
+                        borderRadius: 45,
+                        backgroundColor: theme.colors.divider,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 16
+                    }}>
+                        <Ionicons name="person" size={45} color={theme.colors.textSecondary} />
                     </View>
 
                     <Text style={styles.displayName}>{displayName}</Text>

@@ -3,8 +3,9 @@ import { View, FlatList } from 'react-native';
 import { Text } from '@/components/StyledText';
 import { useAllSessions } from '@/sync/storage';
 import { Session } from '@/sync/storageTypes';
-import { Avatar } from '@/components/Avatar';
-import { getSessionName, getSessionSubtitle, getSessionAvatarId } from '@/utils/sessionUtils';
+import { Ionicons } from '@expo/vector-icons';
+import { getSessionName, getSessionSubtitle } from '@/utils/sessionUtils';
+import { useUnistyles } from 'react-native-unistyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 import { Typography } from '@/constants/Typography';
@@ -161,6 +162,7 @@ function groupSessionsByDate(sessions: Session[]): SessionHistoryItem[] {
 }
 
 export default function SessionHistory() {
+    const { theme } = useUnistyles();
     const safeArea = useSafeAreaInsets();
     const allSessions = useAllSessions();
     const navigateToSession = useNavigateToSession();
@@ -184,27 +186,35 @@ export default function SessionHistory() {
             const session = item.session;
             const sessionName = getSessionName(session);
             const sessionSubtitle = getSessionSubtitle(session);
-            const avatarId = getSessionAvatarId(session);
-            
+
             // Determine card styling based on position within date group
             const prevItem = index > 0 ? groupedItems[index - 1] : null;
             const nextItem = index < groupedItems.length - 1 ? groupedItems[index + 1] : null;
-            
+
             const isFirst = prevItem?.type === 'date-header';
             const isLast = nextItem?.type === 'date-header' || nextItem == null;
             const isSingle = isFirst && isLast;
-            
+
             return (
                 <Pressable
                     style={[
                         styles.sessionCard,
-                        isSingle ? styles.sessionCardSingle : 
+                        isSingle ? styles.sessionCardSingle :
                         isFirst ? styles.sessionCardFirst :
                         isLast ? styles.sessionCardLast : {}
                     ]}
                     onPress={() => navigateToSession(session.id)}
                 >
-                    <Avatar id={avatarId} size={48} />
+                    <View style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        backgroundColor: theme.colors.divider,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Ionicons name="terminal-outline" size={24} color={theme.colors.textSecondary} />
+                    </View>
                     <View style={styles.sessionContent}>
                         <Text style={styles.sessionTitle} numberOfLines={1}>
                             {sessionName}

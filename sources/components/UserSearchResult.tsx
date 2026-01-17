@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { UserProfile, getDisplayName } from '@/sync/friendTypes';
-import { Avatar } from '@/components/Avatar';
+import { Ionicons } from '@expo/vector-icons';
 import { t } from '@/text';
 import { useRouter } from 'expo-router';
 
@@ -12,21 +12,21 @@ interface UserSearchResultProps {
     isProcessing?: boolean;
 }
 
-export function UserSearchResult({ 
-    user, 
-    onAddFriend, 
-    isProcessing = false 
+export function UserSearchResult({
+    user,
+    onAddFriend,
+    isProcessing = false
 }: UserSearchResultProps) {
     const router = useRouter();
+    const { theme } = useUnistyles();
     const displayName = getDisplayName(user);
-    const avatarUrl = user.avatar?.url || user.avatar?.path;
-    
+
     // Determine button state based on relationship status
     const getButtonContent = () => {
         if (isProcessing) {
             return <ActivityIndicator size="small" color="white" />;
         }
-        
+
         switch (user.status) {
             case 'friend':
                 return <Text style={styles.buttonTextDisabled}>{t('friends.alreadyFriends')}</Text>;
@@ -38,22 +38,19 @@ export function UserSearchResult({
                 return <Text style={styles.buttonText}>{t('friends.addFriend')}</Text>;
         }
     };
-    
+
     const isDisabled = isProcessing || user.status === 'friend' || user.status === 'pending' || user.status === 'requested';
 
     return (
-        <Pressable 
+        <Pressable
             style={styles.container}
             onPress={() => router.push(`/user/${user.id}`)}
         >
             <View style={styles.content}>
-                <Avatar
-                    id={user.id}
-                    size={48}
-                    imageUrl={avatarUrl}
-                    thumbhash={user.avatar?.thumbhash}
-                />
-                
+                <View style={styles.iconContainer}>
+                    <Ionicons name="person" size={24} color={theme.colors.textSecondary} />
+                </View>
+
                 <View style={styles.info}>
                     <Text style={styles.name}>{displayName}</Text>
                     <Text style={styles.username}>@{user.username}</Text>
@@ -61,7 +58,7 @@ export function UserSearchResult({
 
                 <TouchableOpacity
                     style={[
-                        styles.button, 
+                        styles.button,
                         isDisabled && styles.buttonDisabled
                     ]}
                     onPress={onAddFriend}
@@ -90,6 +87,14 @@ const styles = StyleSheet.create((theme) => ({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 16,
+    },
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: theme.colors.divider,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     info: {
         flex: 1,

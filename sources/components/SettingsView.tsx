@@ -27,7 +27,6 @@ import { getGitHubOAuthParams, disconnectGitHub } from '@/sync/apiGithub';
 import { disconnectService } from '@/sync/apiServices';
 import { useProfile } from '@/sync/storage';
 import { getDisplayName, getAvatarUrl, getBio } from '@/sync/profile';
-import { Avatar } from '@/components/Avatar';
 import { t } from '@/text';
 import { KeyboardShortcutsPanel } from '@/components/KeyboardShortcutsPanel';
 
@@ -192,17 +191,13 @@ export const SettingsView = React.memo(function SettingsView() {
             {/* App Info Header */}
             <View style={{ maxWidth: layout.maxWidth, alignSelf: 'center', width: '100%' }}>
                 <View style={{ alignItems: 'center', paddingVertical: 24, backgroundColor: theme.colors.surface, marginTop: 16, borderRadius: 12, marginHorizontal: 16 }}>
-                    {profile.firstName ? (
-                        // Profile view: Avatar + name + version
+                    <Image
+                        source={theme.dark ? require('@/assets/images/logotype-light.png') : require('@/assets/images/logotype-dark.png')}
+                        contentFit="contain"
+                        style={{ width: 300, height: 90, marginBottom: 12 }}
+                    />
+                    {profile.firstName && (
                         <>
-                            <View style={{ marginBottom: 12 }}>
-                                <Avatar
-                                    id={profile.id}
-                                    size={90}
-                                    imageUrl={avatarUrl}
-                                    thumbhash={profile.avatar?.thumbhash}
-                                />
-                            </View>
                             <Text style={{ fontSize: 20, fontWeight: '600', color: theme.colors.text, marginBottom: bio ? 4 : 8 }}>
                                 {displayName}
                             </Text>
@@ -211,15 +206,6 @@ export const SettingsView = React.memo(function SettingsView() {
                                     {bio}
                                 </Text>
                             )}
-                        </>
-                    ) : (
-                        // Logo view: Original logo + version
-                        <>
-                            <Image
-                                source={theme.dark ? require('@/assets/images/logotype-light.png') : require('@/assets/images/logotype-dark.png')}
-                                contentFit="contain"
-                                style={{ width: 300, height: 90, marginBottom: 12 }}
-                            />
                         </>
                     )}
                 </View>

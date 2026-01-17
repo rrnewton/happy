@@ -88,19 +88,6 @@ export function getSessionName(session: Session): string {
 }
 
 /**
- * Generates a deterministic avatar ID from machine ID and path.
- * This ensures the same machine + path combination always gets the same avatar.
- */
-export function getSessionAvatarId(session: Session): string {
-    if (session.metadata?.machineId && session.metadata?.path) {
-        // Combine machine ID and path for a unique, deterministic avatar
-        return `${session.metadata.machineId}:${session.metadata.path}`;
-    }
-    // Fallback to session ID if metadata is missing
-    return session.id;
-}
-
-/**
  * Formats a path relative to home directory if possible.
  * If the path starts with the home directory, replaces it with ~
  * Otherwise returns the full path.
