@@ -207,10 +207,7 @@ const stylesheet = StyleSheet.create((theme, runtime) => {
         },
         containerNormal: {
             backgroundColor: theme.colors.header.background,
-            ...(terminalUI.useBorders ? {
-                borderBottomWidth: terminalUI.borderWidth,
-                borderBottomColor: terminalUI.borderColor,
-            } : {}),
+            // No border below header in terminal mode - cleaner look
         },
         contentWrapper: {
             width: '100%',

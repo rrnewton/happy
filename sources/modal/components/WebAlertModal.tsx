@@ -156,7 +156,8 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
         },
         buttonText: {
             fontSize: isTerminal ? 13 : 17,
-            color: theme.colors.textLink,
+            // In terminal mode, use amber text color; otherwise use link color
+            color: isTerminal ? theme.colors.text : theme.colors.textLink,
             letterSpacing: isTerminal ? 0.5 : undefined,
             // Text glow for terminal mode
             ...(terminalUI.textGlow.enabled ? {
@@ -166,10 +167,13 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
             } : {}),
         },
         cancelText: {
-            fontWeight: '400'
+            fontWeight: '400',
+            // In terminal mode, dim the cancel button slightly
+            ...(isTerminal ? { opacity: 0.7 } : {}),
         },
         destructiveText: {
-            color: theme.colors.textDestructive
+            // In terminal mode, keep amber but maybe slightly different; otherwise use destructive red
+            color: isTerminal ? theme.colors.text : theme.colors.textDestructive,
         }
     });
 
@@ -198,7 +202,9 @@ export function WebAlertModal({ config, onClose, onConfirm }: WebAlertModalProps
                                 ]}
                                 onPress={() => handleButtonPress(index)}
                             >
-                                <Text style={[
+                                <Text
+                                    numberOfLines={1}
+                                    style={[
                                     styles.buttonText,
                                     button.style === 'cancel' && styles.cancelText,
                                     button.style === 'destructive' && styles.destructiveText,

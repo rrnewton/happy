@@ -232,8 +232,8 @@ export const Item = React.memo<ItemProps>((props) => {
     const content = (
         <>
             <View style={[styles.container, containerPadding, style]}>
-                {/* Left Section */}
-                {(icon || leftElement) && (
+                {/* Left Section - hide icons in terminal mode for cleaner look */}
+                {!isTerminal && (icon || leftElement) && (
                     <View style={styles.iconContainer}>
                         {leftElement || icon}
                     </View>
