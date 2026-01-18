@@ -185,11 +185,11 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
     const isTerminal = theme.colors.terminalUI.useMonospace;
 
     return (
-        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-end' }}>
             {/* Terminal prompt prefix */}
             {isTerminal && (
                 <span style={{
-                    paddingTop: props.paddingTop ?? 10,
+                    paddingBottom: props.paddingBottom ?? 10,
                     paddingRight: 8,
                     fontFamily: Typography.mono('semiBold').fontFamily,
                     fontWeight: 600,
