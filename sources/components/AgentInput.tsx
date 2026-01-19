@@ -81,6 +81,8 @@ interface AgentInputProps {
     onPickImage?: () => void;
     uploadingImageIds?: Set<string>;
     onPaste?: (event: ClipboardEvent) => void;
+    // Drag and drop handler for file uploads (web only)
+    onFileDrop?: (event: DragEvent) => void;
     // Selection change callback for cursor-aware text insertion
     onSelectionChange?: (selection: { start: number; end: number }) => void;
 }
@@ -339,6 +341,9 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
     const [isAborting, setIsAborting] = React.useState(false);
     // Switch to remote button state
     const [isSwitchingToRemote, setIsSwitchingToRemote] = React.useState(false);
+    // Drag and drop state (web only)
+    const [isDragOver, setIsDragOver] = React.useState(false);
+    const dropZoneRef = React.useRef<View>(null);
     const shakerRef = React.useRef<ShakeInstance>(null);
     const inputRef = React.useRef<MultiTextInputHandle>(null);
 
@@ -569,7 +574,54 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
         };
     }, [isCodex, props.modelMode, props.onModelModeChange]);
 
+    // Drag and drop setup (web only) - attach DOM event listeners via ref
+    React.useEffect(() => {
+        if (Platform.OS !== 'web' || !props.onFileDrop || !dropZoneRef.current) return;
 
+        // Get the underlying DOM element from the React Native Web View
+        const element = dropZoneRef.current as unknown as HTMLElement;
+        if (!element) return;
+
+        const handleDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDragEnter = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragOver(true);
+        };
+
+        const handleDragLeave = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Only set to false if we're leaving the container (not entering a child)
+            const rect = element.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                setIsDragOver(false);
+            }
+        };
+
+        const handleDrop = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragOver(false);
+            props.onFileDrop!(e);
+        };
+
+        element.addEventListener('dragover', handleDragOver);
+        element.addEventListener('dragenter', handleDragEnter);
+        element.addEventListener('dragleave', handleDragLeave);
+        element.addEventListener('drop', handleDrop);
+
+        return () => {
+            element.removeEventListener('dragover', handleDragOver);
+            element.removeEventListener('dragenter', handleDragEnter);
+            element.removeEventListener('dragleave', handleDragLeave);
+            element.removeEventListener('drop', handleDrop);
+        };
+    }, [props.onFileDrop]);
 
     return (
         <View style={[
@@ -838,7 +890,13 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                     </View>
                 )}
                 {/* Unified panel containing input and action buttons */}
-                <View style={styles.unifiedPanel}>
+                <View
+                    ref={dropZoneRef}
+                    style={[
+                        styles.unifiedPanel,
+                        isDragOver && { borderColor: theme.colors.textLink, borderWidth: 2 }
+                    ]}
+                >
                     {/* Recording status bar - shows when recording/transcribing */}
                     {props.micStatus && props.micStatus !== 'idle' && (
                         <RecordingStatusBar

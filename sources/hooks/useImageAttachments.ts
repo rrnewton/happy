@@ -292,6 +292,26 @@ export function useImageAttachments() {
         event.target.value = '';
     }, [addAttachment]);
 
+    /**
+     * Handle file drop event (web only)
+     * Call this from a container's onDrop handler
+     */
+    const handleFileDrop = React.useCallback(async (event: DragEvent) => {
+        if (Platform.OS !== 'web') return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const files = event.dataTransfer?.files;
+        if (!files) return;
+
+        for (const file of Array.from(files)) {
+            if (file.type.startsWith('image/')) {
+                await addAttachment(file);
+            }
+        }
+    }, [addAttachment]);
+
     return {
         /** Current list of attached images */
         attachments,
@@ -309,5 +329,7 @@ export function useImageAttachments() {
         handlePaste,
         /** Handle file input change event */
         handleFileInputChange,
+        /** Handle file drop event (web only) */
+        handleFileDrop,
     };
 }

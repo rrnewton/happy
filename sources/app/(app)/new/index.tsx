@@ -192,6 +192,7 @@ function NewSessionScreen() {
         clearAttachments: clearImageAttachments,
         pickImage,
         handlePaste,
+        handleFileDrop,
     } = useImageAttachments();
     const [uploadingImageIds, setUploadingImageIds] = React.useState<Set<string>>(new Set());
     const headerHeight = useHeaderHeight();
@@ -1005,6 +1006,7 @@ function NewSessionScreen() {
                     onPickImage={pickImage}
                     uploadingImageIds={uploadingImageIds}
                     onPaste={handlePaste}
+                    onFileDrop={handleFileDrop}
                     // Selection tracking for cursor-aware transcription insertion
                     onSelectionChange={(selection) => { selectionRef.current = selection; }}
                     // Voice transcription props

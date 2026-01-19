@@ -209,6 +209,7 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
         clearAttachments: clearImageAttachments,
         pickImage,
         handlePaste,
+        handleFileDrop,
     } = useImageAttachments();
     const [uploadingImageIds, setUploadingImageIds] = React.useState<Set<string>>(new Set());
     const [isSending, setIsSending] = React.useState(false);
@@ -606,6 +607,7 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
             onPickImage={pickImage}
             uploadingImageIds={uploadingImageIds}
             onPaste={handlePaste}
+            onFileDrop={handleFileDrop}
         />
     );
 
