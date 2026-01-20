@@ -23,17 +23,27 @@ export type Option = {
     title: string;
 };
 
-// Context to pass text color override to all child components
-const TextColorContext = React.createContext<string | undefined>(undefined);
+// Context to pass color overrides to all child components (for high contrast mode)
+type ColorOverrides = {
+    textColor?: string;
+    linkColor?: string;
+    codeBackground?: string;
+};
+const ColorOverridesContext = React.createContext<ColorOverrides>({});
 
-// Hook to get text color - returns override if set, otherwise undefined (use theme default)
-const useTextColor = () => React.useContext(TextColorContext);
+// Hook to get color overrides - returns overrides if set, otherwise empty
+const useColorOverrides = () => React.useContext(ColorOverridesContext);
+
+// Backwards compat - hook to get just the text color
+const useTextColor = () => useColorOverrides().textColor;
 
 export const MarkdownView = React.memo((props: {
     markdown: string;
     onOptionPress?: (option: Option) => void;
     onOptionEdit?: (option: Option) => void;
     textColor?: string;
+    linkColor?: string;
+    codeBackground?: string;
 }) => {
     const blocks = React.useMemo(() => parseMarkdown(props.markdown), [props.markdown]);
     
@@ -110,12 +120,18 @@ export const MarkdownView = React.memo((props: {
         );
     })();
 
-    // Wrap with context provider if textColor is specified
-    if (props.textColor) {
+    // Wrap with context provider if any color overrides are specified
+    const hasColorOverrides = props.textColor || props.linkColor || props.codeBackground;
+    if (hasColorOverrides) {
+        const colorOverrides: ColorOverrides = {
+            textColor: props.textColor,
+            linkColor: props.linkColor,
+            codeBackground: props.codeBackground,
+        };
         return (
-            <TextColorContext.Provider value={props.textColor}>
+            <ColorOverridesContext.Provider value={colorOverrides}>
                 {content}
-            </TextColorContext.Provider>
+            </ColorOverridesContext.Provider>
         );
     }
 
@@ -274,16 +290,32 @@ function RenderOptionsBlock(props: {
 }
 
 function RenderSpans(props: { spans: MarkdownSpan[], baseStyle?: any }) {
+    const colorOverrides = useColorOverrides();
     return (<>
         {props.spans.map((span, index) => {
+            // Build style overrides based on context
+            const hasCodeStyle = span.styles.includes('code');
+            const styleOverrides: any[] = [];
+
+            if (colorOverrides.textColor) {
+                styleOverrides.push({ color: colorOverrides.textColor });
+            }
+            if (hasCodeStyle && colorOverrides.codeBackground) {
+                styleOverrides.push({ backgroundColor: colorOverrides.codeBackground });
+            }
+
             if (span.url) {
+                // For links, use linkColor override if available
+                const linkStyleOverrides = colorOverrides.linkColor
+                    ? [{ color: colorOverrides.linkColor }]
+                    : [];
                 return (
                     <Link key={index} href={span.url as any} target="_blank">
-                        <Text selectable style={[style.link, span.styles.map(s => style[s])]}>{span.text}</Text>
+                        <Text selectable style={[style.link, span.styles.map(s => style[s]), ...linkStyleOverrides]}>{span.text}</Text>
                     </Link>
                 );
             } else {
-                return <Text key={index} selectable style={[props.baseStyle, span.styles.map(s => style[s])]}>{span.text}</Text>
+                return <Text key={index} selectable style={[props.baseStyle, span.styles.map(s => style[s]), ...styleOverrides]}>{span.text}</Text>
             }
         })}
     </>)

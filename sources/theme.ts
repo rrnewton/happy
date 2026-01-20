@@ -172,6 +172,8 @@ export const lightTheme = {
         userMessageBackgroundHighContrast: '#FFE066', // Vibrant yellow for high contrast mode
         userMessageText: '#000000',
         userMessageTextHighContrast: '#000000',
+        userMessageLinkHighContrast: '#0055AA',
+        userMessageCodeBackgroundHighContrast: 'rgba(0, 0, 0, 0.12)',
         agentMessageText: '#000000',
         agentEventText: '#666666',
         thinkingBackground: '#F5F0FF',
@@ -416,6 +418,8 @@ export const darkTheme = {
         userMessageBackgroundHighContrast: '#1E5AA8', // Vibrant blue for high contrast mode in dark theme
         userMessageText: '#FFFFFF',
         userMessageTextHighContrast: '#FFFFFF',
+        userMessageLinkHighContrast: '#7DD3FC',
+        userMessageCodeBackgroundHighContrast: 'rgba(255, 255, 255, 0.15)',
         agentMessageText: '#FFFFFF',
         agentEventText: '#8E8E93',
         thinkingBackground: '#2A2440',
@@ -658,6 +662,8 @@ export const terminalTheme = {
         userMessageBackgroundHighContrast: '#FFB000',
         userMessageText: '#ffb000',
         userMessageTextHighContrast: '#000000',
+        userMessageLinkHighContrast: '#0066AA',
+        userMessageCodeBackgroundHighContrast: 'rgba(0, 0, 0, 0.15)',
         agentMessageText: '#cc8800',
         agentEventText: '#666600',
         thinkingBackground: '#121200',
