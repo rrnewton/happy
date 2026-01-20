@@ -411,6 +411,7 @@ export const ca: TranslationStructure = {
         deleteSessionSubtitle: 'Elimina permanentment aquesta sessió',
         deleteSessionConfirm: 'Eliminar permanentment?',
         deleteSessionWarning: 'Aquesta acció no es pot desfer. Tots els missatges i dades associats amb aquesta sessió s\'eliminaran permanentment.',
+        deleteActiveSessionWarning: 'La sessió activa s\'arxivarà primer i després s\'eliminarà permanentment. Aquesta acció no es pot desfer.',
         failedToDeleteSession: 'Error en eliminar la sessió',
         sessionDeleted: 'Sessió eliminada amb èxit',
         

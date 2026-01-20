@@ -411,6 +411,7 @@ export const en = {
         deleteSessionSubtitle: 'Permanently remove this session',
         deleteSessionConfirm: 'Delete Permanently?',
         deleteSessionWarning: 'This action cannot be undone. All messages and data associated with this session will be permanently deleted.',
+        deleteActiveSessionWarning: 'This will archive the active session and then permanently delete it. This action cannot be undone.',
         failedToDeleteSession: 'Failed to delete session',
         sessionDeleted: 'Session deleted successfully',
         

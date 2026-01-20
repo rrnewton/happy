@@ -116,18 +116,30 @@ function SessionInfoContent({ session }: { session: Session }) {
     }, [performArchive]);
 
     // Use HappyAction for deletion - it handles errors automatically
+    // If session is active, archive it first before deleting
     const [deletingSession, performDelete] = useHappyAction(async () => {
+        // If session is active, archive it first
+        if (sessionStatus.isConnected || session.active) {
+            const archiveResult = await sessionKill(session.id);
+            if (!archiveResult.success) {
+                throw new HappyError(archiveResult.message || t('sessionInfo.failedToArchiveSession'), false);
+            }
+        }
+        // Then delete the session
         const result = await sessionDelete(session.id);
         if (!result.success) {
             throw new HappyError(result.message || t('sessionInfo.failedToDeleteSession'), false);
         }
-        // Success - no alert needed, UI will update to show deleted state
+        // Success - navigate back
+        router.back();
+        router.back();
     });
 
     const handleDeleteSession = useCallback(() => {
+        const isActive = sessionStatus.isConnected || session.active;
         Modal.alert(
             t('sessionInfo.deleteSession'),
-            t('sessionInfo.deleteSessionWarning'),
+            isActive ? t('sessionInfo.deleteActiveSessionWarning') : t('sessionInfo.deleteSessionWarning'),
             [
                 { text: t('common.cancel'), style: 'cancel' },
                 {
@@ -137,7 +149,7 @@ function SessionInfoContent({ session }: { session: Session }) {
                 }
             ]
         );
-    }, [performDelete]);
+    }, [performDelete, sessionStatus.isConnected, session.active]);
 
     const formatDate = useCallback((timestamp: number) => {
         return new Date(timestamp).toLocaleString();
@@ -285,14 +297,12 @@ function SessionInfoContent({ session }: { session: Session }) {
                             onPress={() => router.push(`/new?resumeClaudeSessionId=${session.metadata!.claudeSessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
                         />
                     )}
-                    {!sessionStatus.isConnected && !session.active && (
-                        <Item
-                            title={t('sessionInfo.deleteSession')}
-                            subtitle={t('sessionInfo.deleteSessionSubtitle')}
-                            icon={<Ionicons name="trash-outline" size={29} color="#FF3B30" />}
-                            onPress={handleDeleteSession}
-                        />
-                    )}
+                    <Item
+                        title={t('sessionInfo.deleteSession')}
+                        subtitle={t('sessionInfo.deleteSessionSubtitle')}
+                        icon={<Ionicons name="trash-outline" size={29} color="#FF3B30" />}
+                        onPress={handleDeleteSession}
+                    />
                 </ItemGroup>
 
                 {/* Metadata */}

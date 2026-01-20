@@ -378,6 +378,7 @@ export const ru: TranslationStructure = {
         deleteSessionSubtitle: 'Удалить эту сессию навсегда',
         deleteSessionConfirm: 'Удалить навсегда?',
         deleteSessionWarning: 'Это действие нельзя отменить. Все сообщения и данные, связанные с этой сессией, будут удалены навсегда.',
+        deleteActiveSessionWarning: 'Активная сессия будет сначала архивирована, а затем безвозвратно удалена. Это действие нельзя отменить.',
         failedToDeleteSession: 'Не удалось удалить сессию',
         sessionDeleted: 'Сессия успешно удалена',
     },

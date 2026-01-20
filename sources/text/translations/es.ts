@@ -411,6 +411,7 @@ export const es: TranslationStructure = {
         deleteSessionSubtitle: 'Eliminar permanentemente esta sesión',
         deleteSessionConfirm: '¿Eliminar permanentemente?',
         deleteSessionWarning: 'Esta acción no se puede deshacer. Todos los mensajes y datos asociados con esta sesión se eliminarán permanentemente.',
+        deleteActiveSessionWarning: 'La sesión activa se archivará primero y luego se eliminará permanentemente. Esta acción no se puede deshacer.',
         failedToDeleteSession: 'Error al eliminar la sesión',
         sessionDeleted: 'Sesión eliminada exitosamente',
         

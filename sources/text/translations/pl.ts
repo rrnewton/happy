@@ -422,6 +422,7 @@ export const pl: TranslationStructure = {
         deleteSessionSubtitle: 'Trwale usuń tę sesję',
         deleteSessionConfirm: 'Usunąć na stałe?',
         deleteSessionWarning: 'Ta operacja jest nieodwracalna. Wszystkie wiadomości i dane powiązane z tą sesją zostaną trwale usunięte.',
+        deleteActiveSessionWarning: 'Aktywna sesja zostanie najpierw zarchiwizowana, a następnie trwale usunięta. Ta operacja jest nieodwracalna.',
         failedToDeleteSession: 'Nie udało się usunąć sesji',
         sessionDeleted: 'Sesja została pomyślnie usunięta',
     },
