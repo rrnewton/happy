@@ -204,6 +204,8 @@ export const pl: TranslationStructure = {
         wideContentViewDescription: 'Używaj pełnej szerokości dla treści zamiast ograniczonego kontenera. Tabele i szeroka treść będą miały więcej miejsca.',
         highContrastMessages: 'Wysokiego kontrastu wiadomości',
         highContrastMessagesDescription: 'Użyj żywszych kolorów, aby Twoje wysłane wiadomości były bardziej wyraziste',
+        bootSequence: 'Sekwencja rozruchowa',
+        bootSequenceDescription: 'Wyświetlaj animację w stylu retro BIOS podczas uruchamiania aplikacji',
     },
 
     settingsFeatures: {

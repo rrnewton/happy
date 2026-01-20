@@ -193,6 +193,8 @@ export const pt: TranslationStructure = {
         wideContentViewDescription: 'Usar largura total para o conteúdo em vez de contêiner restrito. Tabelas e conteúdo largo terão mais espaço.',
         highContrastMessages: 'Mensagens de alto contraste',
         highContrastMessagesDescription: 'Usar cores vibrantes para que suas mensagens enviadas se destaquem mais',
+        bootSequence: 'Sequencia de inicializacao',
+        bootSequenceDescription: 'Mostrar animacao estilo BIOS retro ao iniciar o aplicativo',
     },
 
     settingsFeatures: {

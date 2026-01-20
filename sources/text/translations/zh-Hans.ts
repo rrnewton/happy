@@ -195,6 +195,8 @@ export const zhHans: TranslationStructure = {
         wideContentViewDescription: '使用全宽显示内容而不是受限容器。表格和宽内容将有更多空间。',
         highContrastMessages: '高对比度消息',
         highContrastMessagesDescription: '使用鲜艳的颜色使您发送的消息更加醒目',
+        bootSequence: '启动序列',
+        bootSequenceDescription: '在应用启动时显示复古 BIOS 风格动画',
     },
 
     settingsFeatures: {

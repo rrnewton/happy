@@ -28,6 +28,8 @@ import { StatusBarProvider } from '@/components/StatusBarProvider';
 import { monkeyPatchConsoleForRemoteLoggingForFasterAiAutoDebuggingOnlyInLocalBuilds } from '@/utils/remoteLogger';
 import { useUnistyles } from 'react-native-unistyles';
 import { AsyncLock } from '@/utils/lock';
+import { loadLocalSettings } from '@/sync/persistence';
+import { BootSequence } from '@/components/BootSequence';
 
 // Configure how notifications are handled when app is in foreground
 // This must be called outside of any component to ensure it's set before any notification arrives
@@ -192,7 +194,8 @@ export default function RootLayout() {
     //
     // Init sequence
     //
-    const [initState, setInitState] = React.useState<{ credentials: AuthCredentials | null } | null>(null);
+    const [initState, setInitState] = React.useState<{ credentials: AuthCredentials | null, bootSequenceEnabled: boolean } | null>(null);
+    const [showBootSequence, setShowBootSequence] = React.useState(false);
 
     React.useEffect(() => {
         (async () => {
@@ -205,7 +208,14 @@ export default function RootLayout() {
                     await syncRestore(credentials);
                 }
 
-                setInitState({ credentials });
+                // Check if boot sequence is enabled (only for terminal theme)
+                const localSettings = loadLocalSettings();
+                const bootSequenceEnabled = localSettings.bootSequenceEnabled && localSettings.themePreference === 'terminal';
+                if (bootSequenceEnabled) {
+                    setShowBootSequence(true);
+                }
+
+                setInitState({ credentials, bootSequenceEnabled });
             } catch (error) {
                 console.error('Error initializing:', error);
             }
@@ -230,6 +240,11 @@ export default function RootLayout() {
     if (!initState) {
         return null;
     }
+
+    // Boot sequence completion handler
+    const handleBootComplete = () => {
+        setShowBootSequence(false);
+    };
 
     //
     // Boot - app loads in background while boot sequence plays as overlay
@@ -271,6 +286,11 @@ export default function RootLayout() {
         <>
             <FaviconPermissionIndicator />
             {providers}
+            {showBootSequence && (
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+                    <BootSequence onComplete={handleBootComplete} />
+                </View>
+            )}
         </>
     );
 }

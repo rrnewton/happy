@@ -14,6 +14,7 @@ export const LocalSettingsSchema = z.object({
     shiftEnterToSend: z.boolean().describe('Use Shift+Enter to send messages (Enter creates new line). Default is Enter to send.'),
     wideContentView: z.boolean().describe('Use full width for content instead of constrained 800px container'),
     sidebarCollapsed: z.boolean().describe('Collapse sidebar on web (Cmd+B to toggle)'),
+    bootSequenceEnabled: z.boolean().describe('Show boot sequence animation on app startup'),
     // CLI version acknowledgments - keyed by machineId
     acknowledgedCliVersions: z.record(z.string(), z.string()).describe('Acknowledged CLI versions per machine'),
 });
@@ -40,6 +41,7 @@ export const localSettingsDefaults: LocalSettings = {
     shiftEnterToSend: false,
     wideContentView: false,
     sidebarCollapsed: false,
+    bootSequenceEnabled: false,
     acknowledgedCliVersions: {},
 };
 Object.freeze(localSettingsDefaults);

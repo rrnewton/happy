@@ -175,6 +175,8 @@ export const ru: TranslationStructure = {
         wideContentViewDescription: 'Использовать полную ширину для контента вместо ограниченного контейнера. Таблицы и широкий контент будут иметь больше места.',
         highContrastMessages: 'Контрастные сообщения',
         highContrastMessagesDescription: 'Использовать яркие цвета для ваших сообщений, чтобы они лучше выделялись',
+        bootSequence: 'Загрузочная последовательность',
+        bootSequenceDescription: 'Показывать ретро-анимацию в стиле BIOS при запуске приложения',
     },
 
     settingsFeatures: {

@@ -193,6 +193,8 @@ export const en = {
         wideContentViewDescription: 'Use full width for content instead of constrained container. Tables and wide content will have more space.',
         highContrastMessages: 'High Contrast Messages',
         highContrastMessagesDescription: 'Use vibrant colors to make your sent messages more visually distinct',
+        bootSequence: 'Boot Sequence',
+        bootSequenceDescription: 'Show retro BIOS-style animation on app startup',
     },
 
     settingsFeatures: {

@@ -25,6 +25,7 @@ export default function AppearanceSettingsScreen() {
     const [highContrastMessages, setHighContrastMessages] = useSettingMutable('highContrastMessages');
     const [themePreference, setThemePreference] = useLocalSettingMutable('themePreference');
     const [wideContentView, setWideContentView] = useLocalSettingMutable('wideContentView');
+    const [bootSequenceEnabled, setBootSequenceEnabled] = useLocalSettingMutable('bootSequenceEnabled');
     const [preferredLanguage] = useSettingMutable('preferredLanguage');
     
     // Language display
@@ -96,6 +97,19 @@ export default function AppearanceSettingsScreen() {
                         }
                     }}
                 />
+                {themePreference === 'terminal' && (
+                    <Item
+                        title={t('settingsAppearance.bootSequence')}
+                        subtitle={t('settingsAppearance.bootSequenceDescription')}
+                        icon={<Ionicons name="terminal-outline" size={29} color={theme.colors.status.connecting} />}
+                        rightElement={
+                            <Switch
+                                value={bootSequenceEnabled}
+                                onValueChange={setBootSequenceEnabled}
+                            />
+                        }
+                    />
+                )}
             </ItemGroup>
 
             {/* Language Settings */}
