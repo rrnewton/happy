@@ -277,11 +277,11 @@ function SessionInfoContent({ session }: { session: Session }) {
                             onPress={handleArchiveSession}
                         />
                     )}
-                    {!sessionStatus.isConnected && !session.active && session.metadata?.claudeSessionId && session.metadata?.machineId && (
+                    {session.metadata?.claudeSessionId && session.metadata?.machineId && (
                         <Item
-                            title={t('sessionInfo.continueFromHere')}
-                            subtitle={t('sessionInfo.continueFromHereSubtitle')}
-                            icon={<Ionicons name="play-outline" size={29} color="#34C759" />}
+                            title={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSession') : t('sessionInfo.continueFromHere')}
+                            subtitle={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSessionSubtitle') : t('sessionInfo.continueFromHereSubtitle')}
+                            icon={<Ionicons name={sessionStatus.isConnected && session.active ? "git-branch-outline" : "play-outline"} size={29} color="#34C759" />}
                             onPress={() => router.push(`/new?resumeClaudeSessionId=${session.metadata!.claudeSessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
                         />
                     )}

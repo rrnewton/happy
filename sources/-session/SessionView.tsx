@@ -23,6 +23,8 @@ import { t } from '@/text';
 import { tracking, trackMessageSent } from '@/track';
 import { isRunningOnMac } from '@/utils/platform';
 import { useDeviceType, useHeaderHeight, useIsLandscape, useIsTablet } from '@/utils/responsive';
+import { useResponsiveMaxWidth } from '@/components/layout';
+import { useWindowDimensions } from 'react-native';
 import { formatPathRelativeToHome, getSessionName, useSessionStatus } from '@/utils/sessionUtils';
 import { isVersionSupported, MINIMUM_CLI_VERSION } from '@/utils/versionUtils';
 import { Ionicons } from '@expo/vector-icons';
@@ -156,6 +158,8 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
     const deviceType = useDeviceType();
     const isTablet = useIsTablet();
     const headerHeight = useHeaderHeight();
+    const screenWidth = useWindowDimensions().width;
+    const responsiveMaxWidth = useResponsiveMaxWidth();
     const [message, setMessage] = React.useState('');
     const { messages, isLoaded } = useSessionMessages(sessionId);
     const acknowledgedCliVersions = useLocalSetting('acknowledgedCliVersions');
@@ -552,7 +556,42 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
         };
     }, []);
 
-    const input = (
+    // Check if session is archived (not connected and not active)
+    const isArchived = !sessionStatus.isConnected && !session.active;
+
+    // Handle continue from archived session
+    const handleContinueFromHere = React.useCallback(() => {
+        if (session.metadata?.claudeSessionId && session.metadata?.machineId) {
+            router.push(`/new?resumeClaudeSessionId=${session.metadata.claudeSessionId}&selectedMachineId=${session.metadata.machineId}&selectedPathParam=${encodeURIComponent(session.metadata.path || '')}`);
+        }
+    }, [session.metadata, router]);
+
+    const input = isArchived ? (
+        // Show "Continue From Here" button for archived sessions
+        session.metadata?.claudeSessionId && session.metadata?.machineId ? (
+            <View style={{ paddingHorizontal: screenWidth > 700 ? 16 : 8, paddingVertical: 12 }}>
+                <View style={{ maxWidth: responsiveMaxWidth, alignSelf: 'center', width: '100%' }}>
+                    <Pressable
+                        onPress={handleContinueFromHere}
+                        style={{
+                            backgroundColor: theme.colors.button.primary.background,
+                            borderRadius: 12,
+                            paddingVertical: 14,
+                            paddingHorizontal: 20,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Ionicons name="play-outline" size={20} color={theme.colors.button.primary.tint} style={{ marginRight: 8 }} />
+                        <Text style={{ color: theme.colors.button.primary.tint, fontSize: 16, fontWeight: '600' }}>
+                            {t('sessionInfo.continueFromHere')}
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
+        ) : null
+    ) : (
         <AgentInput
             ref={inputRef}
             placeholder={t('session.inputPlaceholder')}

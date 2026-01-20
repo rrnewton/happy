@@ -372,6 +372,8 @@ export const ru: TranslationStructure = {
         updateCliInstructions: 'Пожалуйста, выполните npm install -g happy-coder@latest',
         continueFromHere: 'Продолжить отсюда',
         continueFromHereSubtitle: 'Начать новую сессию, продолжая этот разговор',
+        forkSession: 'Ответвить сессию',
+        forkSessionSubtitle: 'Начать новую сессию, ответвляясь от этого разговора',
         deleteSession: 'Удалить',
         deleteSessionSubtitle: 'Удалить эту сессию навсегда',
         deleteSessionConfirm: 'Удалить навсегда?',

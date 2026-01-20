@@ -405,6 +405,8 @@ export const en = {
         updateCliInstructions: 'Please run npm install -g happy-coder@latest',
         continueFromHere: 'Continue From Here',
         continueFromHereSubtitle: 'Start a new session continuing this conversation',
+        forkSession: 'Fork Session',
+        forkSessionSubtitle: 'Start a new session branching from this conversation',
         deleteSession: 'Delete',
         deleteSessionSubtitle: 'Permanently remove this session',
         deleteSessionConfirm: 'Delete Permanently?',

@@ -407,6 +407,8 @@ export const zhHans: TranslationStructure = {
         updateCliInstructions: '请运行 npm install -g happy-coder@latest',
         continueFromHere: '从这里继续',
         continueFromHereSubtitle: '开始新会话继续此对话',
+        forkSession: '分支会话',
+        forkSessionSubtitle: '从此对话创建新的分支会话',
         deleteSession: '删除',
         deleteSessionSubtitle: '永久删除此会话',
         deleteSessionConfirm: '永久删除？',

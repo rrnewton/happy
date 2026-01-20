@@ -416,6 +416,8 @@ export const pl: TranslationStructure = {
         updateCliInstructions: 'Proszę uruchomić npm install -g happy-coder@latest',
         continueFromHere: 'Kontynuuj stąd',
         continueFromHereSubtitle: 'Rozpocznij nową sesję kontynuując tę rozmowę',
+        forkSession: 'Rozgałęź sesję',
+        forkSessionSubtitle: 'Rozpocznij nową sesję rozgałęziając tę rozmowę',
         deleteSession: 'Usuń',
         deleteSessionSubtitle: 'Trwale usuń tę sesję',
         deleteSessionConfirm: 'Usunąć na stałe?',
