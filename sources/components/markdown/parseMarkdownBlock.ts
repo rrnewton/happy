@@ -144,8 +144,18 @@ export function parseMarkdownBlock(markdown: string) {
             continue;
         }
 
-        // Options block
-        if (trimmed.startsWith('<options>')) {
+        // Options block - handle <options> at start or end of line only
+        const optionsIndex = trimmed.indexOf('<options>');
+        const endsWithOptions = trimmed.endsWith('<options>');
+        const startsWithOptions = optionsIndex === 0;
+        if (optionsIndex !== -1 && (startsWithOptions || endsWithOptions)) {
+            // If <options> is at the end, emit preceding text as a text block
+            if (endsWithOptions && !startsWithOptions) {
+                const textBefore = trimmed.slice(0, optionsIndex).trim();
+                if (textBefore.length > 0) {
+                    blocks.push({ type: 'text', content: parseMarkdownSpans(textBefore, false) });
+                }
+            }
             let items: string[] = [];
             while (index < lines.length) {
                 const nextLine = lines[index];
