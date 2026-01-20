@@ -38,8 +38,8 @@ export function useGlobalKeyboard(onCommandPalette: () => void, handlers?: Omit<
             const isModifierPressed = isMac ? e.metaKey : e.ctrlKey;
             const isShiftPressed = e.shiftKey;
 
-            // ⌘K - Open command palette
-            if (isModifierPressed && e.key === 'k') {
+            // ⌘K - Open command palette (without shift - ⌘⇧K is fork session)
+            if (isModifierPressed && !isShiftPressed && e.key === 'k') {
                 e.preventDefault();
                 e.stopPropagation();
                 onCommandPalette();
