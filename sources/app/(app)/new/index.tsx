@@ -849,13 +849,16 @@ function NewSessionScreen() {
             // Custom vars override all preset vars
             mergedEnvVars = { ...mergedEnvVars, ...customEnvVars };
 
+            const resumeSessionId = manualResumeSessionId || resumeClaudeSessionId;
             const result = await machineSpawnNewSession({
                 machineId: selectedMachineId,
                 directory: actualPath,
                 // For now we assume you already have a path to start in
                 approvedNewDirectoryCreation: true,
                 agent: agentType,
-                resumeClaudeSessionId: manualResumeSessionId || resumeClaudeSessionId,
+                resumeClaudeSessionId: resumeSessionId,
+                // Always fork when resuming from /new screen to create a new session
+                forkSession: !!resumeSessionId,
                 // Pass merged environment variables
                 environmentVariables: Object.keys(mergedEnvVars).length > 0 ? mergedEnvVars : undefined,
             });

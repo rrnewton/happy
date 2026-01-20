@@ -142,6 +142,8 @@ export interface SpawnSessionOptions {
     token?: string;
     agent?: 'codex' | 'claude';
     resumeClaudeSessionId?: string;
+    /** When resuming, create a new session ID instead of reusing the original */
+    forkSession?: boolean;
     /** Environment variables to pass to the spawned session */
     environmentVariables?: Record<string, string>;
 }
@@ -153,7 +155,7 @@ export interface SpawnSessionOptions {
  */
 export async function machineSpawnNewSession(options: SpawnSessionOptions): Promise<SpawnSessionResult> {
 
-    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, resumeClaudeSessionId, environmentVariables } = options;
+    const { machineId, directory, approvedNewDirectoryCreation = false, token, agent, resumeClaudeSessionId, forkSession, environmentVariables } = options;
 
     try {
         const result = await apiSocket.machineRPC<SpawnSessionResult, {
@@ -163,11 +165,12 @@ export async function machineSpawnNewSession(options: SpawnSessionOptions): Prom
             token?: string,
             agent?: 'codex' | 'claude',
             resumeClaudeSessionId?: string,
+            forkSession?: boolean,
             environmentVariables?: Record<string, string>
         }>(
             machineId,
             'spawn-happy-session',
-            { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, resumeClaudeSessionId, environmentVariables }
+            { type: 'spawn-in-directory', directory, approvedNewDirectoryCreation, token, agent, resumeClaudeSessionId, forkSession, environmentVariables }
         );
         return result;
     } catch (error) {
