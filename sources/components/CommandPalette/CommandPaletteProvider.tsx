@@ -231,38 +231,46 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                 });
             }
 
-            // Delete session (only for inactive sessions)
-            if (!currentSession.active) {
-                cmds.push({
-                    id: 'delete-session',
-                    title: t('sessionInfo.deleteSession'),
-                    subtitle: `${sessionName} - ${t('sessionInfo.deleteSessionSubtitle')}`,
-                    icon: 'trash-outline',
-                    category: 'Current Session',
-                    shortcut: shortcut({ command: true, key: 'Backspace' }),
-                    action: () => {
-                        Modal.alert(
-                            t('sessionInfo.deleteSession'),
-                            t('sessionInfo.deleteSessionWarning'),
-                            [
-                                { text: t('common.cancel'), style: 'cancel' },
-                                {
-                                    text: t('sessionInfo.deleteSession'),
-                                    style: 'destructive',
-                                    onPress: async () => {
-                                        const result = await sessionDelete(currentSessionId);
-                                        if (result.success) {
-                                            router.replace('/');
-                                        } else {
-                                            Modal.alert(t('common.error'), result.message || t('sessionInfo.failedToDeleteSession'));
+            // Delete session (available for all sessions, auto-archives active ones)
+            cmds.push({
+                id: 'delete-session',
+                title: t('sessionInfo.deleteSession'),
+                subtitle: `${sessionName} - ${t('sessionInfo.deleteSessionSubtitle')}`,
+                icon: 'trash-outline',
+                category: 'Current Session',
+                shortcut: shortcut({ command: true, shift: true, key: 'Backspace' }),
+                action: () => {
+                    const isActive = currentSession.active;
+                    Modal.alert(
+                        t('sessionInfo.deleteSession'),
+                        isActive ? t('sessionInfo.deleteActiveSessionWarning') : t('sessionInfo.deleteSessionWarning'),
+                        [
+                            { text: t('common.cancel'), style: 'cancel' },
+                            {
+                                text: t('sessionInfo.deleteSession'),
+                                style: 'destructive',
+                                onPress: async () => {
+                                    // If session is active, archive it first
+                                    if (isActive) {
+                                        const archiveResult = await sessionKill(currentSessionId);
+                                        if (!archiveResult.success) {
+                                            Modal.alert(t('common.error'), archiveResult.message || t('sessionInfo.failedToArchiveSession'));
+                                            return;
                                         }
                                     }
+                                    // Then delete the session
+                                    const result = await sessionDelete(currentSessionId);
+                                    if (result.success) {
+                                        router.replace('/');
+                                    } else {
+                                        Modal.alert(t('common.error'), result.message || t('sessionInfo.failedToDeleteSession'));
+                                    }
                                 }
-                            ]
-                        );
-                    }
-                });
-            }
+                            }
+                        ]
+                    );
+                }
+            });
         }
 
         // System commands

@@ -20,7 +20,7 @@ export interface KeyboardHandlers {
 
 /**
  * Hook for handling global keyboard shortcuts on web
- * Mac: ⌘K (palette), ⌘⇧O (new session), ⌘⇧A (archive), ⌘⌫ (delete), ⌘⇧V (voice), ⌘⇧F (focus search), ⌘⇧? (shortcuts panel), ⌘B or ⌘1 (toggle sidebar)
+ * Mac: ⌘K (palette), ⌘⇧O (new session), ⌘⇧A (archive), ⌘⇧⌫ (delete), ⌘⇧V (voice), ⌘⇧F (focus search), ⌘⇧? (shortcuts panel), ⌘B or ⌘1 (toggle sidebar)
  * Windows/Linux: Uses Ctrl instead of ⌘ for all shortcuts
  * Prev/Next session: ⌥↑/↓ on Mac, Ctrl+Shift+↑/↓ on Windows/Linux
  */
@@ -61,8 +61,8 @@ export function useGlobalKeyboard(onCommandPalette: () => void, handlers?: Omit<
                 return;
             }
 
-            // ⌘⌫ (Backspace) - Delete session
-            if (isModifierPressed && e.key === 'Backspace') {
+            // ⌘⇧⌫ (Shift+Backspace) - Delete session
+            if (isModifierPressed && isShiftPressed && e.key === 'Backspace') {
                 e.preventDefault();
                 e.stopPropagation();
                 handlers?.onDeleteSession?.();
