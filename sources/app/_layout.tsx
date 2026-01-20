@@ -31,6 +31,9 @@ import { AsyncLock } from '@/utils/lock';
 import { loadLocalSettings } from '@/sync/persistence';
 import { BootSequence } from '@/components/BootSequence';
 
+// Module-level flag to ensure boot sequence only runs once per app session
+let hasShownBootSequence = false;
+
 // Configure how notifications are handled when app is in foreground
 // This must be called outside of any component to ensure it's set before any notification arrives
 Notifications.setNotificationHandler({
@@ -208,10 +211,11 @@ export default function RootLayout() {
                     await syncRestore(credentials);
                 }
 
-                // Check if boot sequence is enabled (only for terminal theme)
+                // Check if boot sequence is enabled (only for terminal theme, only once per session)
                 const localSettings = loadLocalSettings();
-                const bootSequenceEnabled = localSettings.bootSequenceEnabled && localSettings.themePreference === 'terminal';
+                const bootSequenceEnabled = localSettings.bootSequenceEnabled && localSettings.themePreference === 'terminal' && !hasShownBootSequence;
                 if (bootSequenceEnabled) {
+                    hasShownBootSequence = true;
                     setShowBootSequence(true);
                 }
 

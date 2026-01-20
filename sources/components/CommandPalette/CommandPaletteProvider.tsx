@@ -381,6 +381,17 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         );
     }, [currentSession, currentSessionId, router, commandPaletteEnabled]);
 
+    // Handler for fork session shortcut (⌘⇧K)
+    // For active sessions this forks, for archived sessions this continues from that point
+    const handleForkSession = useCallback(() => {
+        if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
+        if (!currentSession || !currentSessionId) return;
+        // Need claudeSessionId and machineId to fork
+        if (!currentSession.metadata?.claudeSessionId || !currentSession.metadata?.machineId) return;
+
+        router.push(`/new?resumeClaudeSessionId=${currentSession.metadata.claudeSessionId}&selectedMachineId=${currentSession.metadata.machineId}&selectedPathParam=${encodeURIComponent(currentSession.metadata.path || '')}`);
+    }, [currentSession, currentSessionId, router, commandPaletteEnabled]);
+
     // Handler for voice recording toggle shortcut (⌘⇧V)
     const handleToggleVoiceRecording = useCallback(async () => {
         if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
