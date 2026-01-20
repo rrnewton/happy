@@ -654,10 +654,10 @@ export const terminalTheme = {
         },
 
         // Message View colors - terminal style
-        userMessageBackground: '#1a1200',
-        userMessageBackgroundHighContrast: '#2a1800',
+        userMessageBackground: '#5A4000',
+        userMessageBackgroundHighContrast: '#FFB000',
         userMessageText: '#ffb000',
-        userMessageTextHighContrast: '#ffcc00',
+        userMessageTextHighContrast: '#000000',
         agentMessageText: '#cc8800',
         agentEventText: '#666600',
         thinkingBackground: '#121200',

@@ -23,10 +23,17 @@ export type Option = {
     title: string;
 };
 
+// Context to pass text color override to all child components
+const TextColorContext = React.createContext<string | undefined>(undefined);
+
+// Hook to get text color - returns override if set, otherwise undefined (use theme default)
+const useTextColor = () => React.useContext(TextColorContext);
+
 export const MarkdownView = React.memo((props: {
     markdown: string;
     onOptionPress?: (option: Option) => void;
     onOptionEdit?: (option: Option) => void;
+    textColor?: string;
 }) => {
     const blocks = React.useMemo(() => parseMarkdown(props.markdown), [props.markdown]);
     
@@ -82,38 +89,60 @@ export const MarkdownView = React.memo((props: {
         );
     }
 
-    if (!markdownCopyV2) {
-        return renderContent();
+    const content = (() => {
+        if (!markdownCopyV2) {
+            return renderContent();
+        }
+
+        if (Platform.OS === 'web') {
+            return renderContent();
+        }
+
+        return (
+            <LongPressGestureHandler
+                onHandlerStateChange={handleLongPressGesture}
+                minDurationMs={500}
+            >
+                <View style={{ width: '100%' }}>
+                    {renderContent()}
+                </View>
+            </LongPressGestureHandler>
+        );
+    })();
+
+    // Wrap with context provider if textColor is specified
+    if (props.textColor) {
+        return (
+            <TextColorContext.Provider value={props.textColor}>
+                {content}
+            </TextColorContext.Provider>
+        );
     }
-    
-    if (Platform.OS === 'web') {
-        return renderContent();
-    }
-    
-    return (
-        <LongPressGestureHandler
-            onHandlerStateChange={handleLongPressGesture}
-            minDurationMs={500}
-        >
-            <View style={{ width: '100%' }}>
-                {renderContent()}
-            </View>
-        </LongPressGestureHandler>
-    );
+
+    return content;
 });
 
 function RenderTextBlock(props: { spans: MarkdownSpan[], first: boolean, last: boolean, selectable: boolean }) {
-    return <Text selectable={props.selectable} style={[style.text, props.first && style.first, props.last && style.last]}><RenderSpans spans={props.spans} baseStyle={style.text} /></Text>;
+    const textColor = useTextColor();
+    const textStyle = React.useMemo(() => [
+        style.text,
+        props.first && style.first,
+        props.last && style.last,
+        textColor && { color: textColor }
+    ], [props.first, props.last, textColor]);
+    return <Text selectable={props.selectable} style={textStyle}><RenderSpans spans={props.spans} baseStyle={textStyle} /></Text>;
 }
 
 function RenderHeaderBlock(props: { level: 1 | 2 | 3 | 4 | 5 | 6, spans: MarkdownSpan[], first: boolean, last: boolean, selectable: boolean }) {
+    const textColor = useTextColor();
     const s = (style as any)[`header${props.level}`];
-    const headerStyle = [style.header, s, props.first && style.first, props.last && style.last];
+    const headerStyle = [style.header, s, props.first && style.first, props.last && style.last, textColor && { color: textColor }];
     return <Text selectable={props.selectable} style={headerStyle}><RenderSpans spans={props.spans} baseStyle={headerStyle} /></Text>;
 }
 
 function RenderListBlock(props: { items: MarkdownSpan[][], first: boolean, last: boolean, selectable: boolean }) {
-    const listStyle = [style.text, style.list];
+    const textColor = useTextColor();
+    const listStyle = [style.text, style.list, textColor && { color: textColor }];
     return (
         <View style={{ flexDirection: 'column', marginBottom: 8, gap: 1 }}>
             {props.items.map((item, index) => (
@@ -124,7 +153,8 @@ function RenderListBlock(props: { items: MarkdownSpan[][], first: boolean, last:
 }
 
 function RenderNumberedListBlock(props: { items: { number: number, spans: MarkdownSpan[] }[], first: boolean, last: boolean, selectable: boolean }) {
-    const listStyle = [style.text, style.list];
+    const textColor = useTextColor();
+    const listStyle = [style.text, style.list, textColor && { color: textColor }];
     return (
         <View style={{ flexDirection: 'column', marginBottom: 8, gap: 1 }}>
             {props.items.map((item, index) => (

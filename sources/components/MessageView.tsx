@@ -117,11 +117,13 @@ function UserTextBlock(props: {
     }
   ], [highContrastMessages, theme.colors.userMessageBackgroundHighContrast]);
 
+  const textColor = highContrastMessages ? theme.colors.userMessageTextHighContrast : undefined;
+
   return (
     <View style={styles.userMessageContainer}>
       <View style={bubbleStyle}>
         {hasText && (
-          <MarkdownView markdown={props.message.displayText || props.message.text} onOptionPress={handleOptionPress} onOptionEdit={handleOptionEdit} />
+          <MarkdownView markdown={props.message.displayText || props.message.text} onOptionPress={handleOptionPress} onOptionEdit={handleOptionEdit} textColor={textColor} />
         )}
         {hasImages && (
           <View style={styles.imagesContainer}>
