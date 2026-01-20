@@ -231,6 +231,22 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                 });
             }
 
+            // Fork session / Continue from here (only if session has required metadata)
+            if (currentSession.metadata?.claudeSessionId && currentSession.metadata?.machineId) {
+                const isActiveSession = currentSession.active;
+                cmds.push({
+                    id: 'fork-session',
+                    title: isActiveSession ? t('sessionInfo.forkSession') : t('sessionInfo.continueFromHere'),
+                    subtitle: `${sessionName} - ${isActiveSession ? t('sessionInfo.forkSessionSubtitle') : t('sessionInfo.continueFromHereSubtitle')}`,
+                    icon: isActiveSession ? 'git-branch-outline' : 'play-outline',
+                    category: 'Current Session',
+                    shortcut: shortcut({ command: true, shift: true, key: 'K' }),
+                    action: () => {
+                        router.push(`/new?resumeClaudeSessionId=${currentSession.metadata!.claudeSessionId}&selectedMachineId=${currentSession.metadata!.machineId}&selectedPathParam=${encodeURIComponent(currentSession.metadata!.path || '')}`);
+                    }
+                });
+            }
+
             // Delete session (available for all sessions, auto-archives active ones)
             cmds.push({
                 id: 'delete-session',
@@ -486,13 +502,14 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         onNewSession: handleNewSession,
         onArchiveSession: handleArchiveSession,
         onDeleteSession: handleDeleteSession,
+        onForkSession: handleForkSession,
         onToggleVoiceRecording: handleToggleVoiceRecording,
         onPrevSession: handlePrevSession,
         onNextSession: handleNextSession,
         onFocusSearch: handleFocusSearch,
         onShowKeyboardShortcuts: handleShowKeyboardShortcuts,
         onToggleSidebar: handleToggleSidebar,
-    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleToggleVoiceRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleToggleSidebar]);
+    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleForkSession, handleToggleVoiceRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleToggleSidebar]);
 
     // Set up global keyboard handler only if feature is enabled
     useGlobalKeyboard(

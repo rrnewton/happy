@@ -1013,6 +1013,7 @@ export const zhHans: TranslationStructure = {
         previousSession: '上一个会话',
         nextSession: '下一个会话',
         toggleVoiceRecording: '切换语音录制',
+        forkSession: '分支 / 继续会话',
         archiveSession: '归档',
         deleteSession: '删除会话',
     },

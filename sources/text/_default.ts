@@ -1047,6 +1047,7 @@ export const en = {
         previousSession: 'Previous session',
         nextSession: 'Next session',
         toggleVoiceRecording: 'Toggle voice recording',
+        forkSession: 'Fork / Continue session',
         archiveSession: 'Archive session',
         deleteSession: 'Delete session',
     },

@@ -49,6 +49,7 @@ function getKeyboardShortcuts(): ShortcutGroup[] {
             title: t('keyboardShortcuts.currentSession'),
             shortcuts: [
                 { keys: `${mod}${shift}V`, description: t('keyboardShortcuts.toggleVoiceRecording') },
+                { keys: `${mod}${shift}K`, description: t('keyboardShortcuts.forkSession') },
                 { keys: `${mod}${shift}A`, description: t('keyboardShortcuts.archiveSession') },
                 { keys: `${mod}⌫`, description: t('keyboardShortcuts.deleteSession') },
             ],

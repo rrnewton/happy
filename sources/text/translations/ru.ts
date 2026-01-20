@@ -1034,6 +1034,7 @@ export const ru: TranslationStructure = {
         previousSession: 'Предыдущая сессия',
         nextSession: 'Следующая сессия',
         toggleVoiceRecording: 'Переключить запись голоса',
+        forkSession: 'Ответвить / Продолжить сессию',
         archiveSession: 'Архивировать',
         deleteSession: 'Удалить сессию',
     },

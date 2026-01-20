@@ -1011,6 +1011,7 @@ export const ca: TranslationStructure = {
         previousSession: 'Sessió anterior',
         nextSession: 'Següent sessió',
         toggleVoiceRecording: 'Alternar gravació de veu',
+        forkSession: 'Bifurcar / Continuar sessió',
         archiveSession: 'Arxivar',
         deleteSession: 'Eliminar sessió',
     },

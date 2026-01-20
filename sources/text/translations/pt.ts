@@ -1011,6 +1011,7 @@ export const pt: TranslationStructure = {
         previousSession: 'Sessão anterior',
         nextSession: 'Próxima sessão',
         toggleVoiceRecording: 'Alternar gravação de voz',
+        forkSession: 'Bifurcar / Continuar sessão',
         archiveSession: 'Arquivar',
         deleteSession: 'Excluir sessão',
     },

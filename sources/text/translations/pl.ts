@@ -1035,6 +1035,7 @@ export const pl: TranslationStructure = {
         previousSession: 'Poprzednia sesja',
         nextSession: 'Następna sesja',
         toggleVoiceRecording: 'Przełącz nagrywanie głosu',
+        forkSession: 'Rozgałęź / Kontynuuj sesję',
         archiveSession: 'Zarchiwizuj',
         deleteSession: 'Usuń sesję',
     },
