@@ -345,20 +345,30 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         );
     }, [currentSession, currentSessionId, commandPaletteEnabled, router]);
 
-    // Handler for delete session shortcut (⌘⌫)
+    // Handler for delete session shortcut (⌘⇧⌫)
     const handleDeleteSession = useCallback(() => {
         if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
-        if (!currentSession || !currentSessionId || currentSession.active) return;
+        if (!currentSession || !currentSessionId) return;
 
+        const isActive = currentSession.active;
         Modal.alert(
             t('sessionInfo.deleteSession'),
-            t('sessionInfo.deleteSessionWarning'),
+            isActive ? t('sessionInfo.deleteActiveSessionWarning') : t('sessionInfo.deleteSessionWarning'),
             [
                 { text: t('common.cancel'), style: 'cancel' },
                 {
                     text: t('sessionInfo.deleteSession'),
                     style: 'destructive',
                     onPress: async () => {
+                        // If session is active, archive it first
+                        if (isActive) {
+                            const archiveResult = await sessionKill(currentSessionId);
+                            if (!archiveResult.success) {
+                                Modal.alert(t('common.error'), archiveResult.message || t('sessionInfo.failedToArchiveSession'));
+                                return;
+                            }
+                        }
+                        // Then delete the session
                         const result = await sessionDelete(currentSessionId);
                         if (result.success) {
                             router.replace('/');
