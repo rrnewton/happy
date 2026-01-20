@@ -143,10 +143,19 @@ export default function PathPickerScreen() {
     }, [sessions, params.machineId, recentMachinePaths]);
 
     // Filter recent paths based on customPath input (case-insensitive search)
+    // Multi-word search: "hello world" searches for paths containing both "hello" AND "world"
     const filteredRecentPaths = useMemo(() => {
         const searchTerm = customPath.trim().toLowerCase();
         if (!searchTerm) return recentPaths;
-        return recentPaths.filter(path => path.toLowerCase().includes(searchTerm));
+
+        // Split into words and filter paths that contain ALL search words
+        const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+        if (searchWords.length === 0) return recentPaths;
+
+        return recentPaths.filter(path => {
+            const lowerPath = path.toLowerCase();
+            return searchWords.every(word => lowerPath.includes(word));
+        });
     }, [recentPaths, customPath]);
 
 
