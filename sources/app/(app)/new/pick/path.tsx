@@ -80,6 +80,12 @@ export default function PathPickerScreen() {
     const recentMachinePaths = useSetting('recentMachinePaths');
 
     const [customPath, setCustomPath] = useState(params.selectedPath || '');
+    // Separate query for filtering - used to maintain filter results during tab completion
+    const [searchQuery, setSearchQuery] = useState(params.selectedPath || '');
+    // Track the current tab index when cycling through results
+    const [tabIndex, setTabIndex] = useState(-1);
+    // Cache the available options when tab is pressed, so we can cycle through them
+    const [tabOptions, setTabOptions] = useState<string[]>([]);
 
     // Auto-focus the input when the screen gains focus
     useFocusEffect(
@@ -142,10 +148,10 @@ export default function PathPickerScreen() {
         return paths.filter(path => !path.includes('.dev/worktree'));
     }, [sessions, params.machineId, recentMachinePaths]);
 
-    // Filter recent paths based on customPath input (case-insensitive search)
+    // Filter recent paths based on searchQuery (case-insensitive search)
     // Multi-word search: "hello world" searches for paths containing both "hello" AND "world"
     const filteredRecentPaths = useMemo(() => {
-        const searchTerm = customPath.trim().toLowerCase();
+        const searchTerm = searchQuery.trim().toLowerCase();
         if (!searchTerm) return recentPaths;
 
         // Split into words and filter paths that contain ALL search words
@@ -156,8 +162,17 @@ export default function PathPickerScreen() {
             const lowerPath = path.toLowerCase();
             return searchWords.every(word => lowerPath.includes(word));
         });
-    }, [recentPaths, customPath]);
+    }, [recentPaths, searchQuery]);
 
+
+    // Handle user typing - reset tab state and sync search query
+    const handleCustomPathChange = React.useCallback((newValue: string) => {
+        setCustomPath(newValue);
+        setSearchQuery(newValue);
+        // Reset tab state when user manually edits
+        setTabIndex(-1);
+        setTabOptions([]);
+    }, []);
 
     const handleSelectPath = React.useCallback(() => {
         const pathToUse = customPath.trim() || machine?.metadata?.homeDir || '/home';
@@ -181,8 +196,9 @@ export default function PathPickerScreen() {
             return true; // Handled - prevent newline
         }
 
-        // Tab - Autocomplete with first available path suggestion
-        if (event.key === 'Tab' && !event.shiftKey) {
+        // Tab - Cycle through available path suggestions
+        if (event.key === 'Tab') {
+            // Get the paths to use - either filtered results or defaults
             const pathsToUse = filteredRecentPaths.length > 0 ? filteredRecentPaths : (recentPaths.length === 0 ? (() => {
                 const homeDir = machine?.metadata?.homeDir || '/home';
                 return [
@@ -194,13 +210,44 @@ export default function PathPickerScreen() {
             })() : []);
 
             if (pathsToUse.length > 0) {
-                setCustomPath(pathsToUse[0]);
+                let nextIndex: number;
+                let optionsToUse: string[];
+
+                // Check if we're already in tab mode with the same options
+                if (tabOptions.length > 0 && JSON.stringify(tabOptions) === JSON.stringify(pathsToUse)) {
+                    // We're already cycling - use cached options
+                    optionsToUse = tabOptions;
+
+                    if (event.shiftKey) {
+                        // Shift+Tab: go backwards
+                        nextIndex = tabIndex - 1;
+                        if (nextIndex < 0) {
+                            nextIndex = optionsToUse.length - 1;
+                        }
+                    } else {
+                        // Tab: go forwards
+                        nextIndex = tabIndex + 1;
+                        if (nextIndex >= optionsToUse.length) {
+                            nextIndex = 0;
+                        }
+                    }
+                } else {
+                    // First tab press or options changed - initialize
+                    optionsToUse = pathsToUse;
+                    setTabOptions(pathsToUse);
+                    nextIndex = event.shiftKey ? pathsToUse.length - 1 : 0;
+                }
+
+                // Update the input with the selected path, but don't update searchQuery
+                setCustomPath(optionsToUse[nextIndex]);
+                setTabIndex(nextIndex);
+
                 return true; // Handled - prevent default tab behavior
             }
         }
 
         return false; // Not handled
-    }, [handleSelectPath, filteredRecentPaths, recentPaths, machine]);
+    }, [handleSelectPath, filteredRecentPaths, recentPaths, machine, tabOptions, tabIndex]);
 
     if (!machine) {
         return (
@@ -280,7 +327,7 @@ export default function PathPickerScreen() {
                                             <MultiTextInput
                                                 ref={inputRef}
                                                 value={customPath}
-                                                onChangeText={setCustomPath}
+                                                onChangeText={handleCustomPathChange}
                                                 placeholder="Enter path (e.g. /home/user/projects)"
                                                 maxHeight={76}
                                                 paddingTop={8}
@@ -291,7 +338,7 @@ export default function PathPickerScreen() {
                                         {customPath.length > 0 && (
                                             <Pressable
                                                 onPress={() => {
-                                                    setCustomPath('');
+                                                    handleCustomPathChange('');
                                                     inputRef.current?.focus();
                                                 }}
                                                 style={styles.clearButton}
@@ -312,7 +359,9 @@ export default function PathPickerScreen() {
                         {filteredRecentPaths.length > 0 && (
                             <ItemGroup title="Recent Paths">
                                 {filteredRecentPaths.map((path, index) => {
+                                    // Check if this item is selected or highlighted by tab navigation
                                     const isSelected = customPath.trim() === path;
+                                    const isTabHighlighted = tabOptions.length > 0 && tabIndex === index && tabOptions[index] === path;
                                     const isLast = index === filteredRecentPaths.length - 1;
 
                                     return (
@@ -327,12 +376,12 @@ export default function PathPickerScreen() {
                                                 />
                                             }
                                             onPress={() => {
-                                                setCustomPath(path);
+                                                handleCustomPathChange(path);
                                                 setTimeout(() => inputRef.current?.focus(), 50);
                                             }}
-                                            selected={isSelected}
+                                            selected={isSelected || isTabHighlighted}
                                             showChevron={false}
-                                            pressableStyle={isSelected ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
+                                            pressableStyle={(isSelected || isTabHighlighted) ? { backgroundColor: theme.colors.surfaceSelected } : undefined}
                                             showDivider={!isLast}
                                         />
                                     );
@@ -365,7 +414,7 @@ export default function PathPickerScreen() {
                                                     />
                                                 }
                                                 onPress={() => {
-                                                    setCustomPath(path);
+                                                    handleCustomPathChange(path);
                                                     setTimeout(() => inputRef.current?.focus(), 50);
                                                 }}
                                                 selected={isSelected}
