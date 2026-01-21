@@ -1034,6 +1034,7 @@ export const zhHans: TranslationStructure = {
         empty: '未配置任何环境变量集',
         addNew: '添加环境变量集',
         edit: '编辑环境变量集',
+        duplicate: '复制',
         name: '名称',
         namePlaceholder: '例如：Z.AI Production',
         nameRequired: '请输入此环境变量集的名称',

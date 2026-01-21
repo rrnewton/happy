@@ -1056,6 +1056,7 @@ export const pl: TranslationStructure = {
         empty: 'Brak skonfigurowanych zestawów zmiennych środowiskowych',
         addNew: 'Dodaj Zestaw Zmiennych Środowiskowych',
         edit: 'Edytuj Zestaw Zmiennych Środowiskowych',
+        duplicate: 'Duplikuj',
         name: 'Nazwa',
         namePlaceholder: 'np. Z.AI Produkcja',
         nameRequired: 'Proszę wpisać nazwę dla tego zestawu zmiennych środowiskowych',

@@ -1022,6 +1022,7 @@ export const ca: TranslationStructure = {
         empty: 'Cap conjunt d\'entorn configurat',
         addNew: 'Afegir conjunt d\'entorn',
         edit: 'Editar conjunt d\'entorn',
+        duplicate: 'Duplicar',
         name: 'Nom',
         namePlaceholder: 'p. ex., Z.AI Producció',
         nameRequired: 'Si us plau, introdueix un nom per a aquest conjunt d\'entorn',

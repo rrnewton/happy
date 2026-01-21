@@ -1055,6 +1055,7 @@ export const ru: TranslationStructure = {
         empty: 'Наборы переменных окружения не настроены',
         addNew: 'Добавить набор переменных',
         edit: 'Редактировать набор переменных',
+        duplicate: 'Дублировать',
         name: 'Имя',
         namePlaceholder: 'например, Z.AI Production',
         nameRequired: 'Пожалуйста, введите имя для этого набора переменных',

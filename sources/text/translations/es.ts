@@ -609,6 +609,7 @@ export const es: TranslationStructure = {
         empty: 'Sin conjuntos de variables de entorno configurados',
         addNew: 'Agregar conjunto de variables',
         edit: 'Editar conjunto de variables',
+        duplicate: 'Duplicar',
         name: 'Nombre',
         namePlaceholder: 'p. ej., Z.AI Producción',
         nameRequired: 'Por favor, ingresa un nombre para este conjunto de variables',

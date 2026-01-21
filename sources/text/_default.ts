@@ -609,6 +609,7 @@ export const en = {
         empty: 'No environment sets configured',
         addNew: 'Add Environment Set',
         edit: 'Edit Environment Set',
+        duplicate: 'Duplicate',
         name: 'Name',
         namePlaceholder: 'e.g., Z.AI Production',
         nameRequired: 'Please enter a name for this environment set',

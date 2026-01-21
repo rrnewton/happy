@@ -126,6 +126,18 @@ export default function RootLayout() {
                 }}
             />
             <Stack.Screen
+                name="settings/environments"
+                options={{
+                    headerTitle: t('settings.environments'),
+                }}
+            />
+            <Stack.Screen
+                name="settings/environment-edit"
+                options={{
+                    headerTitle: t('settingsEnvironments.edit'),
+                }}
+            />
+            <Stack.Screen
                 name="terminal/connect"
                 options={{
                     headerTitle: t('navigation.connectTerminal'),

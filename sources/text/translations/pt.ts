@@ -1032,6 +1032,7 @@ export const pt: TranslationStructure = {
         empty: 'Nenhum conjunto de ambiente configurado',
         addNew: 'Adicionar Conjunto de Ambiente',
         edit: 'Editar Conjunto de Ambiente',
+        duplicate: 'Duplicar',
         name: 'Nome',
         namePlaceholder: 'ex.: Z.AI Produção',
         nameRequired: 'Por favor, insira um nome para este conjunto de ambiente',
