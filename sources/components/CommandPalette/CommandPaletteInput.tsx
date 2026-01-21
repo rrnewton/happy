@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Platform } from 'react-native';
+import { View, TextInput, Platform } from 'react-native';
 import { Typography } from '@/constants/Typography';
 import { t } from '@/text';
+import { useUnistyles } from 'react-native-unistyles';
 
 interface CommandPaletteInputProps {
     value: string;
@@ -11,10 +12,14 @@ interface CommandPaletteInputProps {
 }
 
 export function CommandPaletteInput({ value, onChangeText, onKeyPress, inputRef }: CommandPaletteInputProps) {
+    const { theme } = useUnistyles();
+    const terminalUI = theme.colors.terminalUI;
+    const isTerminal = terminalUI.useMonospace;
+
     const handleKeyDown = React.useCallback((e: any) => {
         if (Platform.OS === 'web' && onKeyPress) {
             const key = e.nativeEvent.key;
-            
+
             // Handle navigation keys
             if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(key)) {
                 e.preventDefault();
@@ -25,14 +30,36 @@ export function CommandPaletteInput({ value, onChangeText, onKeyPress, inputRef 
     }, [onKeyPress]);
 
     return (
-        <View style={styles.container}>
+        <View style={{
+            borderBottomWidth: 1,
+            borderBottomColor: isTerminal ? terminalUI.borderColor : 'rgba(0, 0, 0, 0.06)',
+            backgroundColor: isTerminal ? theme.colors.surface : '#FAFAFA',
+        }}>
             <TextInput
                 ref={inputRef}
-                style={[styles.input, Typography.default()]}
+                style={[
+                    {
+                        paddingHorizontal: 32,
+                        paddingVertical: 24,
+                        fontSize: isTerminal ? 18 : 20,
+                        color: theme.colors.text,
+                        letterSpacing: isTerminal ? 0.5 : -0.3,
+                        ...(Platform.OS === 'web' ? {
+                            outlineStyle: 'none',
+                            outlineWidth: 0,
+                        } as any : {}),
+                        ...(terminalUI.textGlow.enabled ? {
+                            textShadowColor: terminalUI.textGlow.color,
+                            textShadowOffset: { width: 0, height: 0 },
+                            textShadowRadius: terminalUI.textGlow.radius,
+                        } : {}),
+                    },
+                    isTerminal ? Typography.mono() : Typography.default()
+                ]}
                 value={value}
                 onChangeText={onChangeText}
                 placeholder={t('commandPalette.placeholder')}
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.textSecondary}
                 autoFocus
                 autoCorrect={false}
                 spellCheck={false}
@@ -44,23 +71,3 @@ export function CommandPaletteInput({ value, onChangeText, onKeyPress, inputRef 
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0, 0, 0, 0.06)',
-        backgroundColor: '#FAFAFA',
-    },
-    input: {
-        paddingHorizontal: 32,
-        paddingVertical: 24,
-        fontSize: 20,
-        color: '#000',
-        letterSpacing: -0.3,
-        // Remove outline on web
-        ...(Platform.OS === 'web' ? {
-            outlineStyle: 'none',
-            outlineWidth: 0,
-        } as any : {}),
-    },
-});

@@ -7,12 +7,12 @@ import { Command } from './types';
 import { useGlobalKeyboard } from '@/hooks/useGlobalKeyboard';
 import { useAuth } from '@/auth/AuthContext';
 import { storage, useSession } from '@/sync/storage';
-import type { Session } from '@/sync/storageTypes';
+import type { Session, Machine } from '@/sync/storageTypes';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigateToSession } from '@/hooks/useNavigateToSession';
 import { sessionKill, sessionDelete } from '@/sync/ops';
 import { t } from '@/text';
-import { getSessionName } from '@/utils/sessionUtils';
+import { getSessionName, getSessionSubtitle } from '@/utils/sessionUtils';
 import { shortcut } from '@/utils/keyboard';
 import {
     startRecordingGlobal as startRecording,
@@ -30,6 +30,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
     const router = useRouter();
     const { logout } = useAuth();
     const sessions = storage(useShallow((state) => state.sessions));
+    const machines = storage(useShallow((state) => state.machines));
     const commandPaletteEnabled = storage(useShallow((state) => state.localSettings.commandPaletteEnabled));
     const navigateToSession = useNavigateToSession();
 
@@ -151,19 +152,29 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
             },
         ];
 
-        // Add session-specific commands
-        const recentSessions = Object.values(sessions)
-            .sort((a, b) => b.updatedAt - a.updatedAt)
-            .slice(0, 5);
+        // Add active sessions for quick switching
+        // Sort by lastMessageAt (most recent first), then filter to only active sessions
+        const activeSessions = Object.values(sessions)
+            .filter(session => session.active)
+            .sort((a, b) => (b.lastMessageAt ?? b.createdAt) - (a.lastMessageAt ?? a.createdAt));
 
-        recentSessions.forEach(session => {
-            const sessionName = session.metadata?.name || `Session ${session.id.slice(0, 6)}`;
+        activeSessions.forEach(session => {
+            // Use getSessionName for proper title (summary text or last path segment)
+            const sessionName = getSessionName(session);
+            // Build subtitle with path and machine name
+            const sessionPath = getSessionSubtitle(session);
+            const machine = session.metadata?.machineId ? machines[session.metadata.machineId] : undefined;
+            const machineName = machine?.metadata?.displayName || machine?.metadata?.host || '';
+            const subtitle = machineName ? `${sessionPath} · ${machineName}` : sessionPath;
+
             cmds.push({
                 id: `session-${session.id}`,
                 title: sessionName,
-                subtitle: session.metadata?.path || 'Switch to session',
-                icon: 'time-outline',
-                category: 'Recent Sessions',
+                subtitle,
+                // Include machine name for searching (will be used by searchMeta)
+                searchMeta: `${sessionName} ${sessionPath} ${machineName}`.toLowerCase(),
+                icon: 'pulse-outline',
+                category: 'Active Sessions',
                 action: () => {
                     navigateToSession(session.id);
                 }
@@ -316,7 +327,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         }
 
         return cmds;
-    }, [router, logout, sessions, currentSession, currentSessionId, navigateToSession, voiceStatus]);
+    }, [router, logout, sessions, machines, currentSession, currentSessionId, navigateToSession, voiceStatus]);
 
     const showCommandPalette = useCallback(() => {
         if (Platform.OS !== 'web' || !commandPaletteEnabled) return;

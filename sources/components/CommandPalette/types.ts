@@ -5,6 +5,8 @@ export interface Command {
     icon?: string;
     shortcut?: string;
     category?: string;
+    /** Additional text to search against (e.g., machine name, path) */
+    searchMeta?: string;
     action: () => void | Promise<void>;
 }
 

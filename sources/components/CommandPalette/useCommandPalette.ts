@@ -20,6 +20,12 @@ export function useCommandPalette(commands: Command[], onClose: () => void) {
                 return acc;
             }, {} as Record<string, Command[]>);
 
+            // Limit "Active Sessions" to 3 items when not searching
+            // This prevents the command palette from being cluttered
+            if (grouped['Active Sessions'] && grouped['Active Sessions'].length > 3) {
+                grouped['Active Sessions'] = grouped['Active Sessions'].slice(0, 3);
+            }
+
             return Object.entries(grouped).map(([title, cmds]) => ({
                 id: title.toLowerCase().replace(/\s+/g, '-'),
                 title,
@@ -27,12 +33,22 @@ export function useCommandPalette(commands: Command[], onClose: () => void) {
             }));
         }
 
-        // Fuzzy search
+        // Fuzzy search - prioritize title matches, then include subtitle and searchMeta
         const query = searchQuery.toLowerCase();
         const filtered = commands.filter(command => {
             const titleMatch = command.title.toLowerCase().includes(query);
             const subtitleMatch = command.subtitle?.toLowerCase().includes(query);
-            return titleMatch || subtitleMatch;
+            const metaMatch = command.searchMeta?.includes(query);
+            return titleMatch || subtitleMatch || metaMatch;
+        });
+
+        // Sort results: title matches first, then subtitle/meta matches
+        filtered.sort((a, b) => {
+            const aTitle = a.title.toLowerCase().includes(query);
+            const bTitle = b.title.toLowerCase().includes(query);
+            if (aTitle && !bTitle) return -1;
+            if (!aTitle && bTitle) return 1;
+            return 0;
         });
 
         if (filtered.length === 0) {
