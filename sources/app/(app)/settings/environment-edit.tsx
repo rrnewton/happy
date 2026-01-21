@@ -5,6 +5,7 @@ import { ItemGroup } from '@/components/ItemGroup';
 import { ItemList } from '@/components/ItemList';
 import { Item } from '@/components/Item';
 import { Text } from '@/components/StyledText';
+import { Switch } from '@/components/Switch';
 import { useSettingMutable } from '@/sync/storage';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { t } from '@/text';
@@ -30,6 +31,7 @@ function EnvironmentEditScreen() {
     const existingEnvSet = isNew ? null : environmentSets.find(e => e.id === id);
 
     const [name, setName] = useState(existingEnvSet?.name || '');
+    const [applyByDefault, setApplyByDefault] = useState(existingEnvSet?.applyByDefault || false);
     const [variables, setVariables] = useState<Array<{ key: string; value: string }>>(
         existingEnvSet ? Object.entries(existingEnvSet.variables).map(([key, value]) => ({ key, value })) : [{ key: '', value: '' }]
     );
@@ -73,7 +75,7 @@ function EnvironmentEditScreen() {
             id: existingEnvSet?.id || generateId(),
             name: name.trim(),
             variables: variablesObj,
-            applyByDefault: existingEnvSet?.applyByDefault,
+            applyByDefault,
         };
 
         if (isNew) {
@@ -196,6 +198,20 @@ function EnvironmentEditScreen() {
                             </Text>
                         </Pressable>
                     </View>
+                </ItemGroup>
+
+                <ItemGroup>
+                    <Item
+                        title={t('settingsEnvironments.applyByDefault')}
+                        subtitle={t('settingsEnvironments.applyByDefaultDescription')}
+                        icon={<Ionicons name="star-outline" size={29} color="#FFD700" />}
+                        rightElement={
+                            <Switch
+                                value={applyByDefault}
+                                onValueChange={setApplyByDefault}
+                            />
+                        }
+                    />
                 </ItemGroup>
 
                 <ItemGroup>

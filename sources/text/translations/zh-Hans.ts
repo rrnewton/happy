@@ -1035,6 +1035,8 @@ export const zhHans: TranslationStructure = {
         addNew: '添加环境变量集',
         edit: '编辑环境变量集',
         duplicate: '复制',
+        applyByDefault: '默认应用',
+        applyByDefaultDescription: '在启动新会话时自动应用此环境变量集',
         name: '名称',
         namePlaceholder: '例如：Z.AI Production',
         nameRequired: '请输入此环境变量集的名称',

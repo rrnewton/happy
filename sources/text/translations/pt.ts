@@ -1033,6 +1033,8 @@ export const pt: TranslationStructure = {
         addNew: 'Adicionar Conjunto de Ambiente',
         edit: 'Editar Conjunto de Ambiente',
         duplicate: 'Duplicar',
+        applyByDefault: 'Aplicar por padrão',
+        applyByDefaultDescription: 'Aplicar automaticamente este conjunto de variáveis ao iniciar novas sessões',
         name: 'Nome',
         namePlaceholder: 'ex.: Z.AI Produção',
         nameRequired: 'Por favor, insira um nome para este conjunto de ambiente',

@@ -1056,6 +1056,8 @@ export const ru: TranslationStructure = {
         addNew: 'Добавить набор переменных',
         edit: 'Редактировать набор переменных',
         duplicate: 'Дублировать',
+        applyByDefault: 'Применять по умолчанию',
+        applyByDefaultDescription: 'Автоматически применять этот набор переменных при запуске новых сессий',
         name: 'Имя',
         namePlaceholder: 'например, Z.AI Production',
         nameRequired: 'Пожалуйста, введите имя для этого набора переменных',

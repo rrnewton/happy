@@ -1023,6 +1023,8 @@ export const ca: TranslationStructure = {
         addNew: 'Afegir conjunt d\'entorn',
         edit: 'Editar conjunt d\'entorn',
         duplicate: 'Duplicar',
+        applyByDefault: 'Aplicar per defecte',
+        applyByDefaultDescription: 'Aplicar automàticament aquest conjunt d\'entorn quan s\'inicia noves sessions',
         name: 'Nom',
         namePlaceholder: 'p. ex., Z.AI Producció',
         nameRequired: 'Si us plau, introdueix un nom per a aquest conjunt d\'entorn',

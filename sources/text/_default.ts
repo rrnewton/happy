@@ -610,6 +610,8 @@ export const en = {
         addNew: 'Add Environment Set',
         edit: 'Edit Environment Set',
         duplicate: 'Duplicate',
+        applyByDefault: 'Apply by Default',
+        applyByDefaultDescription: 'Automatically apply this environment set when starting new sessions',
         name: 'Name',
         namePlaceholder: 'e.g., Z.AI Production',
         nameRequired: 'Please enter a name for this environment set',

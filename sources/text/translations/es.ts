@@ -610,6 +610,8 @@ export const es: TranslationStructure = {
         addNew: 'Agregar conjunto de variables',
         edit: 'Editar conjunto de variables',
         duplicate: 'Duplicar',
+        applyByDefault: 'Aplicar por defecto',
+        applyByDefaultDescription: 'Aplicar automáticamente este conjunto de variables al iniciar nuevas sesiones',
         name: 'Nombre',
         namePlaceholder: 'p. ej., Z.AI Producción',
         nameRequired: 'Por favor, ingresa un nombre para este conjunto de variables',
