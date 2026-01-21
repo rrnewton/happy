@@ -27,6 +27,14 @@ const agentEventSchema = z.discriminatedUnion('type', [z.object({
     endsAt: z.number(),
 }), z.object({
     type: z.literal('ready'),
+}), z.object({
+    type: z.literal('bash-result'),
+    command: z.string(),
+    cwd: z.string(),
+    stdout: z.string(),
+    stderr: z.string(),
+    exitCode: z.number(),
+    success: z.boolean(),
 })]);
 export type AgentEvent = z.infer<typeof agentEventSchema>;
 

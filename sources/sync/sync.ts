@@ -2258,6 +2258,38 @@ class Sync {
         storage.getState().applyMessages(sessionId, messages);
     }
 
+    /**
+     * Injects a local-only bash result message into the session.
+     * This message is NOT sent to the CLI or used as AI input - it's purely for user display.
+     */
+    injectBashResult(sessionId: string, result: {
+        command: string;
+        cwd: string;
+        stdout: string;
+        stderr: string;
+        exitCode: number;
+        success: boolean;
+    }) {
+        const localId = randomUUID();
+        const message: NormalizedMessage = {
+            id: localId,
+            localId,
+            createdAt: Date.now(),
+            role: 'event',
+            content: {
+                type: 'bash-result',
+                command: result.command,
+                cwd: result.cwd,
+                stdout: result.stdout,
+                stderr: result.stderr,
+                exitCode: result.exitCode,
+                success: result.success,
+            },
+            isSidechain: false,
+        };
+        this.applyMessages(sessionId, [message]);
+    }
+
     private applySessions = (sessions: (Omit<Session, "presence"> & {
         presence?: "online" | number;
     })[]) => {

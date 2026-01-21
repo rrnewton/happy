@@ -199,6 +199,9 @@ function AgentEventBlock(props: {
       </View>
     );
   }
+  if (props.event.type === 'bash-result') {
+    return <BashResultBlock event={props.event} />;
+  }
   return (
     <View style={styles.agentEventContainer}>
       <Text style={styles.agentEventText}>{t('message.unknownEvent')}</Text>
@@ -288,6 +291,44 @@ function SubAgentInvocationBlock(props: {
       >
         {expanded ? t('common.showLess') : t('common.showMore')}
       </Text>
+    </View>
+  );
+}
+
+type BashResultEvent = Extract<AgentEvent, { type: 'bash-result' }>;
+
+function BashResultBlock(props: { event: BashResultEvent }) {
+  const { theme } = useUnistyles();
+  const { event } = props;
+  const hasOutput = event.stdout.length > 0 || event.stderr.length > 0;
+
+  return (
+    <View style={styles.bashResultContainer}>
+      <View style={styles.bashResultHeader}>
+        <Text style={styles.bashResultCommand} numberOfLines={1}>
+          $ {event.command}
+        </Text>
+        <Text style={[
+          styles.bashResultExitCode,
+          { color: event.success ? theme.colors.success : theme.colors.textDestructive }
+        ]}>
+          {event.exitCode === 0 ? '✓' : `exit ${event.exitCode}`}
+        </Text>
+      </View>
+      {hasOutput && (
+        <View style={styles.bashResultOutput}>
+          {event.stdout.length > 0 && (
+            <Text style={styles.bashResultStdout} selectable>
+              {event.stdout}
+            </Text>
+          )}
+          {event.stderr.length > 0 && (
+            <Text style={styles.bashResultStderr} selectable>
+              {event.stderr}
+            </Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -417,6 +458,48 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.textLink,
     fontSize: 13,
     fontWeight: '500',
+    marginTop: 4,
+  },
+  bashResultContainer: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surfaceHigh,
+    overflow: 'hidden',
+  },
+  bashResultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: theme.colors.surface,
+  },
+  bashResultCommand: {
+    flex: 1,
+    color: theme.colors.text,
+    fontSize: 13,
+    fontFamily: 'monospace',
+    fontWeight: '600',
+  },
+  bashResultExitCode: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  bashResultOutput: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  bashResultStdout: {
+    color: theme.colors.text,
+    fontSize: 12,
+    fontFamily: 'monospace',
+  },
+  bashResultStderr: {
+    color: theme.colors.textDestructive,
+    fontSize: 12,
+    fontFamily: 'monospace',
     marginTop: 4,
   },
 }));

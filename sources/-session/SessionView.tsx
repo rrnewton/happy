@@ -14,7 +14,7 @@ import { useImageAttachments } from '@/hooks/useImageAttachments';
 import { Modal } from '@/modal';
 import { useWhisperTranscription, TranscriptionStatus } from '@/hooks/useWhisperTranscription';
 import { gitStatusSync } from '@/sync/gitStatusSync';
-import { sessionAbort, sessionSwitch } from '@/sync/ops';
+import { sessionAbort, sessionSwitch, sessionBash } from '@/sync/ops';
 import { storage, useIsDataReady, useLocalSetting, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
 import { useSession } from '@/sync/storage';
 import { Session } from '@/sync/storageTypes';
@@ -483,6 +483,35 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
         const currentMessage = text;
         const currentImages = [...imageAttachments];
 
+        // Check for quick bash command prefix "!"
+        const trimmedText = text.trim();
+        if (trimmedText.startsWith('!') && trimmedText.length > 1 && !hasImages) {
+            const command = trimmedText.slice(1).trim();
+            if (command.length > 0) {
+                // Clear input immediately for better UX
+                setMessage('');
+                clearDraft();
+
+                // Get current working directory from session metadata
+                const cwd = session?.metadata?.path || '/';
+
+                // Execute bash command via sessionBash
+                const result = await sessionBash(sessionId, { command, cwd });
+
+                // Inject the result as a local-only message
+                sync.injectBashResult(sessionId, {
+                    command,
+                    cwd,
+                    stdout: result.stdout,
+                    stderr: result.stderr,
+                    exitCode: result.exitCode,
+                    success: result.success,
+                });
+
+                return;
+            }
+        }
+
         // Clear input immediately for better UX
         setMessage('');
         clearDraft();
@@ -521,7 +550,7 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
         }
 
         trackMessageSent();
-    }, [imageAttachments, sessionId, clearDraft, clearImageAttachments]);
+    }, [imageAttachments, sessionId, clearDraft, clearImageAttachments, session?.metadata?.path]);
 
     const handleSend = React.useCallback(() => {
         sendMessageWithText(message);
