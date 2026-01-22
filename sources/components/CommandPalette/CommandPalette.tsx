@@ -50,7 +50,7 @@ export function CommandPalette({ commands, onClose }: CommandPaletteProps) {
                 shadowRadius: 40,
                 elevation: 20,
                 borderWidth: 1,
-                borderColor: 'rgba(0, 0, 0, 0.08)',
+                borderColor: theme.colors.modal.border,
             }),
         }}>
             <CommandPaletteInput

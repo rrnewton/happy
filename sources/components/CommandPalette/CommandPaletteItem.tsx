@@ -32,25 +32,26 @@ export function CommandPaletteItem({ command, isSelected, onPress, onHover }: Co
         }
     }, []);
 
-    // Terminal theme colors
+    // Theme-aware colors for selected/hover/pressed states
+    const isDark = theme.dark;
     const selectedBg = isTerminal
         ? `${terminalUI.borderColor}20` // 20 = ~12% opacity
-        : '#F0F7FF';
+        : isDark ? theme.colors.surfaceSelected : '#F0F7FF';
     const selectedBorder = isTerminal
         ? `${terminalUI.borderColor}40`
-        : '#007AFF20';
+        : isDark ? theme.colors.divider : '#007AFF20';
     const hoveredBg = isTerminal
         ? `${terminalUI.borderColor}10`
-        : '#F8F8F8';
+        : theme.colors.surfaceHigh;
     const pressedBg = isTerminal
         ? `${terminalUI.borderColor}30`
-        : '#F5F5F5';
+        : theme.colors.surfacePressed;
     const iconColor = isSelected
-        ? (isTerminal ? theme.colors.text : '#007AFF')
+        ? (isTerminal ? theme.colors.text : (isDark ? theme.colors.textLink : '#007AFF'))
         : theme.colors.textSecondary;
     const iconBg = isTerminal
         ? `${terminalUI.borderColor}15`
-        : 'rgba(0, 0, 0, 0.04)';
+        : isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
 
     const pressableProps: any = {
         style: ({ pressed }: any) => [

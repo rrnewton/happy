@@ -29,11 +29,13 @@ export function CommandPaletteInput({ value, onChangeText, onKeyPress, inputRef 
         }
     }, [onKeyPress]);
 
+    const isDark = theme.dark;
+
     return (
         <View style={{
             borderBottomWidth: 1,
-            borderBottomColor: isTerminal ? terminalUI.borderColor : 'rgba(0, 0, 0, 0.06)',
-            backgroundColor: isTerminal ? theme.colors.surface : '#FAFAFA',
+            borderBottomColor: isTerminal ? terminalUI.borderColor : theme.colors.divider,
+            backgroundColor: isTerminal ? theme.colors.surface : (isDark ? theme.colors.surfaceHigh : '#FAFAFA'),
         }}>
             <TextInput
                 ref={inputRef}
