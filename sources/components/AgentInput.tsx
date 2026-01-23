@@ -524,9 +524,17 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
             // Alternative (shiftEnterToSend=true): Shift+Enter sends, Enter creates new line
             const shouldSend = shiftEnterToSend ? event.shiftKey : !event.shiftKey;
 
-            if (shouldSend && props.value.trim()) {
-                props.onSend();
-                return true; // Key was handled
+            if (shouldSend) {
+                // If recording, stop recording and send after transcription completes
+                if (isRecording && props.onSendWhileRecording) {
+                    props.onSendWhileRecording();
+                    return true;
+                }
+                // Normal send - only if there's text
+                if (props.value.trim()) {
+                    props.onSend();
+                    return true; // Key was handled
+                }
             }
             // If we're in the "new line" case, return false to let the default behavior happen
             // (i.e., don't handle the key so the text input can create a new line)
