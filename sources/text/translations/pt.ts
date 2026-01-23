@@ -80,7 +80,7 @@ export const pt: TranslationStructure = {
         online: 'online',
         offline: 'offline',
         lastSeen: ({ time }: { time: string }) => `visto por último ${time}`,
-        permissionRequired: 'permissão necessária',
+        interactionRequired: 'interação necessária',
         activeNow: 'Ativo agora',
         unknown: 'desconhecido',
     },

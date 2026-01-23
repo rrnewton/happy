@@ -42,7 +42,7 @@ export function useSessionStatus(session: Session): SessionStatus {
         return {
             state: 'permission_required',
             isConnected: true,
-            statusText: t('status.permissionRequired'),
+            statusText: t('status.interactionRequired'),
             shouldShowStatus: true,
             statusColor: '#FF9500',
             statusDotColor: '#FF9500',

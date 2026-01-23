@@ -80,7 +80,7 @@ export const en = {
         online: 'online',
         offline: 'offline',
         lastSeen: ({ time }: { time: string }) => `last seen ${time}`,
-        permissionRequired: 'permission required',
+        interactionRequired: 'interaction required',
         activeNow: 'Active now',
         unknown: 'unknown',
     },

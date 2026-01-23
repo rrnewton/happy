@@ -82,7 +82,7 @@ export const zhHans: TranslationStructure = {
         online: '在线',
         offline: '离线',
         lastSeen: ({ time }: { time: string }) => `最后活跃时间 ${time}`,
-        permissionRequired: '需要权限',
+        interactionRequired: '需要交互',
         activeNow: '当前活跃',
         unknown: '未知',
     },

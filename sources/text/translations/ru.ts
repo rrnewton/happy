@@ -413,7 +413,7 @@ export const ru: TranslationStructure = {
         online: 'online',
         offline: 'offline',
         lastSeen: ({ time }: { time: string }) => `в сети ${time}`,
-        permissionRequired: 'требуется разрешение',
+        interactionRequired: 'требуется взаимодействие',
         activeNow: 'Активен сейчас',
         unknown: 'неизвестно',
     },
