@@ -1,5 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
-import { View, TextInput, Pressable, Linking } from 'react-native';
+import { View, TextInput, Pressable, Linking, Platform } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Item } from '@/components/Item';
@@ -18,6 +20,7 @@ import { layout } from '@/components/layout';
 function VoiceSettingsScreen() {
     const { theme } = useUnistyles();
     const router = useRouter();
+    const headerHeight = useHeaderHeight();
     const [voiceAssistantLanguage] = useSettingMutable('voiceAssistantLanguage');
     const [savedApiKey, setSavedApiKey] = useSettingMutable('openaiApiKey');
     const [savedVocabulary, setSavedVocabulary] = useSettingMutable('whisperVocabulary');
@@ -68,7 +71,12 @@ function VoiceSettingsScreen() {
     };
 
     return (
-        <ItemList style={{ paddingTop: 0 }}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+        >
+            <ItemList style={{ paddingTop: 0 }} keyboardShouldPersistTaps="handled">
             {/* Language Settings */}
             <ItemGroup
                 title={t('settingsVoice.languageTitle')}
@@ -177,7 +185,8 @@ function VoiceSettingsScreen() {
                 </View>
             </ItemGroup>
 
-        </ItemList>
+            </ItemList>
+        </KeyboardAvoidingView>
     );
 }
 
