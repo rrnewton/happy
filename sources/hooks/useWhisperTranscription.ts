@@ -49,6 +49,7 @@ let globalRecordingStatus: TranscriptionStatus = 'idle';
 let globalStatusCallbacks: StatusChangeCallback[] = [];
 let globalStartRecording: (() => Promise<boolean>) | null = null;
 let globalStopRecording: (() => Promise<void>) | null = null;
+let globalSendAfterTranscription = false;
 
 /**
  * Subscribe to global recording status changes.
@@ -95,6 +96,28 @@ export function stopRecordingGlobal(): Promise<void> {
         return globalStopRecording();
     }
     return Promise.resolve();
+}
+
+/**
+ * Stop recording and send after transcription completes.
+ * Sets a flag that the hook owner can check to auto-send.
+ */
+export function stopAndSendGlobal(): Promise<void> {
+    if (globalStopRecording && globalRecordingStatus === 'recording') {
+        globalSendAfterTranscription = true;
+        return globalStopRecording();
+    }
+    return Promise.resolve();
+}
+
+/**
+ * Check and consume the global send-after-transcription flag.
+ * Returns true if send was requested, and clears the flag.
+ */
+export function consumeSendAfterTranscription(): boolean {
+    const shouldSend = globalSendAfterTranscription;
+    globalSendAfterTranscription = false;
+    return shouldSend;
 }
 
 // Internal: update global state and notify subscribers

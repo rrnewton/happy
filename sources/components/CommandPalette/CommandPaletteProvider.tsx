@@ -17,6 +17,7 @@ import { shortcut } from '@/utils/keyboard';
 import {
     startRecordingGlobal as startRecording,
     stopRecordingGlobal as stopRecording,
+    stopAndSendGlobal,
     isRecordingGlobal as isRecording,
     onStatusChange,
     TranscriptionStatus
@@ -508,6 +509,16 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         storage.getState().applyLocalSettings({ sidebarCollapsed: !localSettings.sidebarCollapsed });
     }, [commandPaletteEnabled]);
 
+    // Handler for send while recording (Enter key during recording)
+    const handleSendWhileRecording = useCallback(() => {
+        if (Platform.OS !== 'web' || !commandPaletteEnabled) return;
+        // Only allow when on a session page and currently recording
+        if (!currentSession || !currentSessionId) return;
+        if (!isRecording()) return;
+        // Stop recording with send-after-transcription flag
+        stopAndSendGlobal();
+    }, [currentSession, currentSessionId, commandPaletteEnabled]);
+
     // Keyboard shortcut handlers
     const keyboardHandlers = useMemo(() => ({
         onNewSession: handleNewSession,
@@ -515,12 +526,14 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         onDeleteSession: handleDeleteSession,
         onForkSession: handleForkSession,
         onToggleVoiceRecording: handleToggleVoiceRecording,
+        onSendWhileRecording: handleSendWhileRecording,
+        isRecording,
         onPrevSession: handlePrevSession,
         onNextSession: handleNextSession,
         onFocusSearch: handleFocusSearch,
         onShowKeyboardShortcuts: handleShowKeyboardShortcuts,
         onToggleSidebar: handleToggleSidebar,
-    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleForkSession, handleToggleVoiceRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleToggleSidebar]);
+    }), [handleNewSession, handleArchiveSession, handleDeleteSession, handleForkSession, handleToggleVoiceRecording, handleSendWhileRecording, handlePrevSession, handleNextSession, handleFocusSearch, handleShowKeyboardShortcuts, handleToggleSidebar]);
 
     // Set up global keyboard handler only if feature is enabled
     useGlobalKeyboard(

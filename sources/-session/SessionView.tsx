@@ -12,7 +12,7 @@ import { hapticsHeavy } from '@/components/haptics';
 import { useDraft } from '@/hooks/useDraft';
 import { useImageAttachments } from '@/hooks/useImageAttachments';
 import { Modal } from '@/modal';
-import { useWhisperTranscription, TranscriptionStatus } from '@/hooks/useWhisperTranscription';
+import { useWhisperTranscription, TranscriptionStatus, consumeSendAfterTranscription } from '@/hooks/useWhisperTranscription';
 import { gitStatusSync } from '@/sync/gitStatusSync';
 import { sessionAbort, sessionSwitch, sessionBash } from '@/sync/ops';
 import { storage, useIsDataReady, useLocalSetting, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
@@ -234,7 +234,8 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
     const handleTranscription = React.useCallback((text: string) => {
         // Check if we're in auto-send mode (long-press recording)
         const shouldAutoSend = autoSendModeRef.current;
-        const shouldSendAfterTranscription = sendAfterTranscriptionRef.current;
+        // Check both local ref and global flag (for keyboard shortcut triggers)
+        const shouldSendAfterTranscription = sendAfterTranscriptionRef.current || consumeSendAfterTranscription();
 
         // Reset auto-send mode immediately
         autoSendModeRef.current = false;

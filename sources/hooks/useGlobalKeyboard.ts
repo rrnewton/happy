@@ -12,6 +12,8 @@ export interface KeyboardHandlers {
     onDeleteSession?: () => void;
     onForkSession?: () => void;
     onToggleVoiceRecording?: () => void;
+    onSendWhileRecording?: () => void;
+    isRecording?: () => boolean;
     onPrevSession?: () => void;
     onNextSession?: () => void;
     onFocusSearch?: () => void;
@@ -145,6 +147,26 @@ export function useGlobalKeyboard(onCommandPalette: () => void, handlers?: Omit<
                 e.stopPropagation();
                 handlers?.onToggleSidebar?.();
                 return;
+            }
+
+            // Enter key - send while recording (only when not focused on an input)
+            // This allows sending during voice recording even when the input is not focused
+            if (e.key === 'Enter' && !isModifierPressed && !isShiftPressed) {
+                // Check if we're recording and have a send handler
+                if (handlers?.isRecording?.() && handlers?.onSendWhileRecording) {
+                    // Check if the active element is an input/textarea - if so, let the input handle it
+                    const activeElement = document.activeElement;
+                    const isInputFocused = activeElement instanceof HTMLInputElement ||
+                        activeElement instanceof HTMLTextAreaElement ||
+                        activeElement?.getAttribute('contenteditable') === 'true';
+
+                    if (!isInputFocused) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlers.onSendWhileRecording();
+                        return;
+                    }
+                }
             }
         };
 
