@@ -220,6 +220,8 @@ export const zhHans: TranslationStructure = {
         shiftEnterToSend: 'Shift+Enter 发送',
         shiftEnterToSendEnabled: 'Shift+Enter 发送，Enter 换行',
         shiftEnterToSendDisabled: 'Enter 发送，Shift+Enter 换行',
+        autoCopyOnSelection: '选中时自动复制',
+        autoCopyOnSelectionSubtitle: '自动将选中的文本复制到剪贴板',
     },
 
     errors: {

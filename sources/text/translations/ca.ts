@@ -218,6 +218,8 @@ export const ca: TranslationStructure = {
         shiftEnterToSend: 'Shift+Enter per enviar',
         shiftEnterToSendEnabled: 'Shift+Enter envia, Enter crea nova línia',
         shiftEnterToSendDisabled: 'Enter envia, Shift+Enter crea nova línia',
+        autoCopyOnSelection: 'Còpia automàtica en seleccionar',
+        autoCopyOnSelectionSubtitle: 'Copia automàticament el text seleccionat al porta-retalls',
     },
 
     errors: {

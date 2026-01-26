@@ -11,6 +11,7 @@ export default function FeaturesSettingsScreen() {
     const [experiments, setExperiments] = useSettingMutable('experiments');
     const [commandPaletteEnabled, setCommandPaletteEnabled] = useLocalSettingMutable('commandPaletteEnabled');
     const [markdownCopyV2, setMarkdownCopyV2] = useLocalSettingMutable('markdownCopyV2');
+    const [autoCopyOnSelection, setAutoCopyOnSelection] = useLocalSettingMutable('autoCopyOnSelection');
     const [hideInactiveSessions, setHideInactiveSessions] = useSettingMutable('hideInactiveSessions');
     const [shiftEnterToSend, setShiftEnterToSend] = useLocalSettingMutable('shiftEnterToSend');
 
@@ -92,6 +93,18 @@ export default function FeaturesSettingsScreen() {
                             <Switch
                                 value={commandPaletteEnabled}
                                 onValueChange={setCommandPaletteEnabled}
+                            />
+                        }
+                        showChevron={false}
+                    />
+                    <Item
+                        title={t('settingsFeatures.autoCopyOnSelection')}
+                        subtitle={t('settingsFeatures.autoCopyOnSelectionSubtitle')}
+                        icon={<Ionicons name="copy-outline" size={29} color="#34C759" />}
+                        rightElement={
+                            <Switch
+                                value={autoCopyOnSelection}
+                                onValueChange={setAutoCopyOnSelection}
                             />
                         }
                         showChevron={false}

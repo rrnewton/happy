@@ -218,6 +218,8 @@ export const es: TranslationStructure = {
         shiftEnterToSend: 'Shift+Enter para enviar',
         shiftEnterToSendEnabled: 'Shift+Enter envía, Enter crea nueva línea',
         shiftEnterToSendDisabled: 'Enter envía, Shift+Enter crea nueva línea',
+        autoCopyOnSelection: 'Copia automática al seleccionar',
+        autoCopyOnSelectionSubtitle: 'Copiar automáticamente el texto seleccionado al portapapeles',
     },
 
     errors: {

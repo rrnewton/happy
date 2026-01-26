@@ -229,6 +229,8 @@ export const pl: TranslationStructure = {
         shiftEnterToSend: 'Shift+Enter do wysłania',
         shiftEnterToSendEnabled: 'Shift+Enter wysyła, Enter tworzy nową linię',
         shiftEnterToSendDisabled: 'Enter wysyła, Shift+Enter tworzy nową linię',
+        autoCopyOnSelection: 'Automatyczne kopiowanie przy zaznaczeniu',
+        autoCopyOnSelectionSubtitle: 'Automatycznie kopiuj zaznaczony tekst do schowka',
     },
 
     errors: {

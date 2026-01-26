@@ -218,6 +218,8 @@ export const en = {
         shiftEnterToSend: 'Shift+Enter to Send',
         shiftEnterToSendEnabled: 'Shift+Enter sends, Enter creates new line',
         shiftEnterToSendDisabled: 'Enter sends, Shift+Enter creates new line',
+        autoCopyOnSelection: 'Auto-copy on Selection',
+        autoCopyOnSelectionSubtitle: 'Automatically copy selected text to clipboard',
     },
 
     errors: {

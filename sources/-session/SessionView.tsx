@@ -22,6 +22,7 @@ import { sync } from '@/sync/sync';
 import { t } from '@/text';
 import { tracking, trackMessageSent } from '@/track';
 import { isRunningOnMac } from '@/utils/platform';
+import { useAutoCopyOnSelection } from '@/hooks/useAutoCopyOnSelection';
 import { useDeviceType, useHeaderHeight, useIsLandscape, useIsTablet } from '@/utils/responsive';
 import { useResponsiveMaxWidth } from '@/components/layout';
 import { useWindowDimensions } from 'react-native';
@@ -167,6 +168,9 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
     const isDesktop = rt.breakpoint === 'lg' || rt.breakpoint === 'xl';
     // Show split view only when on desktop AND debug panel is toggled on
     const isDesktopSplitView = isDesktop && showDebugPanel;
+
+    // Auto-copy selected text to clipboard on web (when enabled in settings)
+    useAutoCopyOnSelection();
 
     // Mark session as read when viewing it (synced across devices)
     // Only sync if there's actually a new message to mark as read (saves bandwidth)

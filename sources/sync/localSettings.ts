@@ -15,6 +15,7 @@ export const LocalSettingsSchema = z.object({
     wideContentView: z.boolean().describe('Use full width for content instead of constrained 800px container'),
     sidebarCollapsed: z.boolean().describe('Collapse sidebar on web (Cmd+B to toggle)'),
     bootSequenceEnabled: z.boolean().describe('Show boot sequence animation on app startup'),
+    autoCopyOnSelection: z.boolean().describe('Automatically copy selected text to clipboard (web only)'),
     // CLI version acknowledgments - keyed by machineId
     acknowledgedCliVersions: z.record(z.string(), z.string()).describe('Acknowledged CLI versions per machine'),
 });
@@ -42,6 +43,7 @@ export const localSettingsDefaults: LocalSettings = {
     wideContentView: false,
     sidebarCollapsed: false,
     bootSequenceEnabled: false,
+    autoCopyOnSelection: false,
     acknowledgedCliVersions: {},
 };
 Object.freeze(localSettingsDefaults);

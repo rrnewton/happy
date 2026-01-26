@@ -200,6 +200,8 @@ export const ru: TranslationStructure = {
         shiftEnterToSend: 'Shift+Enter для отправки',
         shiftEnterToSendEnabled: 'Shift+Enter отправляет, Enter создаёт новую строку',
         shiftEnterToSendDisabled: 'Enter отправляет, Shift+Enter создаёт новую строку',
+        autoCopyOnSelection: 'Автокопирование при выделении',
+        autoCopyOnSelectionSubtitle: 'Автоматически копировать выделенный текст в буфер обмена',
     },
 
     errors: {
