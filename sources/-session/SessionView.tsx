@@ -11,11 +11,12 @@ import { DebugTranscriptPanel } from '@/components/DebugTranscriptPanel';
 import { hapticsHeavy } from '@/components/haptics';
 import { useDraft } from '@/hooks/useDraft';
 import { useImageAttachments } from '@/hooks/useImageAttachments';
+import { useWakapiHeartbeat } from '@/hooks/useWakapiHeartbeat';
 import { Modal } from '@/modal';
 import { useWhisperTranscription, TranscriptionStatus, consumeSendAfterTranscription } from '@/hooks/useWhisperTranscription';
 import { gitStatusSync } from '@/sync/gitStatusSync';
 import { sessionAbort, sessionSwitch, sessionBash } from '@/sync/ops';
-import { storage, useIsDataReady, useLocalSetting, useSessionMessages, useSessionUsage, useSetting } from '@/sync/storage';
+import { storage, useIsDataReady, useLocalSetting, useSessionMessages, useSessionUsage, useSetting, useMachine } from '@/sync/storage';
 import { useSession } from '@/sync/storage';
 import { Session } from '@/sync/storageTypes';
 import { sync } from '@/sync/sync';
@@ -209,6 +210,12 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
 
     // Use draft hook for auto-saving message drafts
     const { clearDraft } = useDraft(sessionId, message, setMessage);
+
+    // Track time in session with Wakapi heartbeats
+    const projectName = session.metadata?.path?.split('/').pop() || null;
+    const machine = session.metadata?.machineId ? useMachine(session.metadata?.machineId) : null;
+    const machineName = machine?.metadata?.host || null;
+    useWakapiHeartbeat(session.metadata?.path || null, projectName, machineName, true);
 
     // Image attachments state
     const {

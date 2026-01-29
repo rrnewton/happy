@@ -7,6 +7,18 @@ import type { PermissionMode } from '@/components/PermissionModeSelector';
 
 const mmkv = new MMKV();
 
+// Wakapi heartbeat tracking
+const WAKAPI_LAST_HEARTBEAT_KEY = 'wakapi-last-heartbeat';
+
+export function loadWakapiLastHeartbeat(): number {
+    const last = mmkv.getNumber(WAKAPI_LAST_HEARTBEAT_KEY);
+    return last ?? 0;
+}
+
+export function saveWakapiLastHeartbeat(timestamp: number): void {
+    mmkv.set(WAKAPI_LAST_HEARTBEAT_KEY, timestamp);
+}
+
 export function loadSettings(): { settings: Settings, version: number | null } {
     const settings = mmkv.getString('settings');
     if (settings) {

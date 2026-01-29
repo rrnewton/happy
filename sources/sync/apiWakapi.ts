@@ -231,3 +231,116 @@ export async function fetchWakapiAllTime(): Promise<{ total_seconds: number; tex
     const data = await response.json() as { data: { total_seconds: number; text: string } };
     return data.data;
 }
+
+//
+// Heartbeat Types and Functions
+//
+
+export type HeartbeatType = 'file' | 'app' | 'domain';
+export type HeartbeatCategory = 'coding' | 'building' | 'indexing' | 'debugging' | 'browsing' | 'running tests' | 'writing tests' | 'manual testing' | 'writing docs' | 'code reviewing' | 'researching' | 'learning' | 'designing';
+
+export interface WakapiHeartbeat {
+    entity: string;           // File path, app name, or domain
+    type: HeartbeatType;      // 'file', 'app', or 'domain'
+    time: number;             // UNIX epoch timestamp (seconds with decimals)
+    project?: string;         // Project name
+    branch?: string;          // Git branch
+    language?: string;        // Programming language
+    category?: HeartbeatCategory;
+    is_write?: boolean;       // Whether triggered by file write
+    lines?: number;           // Total lines in file
+    lineno?: number;          // Current cursor line
+    cursorpos?: number;       // Cursor column position
+    machine?: string;         // Machine hostname
+}
+
+/**
+ * Send a single heartbeat to Wakapi
+ * Call this when user is actively using a session
+ */
+export async function sendHeartbeat(heartbeat: WakapiHeartbeat): Promise<boolean> {
+    const config = getWakapiConfig();
+    if (!config) {
+        return false;
+    }
+
+    try {
+        const url = buildRequestUrl(config, 'v1/users/current/heartbeats');
+        const headers = buildHeaders(config);
+
+        // Add user agent to help Wakapi identify the editor
+        headers['User-Agent'] = 'Happy/1.0 happy-wakatime';
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(heartbeat),
+        });
+
+        return response.ok;
+    } catch (error) {
+        console.warn('Failed to send heartbeat:', error);
+        return false;
+    }
+}
+
+/**
+ * Send multiple heartbeats in bulk (max 25 per request)
+ */
+export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[]): Promise<boolean> {
+    const config = getWakapiConfig();
+    if (!config) {
+        return false;
+    }
+
+    if (heartbeats.length === 0) {
+        return true;
+    }
+
+    // Limit to 25 heartbeats per request
+    const batch = heartbeats.slice(0, 25);
+
+    try {
+        const url = buildRequestUrl(config, 'v1/users/current/heartbeats.bulk');
+        const headers = buildHeaders(config);
+
+        // Add user agent to help Wakapi identify the editor
+        headers['User-Agent'] = 'Happy/1.0 happy-wakatime';
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(batch),
+        });
+
+        return response.ok;
+    } catch (error) {
+        console.warn('Failed to send bulk heartbeats:', error);
+        return false;
+    }
+}
+
+/**
+ * Create a heartbeat for a Happy session
+ */
+export function createSessionHeartbeat(
+    sessionPath: string,
+    projectName: string,
+    machineName?: string
+): WakapiHeartbeat {
+    const heartbeat: WakapiHeartbeat = {
+        entity: sessionPath,
+        type: 'app',
+        time: Date.now() / 1000, // Convert to seconds with decimals
+        project: projectName,
+        category: 'coding',
+        language: 'Happy', // Custom "language" to identify Happy usage
+    };
+
+    // Add machine name if available (helps distinguish between devices)
+    if (machineName) {
+        heartbeat.machine = machineName;
+    }
+
+    return heartbeat;
+}
