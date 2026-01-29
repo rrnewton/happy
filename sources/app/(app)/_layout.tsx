@@ -7,6 +7,7 @@ import { Platform, TouchableOpacity, Text } from 'react-native';
 import { isRunningOnMac } from '@/utils/platform';
 import { useUnistyles } from 'react-native-unistyles';
 import { t } from '@/text';
+import { Ionicons } from '@expo/vector-icons';
 
 export const unstable_settings = {
     initialRouteName: 'index',
@@ -133,9 +134,17 @@ export default function RootLayout() {
             />
             <Stack.Screen
                 name="settings/coding-stats"
-                options={{
+                options={({ navigation }) => ({
                     headerTitle: t('settings.codingStats'),
-                }}
+                    headerRight: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('settings/wakapi' as never)}
+                            style={{ paddingHorizontal: 16 }}
+                        >
+                            <Ionicons name="settings-outline" size={22} color={theme.colors.header.tint} />
+                        </TouchableOpacity>
+                    ),
+                })}
             />
             <Stack.Screen
                 name="settings/environments"

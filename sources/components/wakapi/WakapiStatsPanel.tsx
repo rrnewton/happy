@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, ActivityIndicator, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { Text } from '@/components/StyledText';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { Item } from '@/components/Item';
 import { ItemGroup } from '@/components/ItemGroup';
 import { UsageBar } from '@/components/usage/UsageBar';
 import { Ionicons } from '@expo/vector-icons';
@@ -202,16 +201,6 @@ export const WakapiStatsPanel: React.FC = () => {
                             </View>
                         </ItemGroup>
                     )}
-
-                    {/* Settings */}
-                    <ItemGroup>
-                        <Item
-                            title={t('settings.wakapi')}
-                            subtitle={t('settings.wakapiSubtitle')}
-                            icon={<Ionicons name="settings-outline" size={29} color={theme.colors.textSecondary} />}
-                            onPress={() => router.push('/settings/wakapi')}
-                        />
-                    </ItemGroup>
                 </View>
             </View>
         </ScrollView>
