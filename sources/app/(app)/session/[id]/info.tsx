@@ -116,14 +116,12 @@ function SessionInfoContent({ session }: { session: Session }) {
     }, [performArchive]);
 
     // Use HappyAction for deletion - it handles errors automatically
-    // If session is active, archive it first before deleting
+    // If session is active, try to archive it first before deleting (but proceed with delete even if archive fails)
     const [deletingSession, performDelete] = useHappyAction(async () => {
-        // If session is active, archive it first
+        // If session is active, try to archive it first (but don't block deletion if archive fails)
         if (sessionStatus.isConnected || session.active) {
-            const archiveResult = await sessionKill(session.id);
-            if (!archiveResult.success) {
-                throw new HappyError(archiveResult.message || t('sessionInfo.failedToArchiveSession'), false);
-            }
+            await sessionKill(session.id);
+            // Ignore archive result - proceed with deletion regardless
         }
         // Then delete the session
         const result = await sessionDelete(session.id);

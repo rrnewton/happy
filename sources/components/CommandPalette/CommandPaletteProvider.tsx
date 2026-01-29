@@ -278,13 +278,10 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                                 text: t('sessionInfo.deleteSession'),
                                 style: 'destructive',
                                 onPress: async () => {
-                                    // If session is active, archive it first
+                                    // If session is active, try to archive it first (but proceed with delete even if archive fails)
                                     if (isActive) {
-                                        const archiveResult = await sessionKill(currentSessionId);
-                                        if (!archiveResult.success) {
-                                            Modal.alert(t('common.error'), archiveResult.message || t('sessionInfo.failedToArchiveSession'));
-                                            return;
-                                        }
+                                        await sessionKill(currentSessionId);
+                                        // Ignore archive result - proceed with deletion regardless
                                     }
                                     // Then delete the session
                                     const result = await sessionDelete(currentSessionId);
@@ -388,13 +385,10 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                     text: t('sessionInfo.deleteSession'),
                     style: 'destructive',
                     onPress: async () => {
-                        // If session is active, archive it first
+                        // If session is active, try to archive it first (but proceed with delete even if archive fails)
                         if (isActive) {
-                            const archiveResult = await sessionKill(currentSessionId);
-                            if (!archiveResult.success) {
-                                Modal.alert(t('common.error'), archiveResult.message || t('sessionInfo.failedToArchiveSession'));
-                                return;
-                            }
+                            await sessionKill(currentSessionId);
+                            // Ignore archive result - proceed with deletion regardless
                         }
                         // Then delete the session
                         const result = await sessionDelete(currentSessionId);
