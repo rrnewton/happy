@@ -56,6 +56,12 @@ export const SettingsSchema = z.object({
     sessionLastReadAt: z.record(z.string(), z.number()).describe('Last read timestamp per session for unread indicators'),
     // Environment variable sets for session configuration
     environmentSets: z.array(EnvironmentSetSchema).describe('Named sets of environment variables for sessions'),
+    // Wakapi integration settings
+    wakapiEnabled: z.boolean().describe('Whether to enable Wakapi coding stats integration'),
+    wakapiApiUrl: z.string().nullable().describe('Wakapi API URL (e.g., https://wakapi.dev/api)'),
+    wakapiApiKey: z.string().nullable().describe('Wakapi API key for authentication'),
+    wakapiProxyEnabled: z.boolean().describe('Whether to use CORS proxy for Wakapi requests (required for web)'),
+    wakapiProxyUrl: z.string().nullable().describe('CORS proxy URL for Wakapi requests'),
 });
 
 //
@@ -104,6 +110,11 @@ export const settingsDefaults: Settings = {
     customSystemPrompt: null,
     sessionLastReadAt: {},
     environmentSets: [],
+    wakapiEnabled: false,
+    wakapiApiUrl: null,
+    wakapiApiKey: null,
+    wakapiProxyEnabled: false,
+    wakapiProxyUrl: null,
 };
 Object.freeze(settingsDefaults);
 

@@ -126,6 +126,18 @@ export default function RootLayout() {
                 }}
             />
             <Stack.Screen
+                name="settings/wakapi"
+                options={{
+                    headerTitle: t('settings.wakapi'),
+                }}
+            />
+            <Stack.Screen
+                name="settings/coding-stats"
+                options={{
+                    headerTitle: t('settings.codingStats'),
+                }}
+            />
+            <Stack.Screen
                 name="settings/environments"
                 options={{
                     headerTitle: t('settings.environments'),

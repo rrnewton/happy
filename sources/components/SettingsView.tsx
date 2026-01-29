@@ -357,6 +357,12 @@ export const SettingsView = React.memo(function SettingsView() {
                     icon={<Ionicons name="analytics-outline" size={29} color="#007AFF" />}
                     onPress={() => router.push('/settings/usage')}
                 />
+                <Item
+                    title={t('settings.codingStats')}
+                    subtitle={t('settings.codingStatsSubtitle')}
+                    icon={<Ionicons name="bar-chart-outline" size={29} color="#10B981" />}
+                    onPress={() => router.push('/settings/coding-stats')}
+                />
                 {Platform.OS === 'web' && (
                     <Item
                         title={t('keyboardShortcuts.title')}

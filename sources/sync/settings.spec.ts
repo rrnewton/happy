@@ -93,32 +93,8 @@ describe('settings', () => {
     describe('applySettings', () => {
         it('should apply delta to existing settings', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: false,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                hideInactiveSessions: false,
-                highContrastMessages: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
-                openaiApiKey: null,
-                whisperVocabulary: null,
-                customSystemPrompt: null,
-                sessionLastReadAt: {},
-                environmentSets: [],
             };
             const delta: Partial<Settings> = {
                 viewInline: true
@@ -131,32 +107,8 @@ describe('settings', () => {
 
         it('should merge with defaults', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                hideInactiveSessions: false,
-                highContrastMessages: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
-                openaiApiKey: null,
-                whisperVocabulary: null,
-                customSystemPrompt: null,
-                sessionLastReadAt: {},
-                environmentSets: [],
             };
             const delta: Partial<Settings> = {};
             expect(applySettings(currentSettings, delta)).toEqual({
@@ -167,32 +119,8 @@ describe('settings', () => {
 
         it('should override existing values with delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                hideInactiveSessions: false,
-                highContrastMessages: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
-                openaiApiKey: null,
-                whisperVocabulary: null,
-                customSystemPrompt: null,
-                sessionLastReadAt: {},
-                environmentSets: [],
             };
             const delta: Partial<Settings> = {
                 viewInline: false
@@ -205,32 +133,8 @@ describe('settings', () => {
 
         it('should handle empty delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                hideInactiveSessions: false,
-                highContrastMessages: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
-                openaiApiKey: null,
-                whisperVocabulary: null,
-                customSystemPrompt: null,
-                sessionLastReadAt: {},
-                environmentSets: [],
             };
             expect(applySettings(currentSettings, {})).toEqual({
                 ...settingsDefaults,
@@ -255,32 +159,8 @@ describe('settings', () => {
 
         it('should handle extra fields in delta', () => {
             const currentSettings: Settings = {
+                ...settingsDefaults,
                 viewInline: true,
-                expandTodos: true,
-                showLineNumbers: true,
-                showLineNumbersInToolViews: false,
-                wrapLinesInDiffs: false,
-                analyticsOptOut: false,
-                inferenceOpenAIKey: null,
-                experiments: false,
-                alwaysShowContextSize: false,
-                avatarStyle: 'brutalist',
-                showFlavorIcons: false,
-                hideInactiveSessions: false,
-                highContrastMessages: false,
-                reviewPromptAnswered: false,
-                reviewPromptLikedApp: null,
-                voiceAssistantLanguage: null,
-                preferredLanguage: null,
-                recentMachinePaths: [],
-                lastUsedAgent: null,
-                lastUsedPermissionMode: null,
-                lastUsedModelMode: null,
-                openaiApiKey: null,
-                whisperVocabulary: null,
-                customSystemPrompt: null,
-                sessionLastReadAt: {},
-                environmentSets: [],
             };
             const delta: any = {
                 viewInline: false,
@@ -340,6 +220,11 @@ describe('settings', () => {
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
                 environmentSets: [],
+                wakapiEnabled: false,
+                wakapiApiUrl: null,
+                wakapiApiKey: null,
+                wakapiProxyEnabled: false,
+                wakapiProxyUrl: null,
             });
         });
 
