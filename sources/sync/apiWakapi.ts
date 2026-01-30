@@ -246,6 +246,7 @@ export interface WakapiHeartbeat {
     project?: string;         // Project name
     branch?: string;          // Git branch
     language?: string;        // Programming language
+    editor?: string;          // Editor name
     category?: HeartbeatCategory;
     is_write?: boolean;       // Whether triggered by file write
     lines?: number;           // Total lines in file
@@ -321,12 +322,28 @@ export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[]): Promise
 }
 
 /**
+ * Map session flavor to a display name for the language field.
+ * The "language" tracks which AI agent/CLI is being used.
+ */
+function flavorToLanguage(flavor?: string): string {
+    switch (flavor) {
+        case 'codex': return 'Codex';
+        case 'gpt':
+        case 'openai': return 'Codex';
+        case 'gemini': return 'Gemini';
+        case 'claude':
+        default: return 'Claude';
+    }
+}
+
+/**
  * Create a heartbeat for a Happy session
  */
 export function createSessionHeartbeat(
     sessionPath: string,
     projectName: string,
-    machineName?: string
+    machineName?: string,
+    flavor?: string,
 ): WakapiHeartbeat {
     const heartbeat: WakapiHeartbeat = {
         entity: sessionPath,
@@ -334,7 +351,8 @@ export function createSessionHeartbeat(
         time: Date.now() / 1000, // Convert to seconds with decimals
         project: projectName,
         category: 'coding',
-        language: 'Happy', // Custom "language" to identify Happy usage
+        language: flavorToLanguage(flavor),
+        editor: 'Happy',
     };
 
     // Add machine name if available (helps distinguish between devices)

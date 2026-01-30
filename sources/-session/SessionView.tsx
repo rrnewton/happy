@@ -215,7 +215,7 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
     const projectName = session.metadata?.path?.split('/').pop() || null;
     const machine = session.metadata?.machineId ? useMachine(session.metadata?.machineId) : null;
     const machineName = machine?.metadata?.host || null;
-    useWakapiHeartbeat(session.metadata?.path || null, projectName, machineName, true);
+    useWakapiHeartbeat(session.metadata?.path || null, projectName, machineName, true, session.metadata?.flavor);
 
     // Image attachments state
     const {

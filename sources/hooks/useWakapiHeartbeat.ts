@@ -25,7 +25,8 @@ export function useWakapiHeartbeat(
     sessionPath: string | null,
     projectName: string | null,
     machineName: string | null,
-    isActive: boolean
+    isActive: boolean,
+    flavor?: string | null,
 ) {
     const wakapiEnabled = useSetting('wakapiEnabled');
 
@@ -53,14 +54,14 @@ export function useWakapiHeartbeat(
         }
 
         // Create and send heartbeat
-        const heartbeat = createSessionHeartbeat(sessionPath, projectName, machineName || undefined);
+        const heartbeat = createSessionHeartbeat(sessionPath, projectName, machineName || undefined, flavor || undefined);
         const success = await sendHeartbeat(heartbeat);
 
         if (success) {
             // Update the global last heartbeat time in MMKV
             saveWakapiLastHeartbeat(now);
         }
-    }, [shouldSendHeartbeats, sessionPath, projectName, machineName]);
+    }, [shouldSendHeartbeats, sessionPath, projectName, machineName, flavor]);
 
     // Send heartbeat when session becomes active
     React.useEffect(() => {
