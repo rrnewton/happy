@@ -28,7 +28,7 @@ export const SidebarToggleButton = React.memo(() => {
             <Pressable
                 style={({ pressed }) => [
                     styles.button,
-                    pressed ? styles.buttonPressed : styles.buttonDefault
+                    pressed && styles.buttonPressed
                 ]}
                 onPress={handlePress}
             >
@@ -36,7 +36,7 @@ export const SidebarToggleButton = React.memo(() => {
                     source={require('@/assets/images/brutalist/Abstract 208.png')}
                     contentFit="contain"
                     style={{ width: 24, height: 24 }}
-                    tintColor={theme.colors.fab.icon}
+                    tintColor={theme.colors.text}
                 />
             </Pressable>
         </View>
@@ -52,19 +52,11 @@ const stylesheet = StyleSheet.create((theme) => ({
     button: {
         width: 44,
         height: 44,
-        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: theme.colors.shadow.color,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 3.84,
-        shadowOpacity: theme.colors.shadow.opacity,
-        elevation: 5,
-    },
-    buttonDefault: {
-        backgroundColor: theme.colors.fab.background,
+        padding: 10,
     },
     buttonPressed: {
-        backgroundColor: theme.colors.fab.backgroundPressed,
+        opacity: 0.6,
     },
 }));
