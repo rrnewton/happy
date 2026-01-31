@@ -246,7 +246,6 @@ export interface WakapiHeartbeat {
     project?: string;         // Project name
     branch?: string;          // Git branch
     language?: string;        // Programming language
-    editor?: string;          // Editor name
     category?: HeartbeatCategory;
     is_write?: boolean;       // Whether triggered by file write
     lines?: number;           // Total lines in file
@@ -259,7 +258,7 @@ export interface WakapiHeartbeat {
  * Send a single heartbeat to Wakapi
  * Call this when user is actively using a session
  */
-export async function sendHeartbeat(heartbeat: WakapiHeartbeat): Promise<boolean> {
+export async function sendHeartbeat(heartbeat: WakapiHeartbeat, flavor?: string): Promise<boolean> {
     const config = getWakapiConfig();
     if (!config) {
         return false;
@@ -269,8 +268,10 @@ export async function sendHeartbeat(heartbeat: WakapiHeartbeat): Promise<boolean
         const url = buildRequestUrl(config, 'v1/users/current/heartbeats');
         const headers = buildHeaders(config);
 
-        // Add user agent to help Wakapi identify the editor
-        headers['User-Agent'] = 'Happy/1.0 happy-wakatime';
+        // Set User-Agent header to identify the editor (detected from this header by Wakapi/WakaTime)
+        // Format: wakatime/[version] ([platform]) [plugin-name]/[plugin-version]
+        const editorName = flavorToEditorName(flavor);
+        headers['User-Agent'] = `wakatime/1.0.0 (app) ${editorName}/1.0.0`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -288,7 +289,7 @@ export async function sendHeartbeat(heartbeat: WakapiHeartbeat): Promise<boolean
 /**
  * Send multiple heartbeats in bulk (max 25 per request)
  */
-export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[]): Promise<boolean> {
+export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[], flavor?: string): Promise<boolean> {
     const config = getWakapiConfig();
     if (!config) {
         return false;
@@ -305,8 +306,10 @@ export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[]): Promise
         const url = buildRequestUrl(config, 'v1/users/current/heartbeats.bulk');
         const headers = buildHeaders(config);
 
-        // Add user agent to help Wakapi identify the editor
-        headers['User-Agent'] = 'Happy/1.0 happy-wakatime';
+        // Set User-Agent header to identify the editor (detected from this header by Wakapi/WakaTime)
+        // Format: wakatime/[version] ([platform]) [plugin-name]/[plugin-version]
+        const editorName = flavorToEditorName(flavor);
+        headers['User-Agent'] = `wakatime/1.0.0 (app) ${editorName}/1.0.0`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -322,17 +325,17 @@ export async function sendHeartbeatsBulk(heartbeats: WakapiHeartbeat[]): Promise
 }
 
 /**
- * Map session flavor to a display name for the language field.
- * The "language" tracks which AI agent/CLI is being used.
+ * Map session flavor to a display name for the User-Agent header.
+ * This determines how the editor appears in Wakapi stats.
  */
-function flavorToLanguage(flavor?: string): string {
+function flavorToEditorName(flavor?: string): string {
     switch (flavor) {
-        case 'codex': return 'Codex';
+        case 'codex': return 'Happy-Codex';
         case 'gpt':
-        case 'openai': return 'Codex';
-        case 'gemini': return 'Gemini';
+        case 'openai': return 'Happy-Codex';
+        case 'gemini': return 'Happy-Gemini';
         case 'claude':
-        default: return 'Claude';
+        default: return 'Happy-Claude';
     }
 }
 
@@ -343,7 +346,6 @@ export function createSessionHeartbeat(
     sessionPath: string,
     projectName: string,
     machineName?: string,
-    flavor?: string,
 ): WakapiHeartbeat {
     const heartbeat: WakapiHeartbeat = {
         entity: sessionPath,
@@ -351,8 +353,7 @@ export function createSessionHeartbeat(
         time: Date.now() / 1000, // Convert to seconds with decimals
         project: projectName,
         category: 'coding',
-        language: flavorToLanguage(flavor),
-        editor: 'Happy',
+        language: 'Happy',
     };
 
     // Add machine name if available (helps distinguish between devices)

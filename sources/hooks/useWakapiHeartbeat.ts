@@ -54,8 +54,8 @@ export function useWakapiHeartbeat(
         }
 
         // Create and send heartbeat
-        const heartbeat = createSessionHeartbeat(sessionPath, projectName, machineName || undefined, flavor || undefined);
-        const success = await sendHeartbeat(heartbeat);
+        const heartbeat = createSessionHeartbeat(sessionPath, projectName, machineName || undefined);
+        const success = await sendHeartbeat(heartbeat, flavor || undefined);
 
         if (success) {
             // Update the global last heartbeat time in MMKV
