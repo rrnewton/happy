@@ -93,6 +93,17 @@ export const ru: TranslationStructure = {
         social: 'Социальное',
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
+
+        // Web notifications
+        webNotifications: {
+            title: 'Уведомления на рабочем столе',
+            subtitle: 'Получайте уведомления, когда сессии готовы к вводу',
+            permissionDenied: 'Разрешение отклонено',
+            permissionInstructions: 'Пожалуйста, включите уведомления в настройках браузера, чтобы использовать эту функцию.',
+            testNotification: 'Тестовое уведомление',
+            testNotificationSubtitle: 'Отправить тестовое уведомление, чтобы увидеть, как они выглядят',
+        },
+
         account: 'Аккаунт',
         accountSubtitle: 'Управление учётной записью',
         appearance: 'Внешний вид',

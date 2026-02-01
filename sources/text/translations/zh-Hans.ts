@@ -113,6 +113,17 @@ export const zhHans: TranslationStructure = {
         social: '社交',
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
+
+        // Web notifications
+        webNotifications: {
+            title: '桌面通知',
+            subtitle: '当会话准备好接受输入时收到通知',
+            permissionDenied: '权限被拒绝',
+            permissionInstructions: '请在浏览器设置中启用通知以使用此功能。',
+            testNotification: '测试通知',
+            testNotificationSubtitle: '发送测试通知以查看其显示效果',
+        },
+
         account: '账户',
         accountSubtitle: '管理您的账户详情',
         appearance: '外观',

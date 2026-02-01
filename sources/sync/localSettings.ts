@@ -16,6 +16,7 @@ export const LocalSettingsSchema = z.object({
     sidebarCollapsed: z.boolean().describe('Collapse sidebar on web (Cmd+B to toggle)'),
     bootSequenceEnabled: z.boolean().describe('Show boot sequence animation on app startup'),
     autoCopyOnSelection: z.boolean().describe('Automatically copy selected text to clipboard (web only)'),
+    webNotificationsEnabled: z.boolean().describe('Show browser notifications when sessions become ready (web only)'),
     // CLI version acknowledgments - keyed by machineId
     acknowledgedCliVersions: z.record(z.string(), z.string()).describe('Acknowledged CLI versions per machine'),
 });
@@ -44,6 +45,7 @@ export const localSettingsDefaults: LocalSettings = {
     sidebarCollapsed: false,
     bootSequenceEnabled: false,
     autoCopyOnSelection: false,
+    webNotificationsEnabled: false,
     acknowledgedCliVersions: {},
 };
 Object.freeze(localSettingsDefaults);

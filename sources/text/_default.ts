@@ -146,6 +146,16 @@ export const en = {
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
 
+        // Web notifications
+        webNotifications: {
+            title: 'Desktop Notifications',
+            subtitle: 'Get notified when sessions are ready for input',
+            permissionDenied: 'Permission Denied',
+            permissionInstructions: 'Please enable notifications in your browser settings to use this feature.',
+            testNotification: 'Test Notification',
+            testNotificationSubtitle: 'Send a test notification to see how they appear',
+        },
+
         // Dynamic settings messages
         accountConnected: ({ service }: { service: string }) => `${service} account connected`,
         machineStatus: ({ name, status }: { name: string; status: 'online' | 'offline' }) =>

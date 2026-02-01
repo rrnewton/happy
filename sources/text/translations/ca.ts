@@ -111,6 +111,17 @@ export const ca: TranslationStructure = {
         social: 'Social',
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
+
+        // Web notifications
+        webNotifications: {
+            title: 'Notificacions d\'escriptori',
+            subtitle: 'Rep notificacions quan les sessions estiguin preparades per a entrada',
+            permissionDenied: 'Permís denegat',
+            permissionInstructions: 'Activa les notificacions a la configuració del navegador per utilitzar aquesta funció.',
+            testNotification: 'Notificació de prova',
+            testNotificationSubtitle: 'Envia una notificació de prova per veure com apareixen',
+        },
+
         account: 'Compte',
         accountSubtitle: 'Gestiona els detalls del teu compte',
         appearance: 'Aparença',

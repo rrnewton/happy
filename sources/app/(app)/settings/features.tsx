@@ -6,6 +6,8 @@ import { ItemList } from '@/components/ItemList';
 import { useSettingMutable, useLocalSettingMutable } from '@/sync/storage';
 import { Switch } from '@/components/Switch';
 import { t } from '@/text';
+import { webNotificationManager } from '@/utils/webNotifications';
+import { Modal } from '@/modal';
 
 export default function FeaturesSettingsScreen() {
     const [experiments, setExperiments] = useSettingMutable('experiments');
@@ -14,6 +16,7 @@ export default function FeaturesSettingsScreen() {
     const [autoCopyOnSelection, setAutoCopyOnSelection] = useLocalSettingMutable('autoCopyOnSelection');
     const [hideInactiveSessions, setHideInactiveSessions] = useSettingMutable('hideInactiveSessions');
     const [shiftEnterToSend, setShiftEnterToSend] = useLocalSettingMutable('shiftEnterToSend');
+    const [webNotificationsEnabled, setWebNotificationsEnabled] = useLocalSettingMutable('webNotificationsEnabled');
 
     return (
         <ItemList style={{ paddingTop: 0 }}>
@@ -109,6 +112,73 @@ export default function FeaturesSettingsScreen() {
                         }
                         showChevron={false}
                     />
+                    <Item
+                        title={t('settings.webNotifications.title')}
+                        subtitle={t('settings.webNotifications.subtitle')}
+                        icon={<Ionicons name="notifications-outline" size={29} color="#FF9500" />}
+                        rightElement={
+                            <Switch
+                                value={webNotificationsEnabled}
+                                onValueChange={async (value) => {
+                                    if (value) {
+                                        // Request permission when enabling
+                                        const granted = await webNotificationManager.requestPermission();
+                                        if (!granted) {
+                                            // Show alert that permission was denied
+                                            Modal.alert(
+                                                t('settings.webNotifications.permissionDenied'),
+                                                t('settings.webNotifications.permissionInstructions'),
+                                                [{ text: t('common.ok'), style: 'cancel' }]
+                                            );
+                                            return;
+                                        }
+                                    }
+                                    setWebNotificationsEnabled(value);
+                                }}
+                            />
+                        }
+                        showChevron={false}
+                    />
+                    {webNotificationsEnabled && (
+                        <Item
+                            title={t('settings.webNotifications.testNotification')}
+                            subtitle={t('settings.webNotifications.testNotificationSubtitle')}
+                            icon={<Ionicons name="flask-outline" size={29} color="#5856D6" />}
+                            onPress={() => {
+                                const permission = webNotificationManager.getPermission();
+                                if (permission !== 'granted') {
+                                    Modal.alert(
+                                        t('settings.webNotifications.permissionDenied'),
+                                        t('settings.webNotifications.permissionInstructions'),
+                                        [{ text: t('common.ok'), style: 'cancel' }]
+                                    );
+                                    return;
+                                }
+
+                                // Show alert that notification will appear in 5 seconds
+                                Modal.alert(
+                                    'Test Scheduled',
+                                    'A test notification will appear in 5 seconds. You can switch to another tab to test background notifications.',
+                                    [{ text: t('common.ok'), style: 'cancel' }]
+                                );
+
+                                // Show test notification after 5 seconds
+                                setTimeout(() => {
+                                    const notification = new Notification('Test Notification', {
+                                        body: 'This is how notifications will appear when sessions are ready',
+                                        icon: '/icon.png',
+                                        requireInteraction: false,
+                                    });
+
+                                    notification.onclick = () => {
+                                        window.focus();
+                                        notification.close();
+                                    };
+                                }, 5000);
+                            }}
+                            showChevron={false}
+                        />
+                    )}
                 </ItemGroup>
             )}
         </ItemList>

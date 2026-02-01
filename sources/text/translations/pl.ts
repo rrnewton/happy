@@ -122,6 +122,17 @@ export const pl: TranslationStructure = {
         social: 'Społeczność',
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
+
+        // Web notifications
+        webNotifications: {
+            title: 'Powiadomienia na pulpicie',
+            subtitle: 'Otrzymuj powiadomienia, gdy sesje są gotowe do wprowadzania danych',
+            permissionDenied: 'Odmowa uprawnień',
+            permissionInstructions: 'Włącz powiadomienia w ustawieniach przeglądarki, aby korzystać z tej funkcji.',
+            testNotification: 'Powiadomienie testowe',
+            testNotificationSubtitle: 'Wyślij testowe powiadomienie, aby zobaczyć, jak wyglądają',
+        },
+
         account: 'Konto',
         accountSubtitle: 'Zarządzaj szczegółami konta',
         appearance: 'Wygląd',

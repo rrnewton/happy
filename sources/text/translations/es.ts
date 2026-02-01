@@ -111,6 +111,17 @@ export const es: TranslationStructure = {
         social: 'Social',
         environments: 'Environment Variables',
         environmentsSubtitle: 'Configure environment variable sets',
+
+        // Web notifications
+        webNotifications: {
+            title: 'Notificaciones de escritorio',
+            subtitle: 'Recibe notificaciones cuando las sesiones estén listas para entrada',
+            permissionDenied: 'Permiso denegado',
+            permissionInstructions: 'Habilita las notificaciones en la configuración de tu navegador para usar esta función.',
+            testNotification: 'Notificación de prueba',
+            testNotificationSubtitle: 'Enviar una notificación de prueba para ver cómo aparecen',
+        },
+
         account: 'Cuenta',
         accountSubtitle: 'Gestiona los detalles de tu cuenta',
         appearance: 'Apariencia',
