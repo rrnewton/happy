@@ -22,7 +22,7 @@ export interface KeyboardHandlers {
 }
 
 // Double-tap detection threshold in milliseconds
-const DOUBLE_TAP_THRESHOLD = 300;
+const DOUBLE_TAP_THRESHOLD = 600;
 
 /**
  * Hook for handling global keyboard shortcuts on web
