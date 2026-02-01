@@ -52,7 +52,6 @@ import { initializeTodoSync } from '../-zen/model/ops';
 import { Toast } from '@/toast';
 import { uploadBlob, downloadBlob } from './apiBlobs';
 import { ImageAttachment } from '@/hooks/useImageAttachments';
-import { webNotificationManager } from '@/utils/webNotifications';
 
 class Sync {
     // Spawned agents (especially in spawn mode) can take noticeable time to connect.
@@ -2196,7 +2195,6 @@ class Sync {
 
 
         const sessions: Session[] = [];
-        const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
 
         for (const [sessionId, update] of updates) {
             const session = storage.getState().sessions[sessionId];
@@ -2208,19 +2206,6 @@ class Sync {
                     thinking: update.thinking ?? false,
                     thinkingAt: update.activeAt // Always use activeAt for consistency
                 });
-
-                // Track activity for web notifications (only if enabled)
-                if (webNotificationsEnabled) {
-                    const sessionName = (typeof session.metadata?.summary === 'object'
-                        ? session.metadata.summary.text
-                        : session.metadata?.summary) || session.metadata?.path;
-                    webNotificationManager.handleActivityUpdate(
-                        sessionId,
-                        update.active,
-                        update.thinking ?? false,
-                        sessionName
-                    );
-                }
             }
         }
 
@@ -2270,7 +2255,12 @@ class Sync {
     //
 
     private applyMessages = (sessionId: string, messages: NormalizedMessage[]) => {
-        storage.getState().applyMessages(sessionId, messages);
+        const result = storage.getState().applyMessages(sessionId, messages);
+
+        // Handle ready events for web notifications
+        if (result.hasReadyEvent) {
+            this.handleSessionReady(sessionId);
+        }
     }
 
     /**
@@ -2309,6 +2299,30 @@ class Sync {
         presence?: "online" | number;
     })[]) => {
         storage.getState().applySessions(sessions);
+    }
+
+    /**
+     * Handles session ready events from the CLI.
+     * Shows a web notification if enabled and permission is granted.
+     */
+    private handleSessionReady(sessionId: string) {
+        // Check if web notifications are enabled
+        const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
+        if (!webNotificationsEnabled) {
+            return;
+        }
+
+        // Get session name for notification
+        const session = storage.getState().sessions[sessionId];
+        const sessionName = (typeof session?.metadata?.summary === 'object'
+            ? session.metadata.summary.text
+            : session?.metadata?.summary) || session?.metadata?.path;
+
+        // Show notification
+        if (Platform.OS === 'web') {
+            const { webNotificationManager } = require('@/utils/webNotifications');
+            webNotificationManager.showSessionReady(sessionId, sessionName);
+        }
     }
 
     /**
