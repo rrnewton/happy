@@ -30,6 +30,7 @@ import { useUnistyles } from 'react-native-unistyles';
 import { AsyncLock } from '@/utils/lock';
 import { loadLocalSettings } from '@/sync/persistence';
 import { BootSequence } from '@/components/BootSequence';
+import { router } from 'expo-router';
 
 // Module-level flag to ensure boot sequence only runs once per app session
 let hasShownBootSequence = false;
@@ -236,6 +237,22 @@ export default function RootLayout() {
 
     // Track the screens
     useTrackScreens()
+
+    // Handle notification taps (navigate to session)
+    React.useEffect(() => {
+        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+            const data = response.notification.request.content.data;
+
+            // Extract sessionId from notification data
+            // CLI sends: { sessionId: string, ... }
+            if (data?.sessionId && typeof data.sessionId === 'string') {
+                // Navigate to the session
+                router.navigate(`/session/${data.sessionId}`);
+            }
+        });
+
+        return () => subscription.remove();
+    }, []);
 
     //
     // Not inited
