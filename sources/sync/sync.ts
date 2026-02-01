@@ -2306,6 +2306,11 @@ class Sync {
      * Shows a web notification if enabled and permission is granted.
      */
     private handleSessionReady(sessionId: string) {
+        // Only handle on web platform
+        if (Platform.OS !== 'web') {
+            return;
+        }
+
         // Check if web notifications are enabled
         const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
         if (!webNotificationsEnabled) {
@@ -2319,10 +2324,8 @@ class Sync {
             : session?.metadata?.summary) || session?.metadata?.path;
 
         // Show notification
-        if (Platform.OS === 'web') {
-            const { webNotificationManager } = require('@/utils/webNotifications');
-            webNotificationManager.showSessionReady(sessionId, sessionName);
-        }
+        const { webNotificationManager } = require('@/utils/webNotifications');
+        webNotificationManager.showSessionReady(sessionId, sessionName);
     }
 
     /**
