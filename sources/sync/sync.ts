@@ -52,6 +52,7 @@ import { initializeTodoSync } from '../-zen/model/ops';
 import { Toast } from '@/toast';
 import { uploadBlob, downloadBlob } from './apiBlobs';
 import { ImageAttachment } from '@/hooks/useImageAttachments';
+import { webNotificationManager } from '@/utils/webNotifications';
 
 class Sync {
     // Spawned agents (especially in spawn mode) can take noticeable time to connect.
@@ -2244,6 +2245,14 @@ class Sync {
                     activeAt: updateData.activeAt
                 };
                 storage.getState().applyMachines([updatedMachine]);
+            }
+        }
+
+        // Handle session-ready notifications
+        if (updateData.type === 'session-ready') {
+            const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
+            if (webNotificationsEnabled) {
+                webNotificationManager.showNotification(updateData.sessionId, updateData.sessionName);
             }
         }
 
