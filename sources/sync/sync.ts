@@ -2196,6 +2196,7 @@ class Sync {
 
 
         const sessions: Session[] = [];
+        const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
 
         for (const [sessionId, update] of updates) {
             const session = storage.getState().sessions[sessionId];
@@ -2207,6 +2208,19 @@ class Sync {
                     thinking: update.thinking ?? false,
                     thinkingAt: update.activeAt // Always use activeAt for consistency
                 });
+
+                // Track activity for web notifications (only if enabled)
+                if (webNotificationsEnabled) {
+                    const sessionName = (typeof session.metadata?.summary === 'object'
+                        ? session.metadata.summary.text
+                        : session.metadata?.summary) || session.metadata?.path;
+                    webNotificationManager.handleActivityUpdate(
+                        sessionId,
+                        update.active,
+                        update.thinking ?? false,
+                        sessionName
+                    );
+                }
             }
         }
 
@@ -2245,14 +2259,6 @@ class Sync {
                     activeAt: updateData.activeAt
                 };
                 storage.getState().applyMachines([updatedMachine]);
-            }
-        }
-
-        // Handle session-ready notifications
-        if (updateData.type === 'session-ready') {
-            const webNotificationsEnabled = storage.getState().localSettings.webNotificationsEnabled;
-            if (webNotificationsEnabled) {
-                webNotificationManager.showNotification(updateData.sessionId, updateData.sessionName);
             }
         }
 
