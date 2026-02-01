@@ -158,7 +158,12 @@ function buildSessionListViewData(
     // Sort sessions by updated date (newest first)
     // Round updatedAt to the start of each minute for stable sorting (reduces jumping)
     const roundToMinute = (timestamp: number) => Math.floor(timestamp / 60000) * 60000;
-    activeSessions.sort((a, b) => roundToMinute(b.updatedAt) - roundToMinute(a.updatedAt));
+    activeSessions.sort((a, b) => {
+        const roundedDiff = roundToMinute(b.updatedAt) - roundToMinute(a.updatedAt);
+        if (roundedDiff !== 0) return roundedDiff;
+        // Tiebreaker: use session ID for stable ordering within same minute
+        return a.id.localeCompare(b.id);
+    });
     inactiveSessions.sort((a, b) => b.updatedAt - a.updatedAt);
 
     // Build unified list view data
