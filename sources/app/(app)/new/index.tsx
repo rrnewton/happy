@@ -655,8 +655,12 @@ function NewSessionScreen() {
     }, [selectedEnvSetIdsJsonParam, customEnvVarsJson, environmentSets]);
 
     // Update environment selection when path changes (restore last used env for this path)
+    // Only restore from settings if the user hasn't explicitly returned from the environment picker
     React.useEffect(() => {
-        if (selectedMachineId && selectedPath && !selectedEnvSetIdsJsonParam && !customEnvVarsJson) {
+        // Check if params are undefined (not just falsy) to allow explicit empty selections
+        const hasExplicitEnvSelection = selectedEnvSetIdsJsonParam !== undefined || customEnvVarsJson !== undefined;
+
+        if (selectedMachineId && selectedPath && !hasExplicitEnvSelection) {
             const envInfo = getRecentEnvForPath(selectedMachineId, selectedPath, recentMachinePaths, environmentSets);
             setSelectedEnvSetIds(envInfo.envSetIds);
             setCustomEnvVars(envInfo.customEnvVars);
