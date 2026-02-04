@@ -11,6 +11,8 @@ import { Message } from '@/sync/typesMessage';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { LoadMoreButton } from './LoadMoreButton';
+import { sync } from '@/sync/sync';
 
 export const ChatList = React.memo((props: {
     session: Session;
@@ -19,6 +21,11 @@ export const ChatList = React.memo((props: {
     onOptionEdit?: (text: string) => void;
 }) => {
     const { messages } = useSessionMessages(props.session.id);
+
+    const handleLoadMore = useCallback(() => {
+        sync.fetchOlderMessages(props.session.id);
+    }, [props.session.id]);
+
     return (
         <ChatListInternal
             metadata={props.session.metadata}
@@ -27,6 +34,7 @@ export const ChatList = React.memo((props: {
             onMessageSelect={props.onMessageSelect}
             selectedMessageId={props.selectedMessageId}
             onOptionEdit={props.onOptionEdit}
+            onLoadMore={handleLoadMore}
         />
     )
 });
@@ -57,6 +65,7 @@ const ChatListInternal = React.memo((props: {
     onMessageSelect?: (messageId: string) => void;
     selectedMessageId?: string | null;
     onOptionEdit?: (text: string) => void;
+    onLoadMore: () => void;
 }) => {
     const flatListRef = useRef<FlatList<Message>>(null);
     const [showScrollButton, setShowScrollButton] = useState(false);
@@ -98,7 +107,16 @@ const ChatListInternal = React.memo((props: {
                 keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
                 renderItem={renderItem}
                 ListHeaderComponent={<ListFooter sessionId={props.sessionId} />}
-                ListFooterComponent={<ListHeader />}
+                ListFooterComponent={
+                    <>
+                        <LoadMoreButton
+                            sessionId={props.sessionId}
+                            messageCount={props.messages.length}
+                            onLoadMore={props.onLoadMore}
+                        />
+                        <ListHeader />
+                    </>
+                }
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
             />
