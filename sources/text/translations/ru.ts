@@ -446,6 +446,10 @@ export const ru: TranslationStructure = {
         inputPlaceholder: 'Введите сообщение...',
         searchPlaceholder: 'Поиск сессий...',
         selectToolToViewDetails: 'Выберите инструмент для просмотра деталей',
+        loadOlder: 'Загрузить предыдущие сообщения',
+        loadingHistory: 'Загрузка истории беседы...',
+        historyLoadedAll: 'Все сообщения загружены',
+        historyError: 'Не удалось загрузить предыдущие сообщения',
     },
 
     commandPalette: {

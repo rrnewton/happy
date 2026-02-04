@@ -41,12 +41,52 @@ function isSessionActive(session: { active: boolean; activeAt: number }): boolea
 // Known entitlement IDs
 export type KnownEntitlements = 'pro';
 
+export interface SessionHistoryState {
+    hasMore: boolean;
+    nextCursor: string | null;
+    totalCount: number | null;
+    isLoading: boolean;
+    error: string | null;
+}
+
 interface SessionMessages {
     messages: Message[];
     messagesMap: Record<string, Message>;
     reducerState: ReducerState;
     isLoaded: boolean;
+    history: SessionHistoryState;
 }
+
+const createDefaultHistoryState = (): SessionHistoryState => ({
+    hasMore: false,
+    nextCursor: null,
+    totalCount: null,
+    isLoading: false,
+    error: null,
+});
+
+const createInitialSessionMessages = (): SessionMessages => ({
+    messages: [],
+    messagesMap: {},
+    reducerState: createReducer(),
+    isLoaded: false,
+    history: createDefaultHistoryState(),
+});
+
+const defaultHistorySnapshot = createDefaultHistoryState();
+
+const ensureSessionMessages = (session?: SessionMessages): SessionMessages => {
+    if (!session) {
+        return createInitialSessionMessages();
+    }
+    if (!session.history) {
+        return {
+            ...session,
+            history: createDefaultHistoryState(),
+        };
+    }
+    return session;
+};
 
 // Machine type is now imported from storageTypes - represents persisted machine data
 
@@ -94,6 +134,7 @@ interface StorageState {
     applyReady: () => void;
     applyMessages: (sessionId: string, messages: NormalizedMessage[]) => { changed: string[], hasReadyEvent: boolean };
     applyMessagesLoaded: (sessionId: string) => void;
+    updateSessionHistory: (sessionId: string, updates: Partial<SessionHistoryState> | ((history: SessionHistoryState) => SessionHistoryState)) => void;
     applySettings: (settings: Settings, version: number) => void;
     applySettingsLocal: (settings: Partial<Settings>) => void;
     applyLocalSettings: (settings: Partial<LocalSettings>) => void;
@@ -319,36 +360,44 @@ export const storage = create<StorageState>()((set, get) => {
 
                 // Check if sessionMessages exists AND agentStateVersion is newer
                 const existingSessionMessages = updatedSessionMessages[session.id];
-                if (existingSessionMessages && newSession.agentState &&
-                    (!oldSession || newSession.agentStateVersion > (oldSession.agentStateVersion || 0))) {
+                if (existingSessionMessages) {
+                    const normalizedSessionMessages = ensureSessionMessages(existingSessionMessages);
+                    if (normalizedSessionMessages !== existingSessionMessages) {
+                        updatedSessionMessages[session.id] = normalizedSessionMessages;
+                    }
 
-                    // Process new AgentState through reducer
-                    const reducerResult = reducer(existingSessionMessages.reducerState, [], newSession.agentState);
-                    const processedMessages = reducerResult.messages;
+                    if (newSession.agentState &&
+                        (!oldSession || newSession.agentStateVersion > (oldSession.agentStateVersion || 0))) {
 
-                    // Always update the session messages, even if no new messages were created
-                    // This ensures the reducer state is updated with the new AgentState
-                    const mergedMessagesMap = { ...existingSessionMessages.messagesMap };
-                    processedMessages.forEach(message => {
-                        mergedMessagesMap[message.id] = message;
-                    });
+                        // Process new AgentState through reducer
+                        const reducerResult = reducer(normalizedSessionMessages.reducerState, [], newSession.agentState);
+                        const processedMessages = reducerResult.messages;
 
-                    const messagesArray = Object.values(mergedMessagesMap)
-                        .sort((a, b) => b.createdAt - a.createdAt);
+                        // Always update the session messages, even if no new messages were created
+                        // This ensures the reducer state is updated with the new AgentState
+                        const mergedMessagesMap = { ...normalizedSessionMessages.messagesMap };
+                        processedMessages.forEach(message => {
+                            mergedMessagesMap[message.id] = message;
+                        });
 
-                    updatedSessionMessages[session.id] = {
-                        messages: messagesArray,
-                        messagesMap: mergedMessagesMap,
-                        reducerState: existingSessionMessages.reducerState, // The reducer modifies state in-place, so this has the updates
-                        isLoaded: existingSessionMessages.isLoaded
-                    };
+                        const messagesArray = Object.values(mergedMessagesMap)
+                            .sort((a, b) => b.createdAt - a.createdAt);
 
-                    // IMPORTANT: Copy latestUsage from reducerState to Session for immediate availability
-                    if (existingSessionMessages.reducerState.latestUsage) {
-                        mergedSessions[session.id] = {
-                            ...mergedSessions[session.id],
-                            latestUsage: { ...existingSessionMessages.reducerState.latestUsage }
+                        updatedSessionMessages[session.id] = {
+                            ...normalizedSessionMessages,
+                            messages: messagesArray,
+                            messagesMap: mergedMessagesMap,
+                            reducerState: normalizedSessionMessages.reducerState, // The reducer modifies state in-place, so this has the updates
+                            isLoaded: normalizedSessionMessages.isLoaded
                         };
+
+                        // IMPORTANT: Copy latestUsage from reducerState to Session for immediate availability
+                        if (normalizedSessionMessages.reducerState.latestUsage) {
+                            mergedSessions[session.id] = {
+                                ...mergedSessions[session.id],
+                                latestUsage: { ...normalizedSessionMessages.reducerState.latestUsage }
+                            };
+                        }
                     }
                 }
             });
@@ -392,12 +441,7 @@ export const storage = create<StorageState>()((set, get) => {
             set((state) => {
 
                 // Resolve session messages state
-                const existingSession = state.sessionMessages[sessionId] || {
-                    messages: [],
-                    messagesMap: {},
-                    reducerState: createReducer(),
-                    isLoaded: false
-                };
+                const existingSession = ensureSessionMessages(state.sessionMessages[sessionId]);
 
                 // Get the session's agentState if available
                 const session = state.sessions[sessionId];
@@ -514,17 +558,19 @@ export const storage = create<StorageState>()((set, get) => {
                             reducerState,
                             messages,
                             messagesMap,
-                            isLoaded: true
+                            isLoaded: true,
+                            history: createDefaultHistoryState()
                         } satisfies SessionMessages
                     }
                 };
             } else {
+                const normalizedSession = ensureSessionMessages(existingSession);
                 result = {
                     ...state,
                     sessionMessages: {
                         ...state.sessionMessages,
                         [sessionId]: {
-                            ...existingSession,
+                            ...normalizedSession,
                             isLoaded: true
                         } satisfies SessionMessages
                     }
@@ -532,6 +578,23 @@ export const storage = create<StorageState>()((set, get) => {
             }
 
             return result;
+        }),
+        updateSessionHistory: (sessionId: string, updates) => set((state) => {
+            const existingSession = ensureSessionMessages(state.sessionMessages[sessionId]);
+            const nextHistory = typeof updates === 'function'
+                ? updates(existingSession.history)
+                : { ...existingSession.history, ...updates };
+
+            return {
+                ...state,
+                sessionMessages: {
+                    ...state.sessionMessages,
+                    [sessionId]: {
+                        ...existingSession,
+                        history: nextHistory
+                    }
+                }
+            };
         }),
         applySettingsLocal: (settings: Partial<Settings>) => set((state) => {
             saveSettings(applySettings(state.settings, settings), state.settingsVersion ?? 0);
@@ -989,12 +1052,13 @@ export function useSession(id: string): Session | null {
 
 const emptyArray: unknown[] = [];
 
-export function useSessionMessages(sessionId: string): { messages: Message[], isLoaded: boolean } {
+export function useSessionMessages(sessionId: string): { messages: Message[], isLoaded: boolean, history: SessionHistoryState } {
     return storage(useShallow((state) => {
         const session = state.sessionMessages[sessionId];
         return {
             messages: session?.messages ?? emptyArray,
-            isLoaded: session?.isLoaded ?? false
+            isLoaded: session?.isLoaded ?? false,
+            history: session?.history ?? defaultHistorySnapshot
         };
     }));
 }

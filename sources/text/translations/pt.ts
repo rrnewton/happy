@@ -337,6 +337,10 @@ export const pt: TranslationStructure = {
         inputPlaceholder: 'Digite uma mensagem ...',
         searchPlaceholder: 'Pesquisar sessões...',
         selectToolToViewDetails: 'Selecione uma ferramenta para ver os detalhes',
+        loadOlder: 'Carregar mensagens anteriores',
+        loadingHistory: 'Carregando histórico da conversa...',
+        historyLoadedAll: 'Todas as mensagens carregadas',
+        historyError: 'Não foi possível carregar mensagens anteriores',
     },
 
     commandPalette: {

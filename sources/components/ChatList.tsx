@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useSession, useSessionMessages } from "@/sync/storage";
-import { FlatList, Platform, Pressable, View } from 'react-native';
+import { useSession, useSessionMessages, type SessionHistoryState } from "@/sync/storage";
+import { ActivityIndicator, FlatList, Platform, Pressable, Text, View } from 'react-native';
 import { useCallback, useRef, useState } from 'react';
 import { useHeaderHeight } from '@/utils/responsive';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,8 @@ import { ChatFooter } from './ChatFooter';
 import { Message } from '@/sync/typesMessage';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { t } from '@/text';
+import { sync } from '@/sync/sync';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 export const ChatList = React.memo((props: {
@@ -18,12 +20,13 @@ export const ChatList = React.memo((props: {
     selectedMessageId?: string | null;
     onOptionEdit?: (text: string) => void;
 }) => {
-    const { messages } = useSessionMessages(props.session.id);
+    const { messages, history } = useSessionMessages(props.session.id);
     return (
         <ChatListInternal
             metadata={props.session.metadata}
             sessionId={props.session.id}
             messages={messages}
+            history={history}
             onMessageSelect={props.onMessageSelect}
             selectedMessageId={props.selectedMessageId}
             onOptionEdit={props.onOptionEdit}
@@ -54,6 +57,7 @@ const ChatListInternal = React.memo((props: {
     metadata: Metadata | null,
     sessionId: string,
     messages: Message[],
+    history: SessionHistoryState;
     onMessageSelect?: (messageId: string) => void;
     selectedMessageId?: string | null;
     onOptionEdit?: (text: string) => void;
@@ -83,6 +87,30 @@ const ChatListInternal = React.memo((props: {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     }, []);
 
+    const handleLoadOlder = useCallback(() => {
+        sync.loadMoreMessages(props.sessionId).catch((error) => {
+            console.error('Failed to load older messages', error);
+        });
+    }, [props.sessionId]);
+
+    const handleEndReached = useCallback(() => {
+        if (!props.history.hasMore || props.history.isLoading || props.history.error) {
+            return;
+        }
+        handleLoadOlder();
+    }, [props.history.hasMore, props.history.isLoading, props.history.error, handleLoadOlder]);
+
+    const footerComponent = React.useMemo(() => (
+        <View>
+            <HistoryLoader
+                history={props.history}
+                totalLoaded={props.messages.length}
+                onLoadMore={handleLoadOlder}
+            />
+            <ListHeader />
+        </View>
+    ), [props.history, props.messages.length, handleLoadOlder]);
+
     return (
         <View style={{ flex: 1 }}>
             <FlatList
@@ -98,9 +126,11 @@ const ChatListInternal = React.memo((props: {
                 keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
                 renderItem={renderItem}
                 ListHeaderComponent={<ListFooter sessionId={props.sessionId} />}
-                ListFooterComponent={<ListHeader />}
+                ListFooterComponent={footerComponent}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
+                onEndReached={handleEndReached}
+                onEndReachedThreshold={0.5}
             />
             {showScrollButton && (
                 <ScrollToBottomButton onPress={scrollToBottom} />
@@ -127,6 +157,48 @@ const ScrollToBottomButton = React.memo((props: { onPress: () => void }) => {
     );
 });
 
+const HistoryLoader = React.memo((props: {
+    history: SessionHistoryState;
+    totalLoaded: number;
+    onLoadMore: () => void;
+}) => {
+    const { theme } = useUnistyles();
+    const { history, totalLoaded, onLoadMore } = props;
+    const shouldShowButton = history.hasMore || history.isLoading || !!history.error;
+
+    if (!shouldShowButton) {
+        return null;
+    }
+
+    return (
+        <View style={styles.historyContainer}>
+            {history.isLoading ? (
+                <View style={styles.historyLoadingRow}>
+                    <ActivityIndicator size="small" color={theme.colors.textSecondary} />
+                    <Text style={[styles.historyStatusText, { color: theme.colors.textSecondary, marginLeft: 8 }]}>
+                        {t('session.loadingHistory')}
+                    </Text>
+                </View>
+            ) : history.error ? (
+                <Pressable onPress={onLoadMore} style={[styles.historyButton, { borderColor: theme.colors.divider }]}>
+                    <Text style={[styles.historyButtonText, { color: theme.colors.text }]}>{t('session.historyError')}</Text>
+                    <Text style={[styles.historyErrorDetail, { color: theme.colors.textSecondary }]} numberOfLines={2}>
+                        {history.error}
+                    </Text>
+                </Pressable>
+            ) : history.hasMore ? (
+                <Pressable onPress={onLoadMore} style={[styles.historyButton, { borderColor: theme.colors.divider }]}>
+                    <Text style={[styles.historyButtonText, { color: theme.colors.text }]}>{t('session.loadOlder')}</Text>
+                </Pressable>
+            ) : (
+                <Text style={[styles.historyStatusText, { color: theme.colors.textSecondary }]}>
+                    {t('session.historyLoadedAll')}
+                </Text>
+            )}
+        </View>
+    );
+});
+
 const styles = StyleSheet.create((theme) => ({
     scrollButtonContainer: {
         position: 'absolute',
@@ -147,5 +219,37 @@ const styles = StyleSheet.create((theme) => ({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+    },
+    historyContainer: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        alignItems: 'center',
+    },
+    historyStatusText: {
+        marginTop: 8,
+        fontSize: 13,
+        textAlign: 'center',
+    },
+    historyButton: {
+        marginTop: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    historyButtonText: {
+        fontSize: 15,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    historyErrorDetail: {
+        marginTop: 4,
+        fontSize: 12,
+        textAlign: 'center',
+    },
+    historyLoadingRow: {
+        marginTop: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 }));

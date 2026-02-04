@@ -337,6 +337,10 @@ export const ca: TranslationStructure = {
         inputPlaceholder: 'Escriu un missatge...',
         searchPlaceholder: 'Cercar sessions...',
         selectToolToViewDetails: 'Selecciona una eina per veure els detalls',
+        loadOlder: 'Carrega missatges anteriors',
+        loadingHistory: 'Carregant l’historial de la conversa...',
+        historyLoadedAll: 'Tots els missatges carregats',
+        historyError: 'No s’han pogut carregar els missatges anteriors',
     },
 
     commandPalette: {
