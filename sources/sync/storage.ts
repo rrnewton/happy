@@ -92,7 +92,7 @@ interface StorageState {
     applyMachines: (machines: Machine[], replace?: boolean) => void;
     applyLoaded: () => void;
     applyReady: () => void;
-    applyMessages: (sessionId: string, messages: NormalizedMessage[]) => { changed: string[], hasReadyEvent: boolean };
+    applyMessages: (sessionId: string, messages: NormalizedMessage[], pagination?: { hasMore: boolean; nextCursor: string | null; totalCount: number }) => { changed: string[], hasReadyEvent: boolean };
     applyMessagesLoaded: (sessionId: string) => void;
     applySettings: (settings: Settings, version: number) => void;
     applySettingsLocal: (settings: Partial<Settings>) => void;
@@ -386,7 +386,7 @@ export const storage = create<StorageState>()((set, get) => {
             ...state,
             isDataReady: true
         })),
-        applyMessages: (sessionId: string, messages: NormalizedMessage[]) => {
+        applyMessages: (sessionId: string, messages: NormalizedMessage[], pagination?: { hasMore: boolean; nextCursor: string | null; totalCount: number }) => {
             let changed = new Set<string>();
             let hasReadyEvent = false;
             set((state) => {
@@ -456,7 +456,13 @@ export const storage = create<StorageState>()((set, get) => {
                             messages: messagesArray,
                             messagesMap: mergedMessagesMap,
                             reducerState: existingSession.reducerState, // Explicitly include the mutated reducer state
-                            isLoaded: true
+                            isLoaded: true,
+                            pagination: pagination ? {
+                                hasMore: pagination.hasMore,
+                                nextCursor: pagination.nextCursor,
+                                totalCount: pagination.totalCount,
+                                isLoadingMore: false
+                            } : existingSession.pagination
                         }
                     }
                 };
