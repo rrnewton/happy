@@ -318,6 +318,8 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
                     >
                         {sessionName}
                     </Text>
+                    {/* Unread indicator */}
+                    {hasUnreadMessages && <View style={styles.unreadDot} />}
                 </View>
 
                 {/* Line 3: Status with dot + timestamp */}
@@ -335,8 +337,6 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
                         <Text style={styles.statusTimestamp}>
                             {' · '}{lastUpdatedText}
                         </Text>
-                        {/* Unread indicator */}
-                        {hasUnreadMessages && <View style={styles.unreadDot} />}
                     </View>
 
                     {/* Task status indicator */}
