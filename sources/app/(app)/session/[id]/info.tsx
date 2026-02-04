@@ -6,7 +6,7 @@ import { Typography } from '@/constants/Typography';
 import { Item } from '@/components/Item';
 import { ItemGroup } from '@/components/ItemGroup';
 import { ItemList } from '@/components/ItemList';
-import { useSession, useIsDataReady } from '@/sync/storage';
+import { useSession, useIsDataReady, useSetting } from '@/sync/storage';
 import { getSessionName, useSessionStatus, formatOSPlatform, formatPathRelativeToHome } from '@/utils/sessionUtils';
 import * as Clipboard from 'expo-clipboard';
 import { Modal } from '@/modal';
@@ -19,6 +19,7 @@ import { CodeView } from '@/components/CodeView';
 import { Session } from '@/sync/storageTypes';
 import { useHappyAction } from '@/hooks/useHappyAction';
 import { HappyError } from '@/utils/errors';
+import { sync } from '@/sync/sync';
 
 // Animated status dot component
 function StatusDot({ color, isPulsing, size = 8 }: { color: string; isPulsing?: boolean; size?: number }) {
@@ -65,9 +66,26 @@ function SessionInfoContent({ session }: { session: Session }) {
     const devModeEnabled = __DEV__;
     const sessionName = getSessionName(session);
     const sessionStatus = useSessionStatus(session);
+    const pinnedSessions = useSetting('pinnedSessions');
+    const resumeTarget = React.useMemo(() => {
+        if (!session.metadata?.machineId) {
+            return null;
+        }
+        if (session.metadata?.claudeSessionId) {
+            return { sessionId: session.metadata.claudeSessionId, agent: 'claude' as const };
+        }
+        if (session.metadata?.codexSessionId) {
+            return { sessionId: session.metadata.codexSessionId, agent: 'codex' as const };
+        }
+        return null;
+    }, [session.metadata?.machineId, session.metadata?.claudeSessionId, session.metadata?.codexSessionId]);
     
     // Check if CLI version is outdated
     const isCliOutdated = session.metadata?.version && !isVersionSupported(session.metadata.version, MINIMUM_CLI_VERSION);
+    const isPinned = React.useMemo(
+        () => pinnedSessions.includes(session.id),
+        [pinnedSessions, session.id]
+    );
 
     const handleCopySessionId = useCallback(async () => {
         if (!session) return;
@@ -78,6 +96,16 @@ function SessionInfoContent({ session }: { session: Session }) {
             Modal.alert(t('common.error'), t('sessionInfo.failedToCopySessionId'));
         }
     }, [session]);
+
+    const handleCopyCodexSessionId = useCallback(async () => {
+        if (!session?.metadata?.codexSessionId) return;
+        try {
+            await Clipboard.setStringAsync(session.metadata.codexSessionId);
+            Modal.alert(t('common.success'), t('sessionInfo.codexSessionIdCopied'));
+        } catch (error) {
+            Modal.alert(t('common.error'), t('sessionInfo.failedToCopyCodexSessionId'));
+        }
+    }, [session?.metadata?.codexSessionId]);
 
     const handleCopyMetadata = useCallback(async () => {
         if (!session?.metadata) return;
@@ -152,6 +180,12 @@ function SessionInfoContent({ session }: { session: Session }) {
     const formatDate = useCallback((timestamp: number) => {
         return new Date(timestamp).toLocaleString();
     }, []);
+
+    const handleTogglePinned = useCallback(() => {
+        const withoutCurrent = pinnedSessions.filter(id => id !== session.id);
+        const nextPinned = isPinned ? withoutCurrent : [session.id, ...withoutCurrent];
+        sync.applySettings({ pinnedSessions: nextPinned });
+    }, [pinnedSessions, isPinned, session.id]);
 
     const handleCopyUpdateCommand = useCallback(async () => {
         const updateCommand = 'npm install -g happy-coder@latest';
@@ -243,6 +277,14 @@ function SessionInfoContent({ session }: { session: Session }) {
                             }}
                         />
                     )}
+                    {session.metadata?.codexSessionId && (
+                        <Item
+                            title={t('sessionInfo.codexSessionId')}
+                            subtitle={`${session.metadata.codexSessionId.substring(0, 8)}...${session.metadata.codexSessionId.substring(session.metadata.codexSessionId.length - 8)}`}
+                            icon={<Ionicons name="sparkles-outline" size={29} color="#0A84FF" />}
+                            onPress={handleCopyCodexSessionId}
+                        />
+                    )}
                     <Item
                         title={t('sessionInfo.connectionStatus')}
                         detail={sessionStatus.isConnected ? t('status.online') : t('status.offline')}
@@ -271,6 +313,12 @@ function SessionInfoContent({ session }: { session: Session }) {
 
                 {/* Quick Actions */}
                 <ItemGroup title={t('sessionInfo.quickActions')}>
+                    <Item
+                        title={isPinned ? t('session.unpinSession') : t('session.pinSession')}
+                        subtitle={isPinned ? t('session.pinned') : undefined}
+                        icon={<Ionicons name={isPinned ? 'bookmark' : 'bookmark-outline'} size={29} color={isPinned ? '#FF9500' : '#007AFF'} />}
+                        onPress={handleTogglePinned}
+                    />
                     {session.metadata?.machineId && (
                         <Item
                             title={t('sessionInfo.viewMachine')}
@@ -287,12 +335,12 @@ function SessionInfoContent({ session }: { session: Session }) {
                             onPress={handleArchiveSession}
                         />
                     )}
-                    {session.metadata?.claudeSessionId && session.metadata?.machineId && (
+                    {resumeTarget && session.metadata?.machineId && (
                         <Item
                             title={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSession') : t('sessionInfo.continueFromHere')}
                             subtitle={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSessionSubtitle') : t('sessionInfo.continueFromHereSubtitle')}
                             icon={<Ionicons name={sessionStatus.isConnected && session.active ? "git-branch-outline" : "play-outline"} size={29} color="#34C759" />}
-                            onPress={() => router.push(`/new?resumeClaudeSessionId=${session.metadata!.claudeSessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
+                            onPress={() => router.push(`/new?agent=${resumeTarget.agent}&resumeClaudeSessionId=${resumeTarget.sessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
                         />
                     )}
                     <Item

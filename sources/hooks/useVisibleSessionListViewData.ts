@@ -9,6 +9,7 @@ interface UseVisibleSessionListViewDataOptions {
 export function useVisibleSessionListViewData(options?: UseVisibleSessionListViewDataOptions): SessionListViewItem[] | null {
     const data = useSessionListViewData();
     const hideInactiveSessionsSetting = useSetting('hideInactiveSessions');
+    const pinnedSessionIds = useSetting('pinnedSessions');
 
     // Override the setting when showAllSessions is true (e.g., when searching)
     const hideInactiveSessions = options?.showAllSessions ? false : hideInactiveSessionsSetting;
@@ -23,6 +24,7 @@ export function useVisibleSessionListViewData(options?: UseVisibleSessionListVie
 
         const filtered: SessionListViewItem[] = [];
         let pendingProjectGroup: SessionListViewItem | null = null;
+        const pinnedSet = new Set(pinnedSessionIds);
 
         for (const item of data) {
             if (item.type === 'project-group') {
@@ -31,7 +33,8 @@ export function useVisibleSessionListViewData(options?: UseVisibleSessionListVie
             }
 
             if (item.type === 'session') {
-                if (item.session.active) {
+                const isPinned = pinnedSet.has(item.session.id);
+                if (item.session.active || isPinned) {
                     if (pendingProjectGroup) {
                         filtered.push(pendingProjectGroup);
                         pendingProjectGroup = null;
@@ -49,5 +52,5 @@ export function useVisibleSessionListViewData(options?: UseVisibleSessionListVie
         }
 
         return filtered;
-    }, [data, hideInactiveSessions]);
+    }, [data, hideInactiveSessions, pinnedSessionIds]);
 }

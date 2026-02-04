@@ -38,6 +38,20 @@ function isSessionActive(session: { active: boolean; activeAt: number }): boolea
     return session.active;
 }
 
+function shallowArrayEqual<T>(a: readonly T[], b: readonly T[]): boolean {
+    if (a.length !== b.length) {
+        return false;
+    }
+
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Known entitlement IDs
 export type KnownEntitlements = 'pro';
 
@@ -182,9 +196,23 @@ interface StorageState {
 
 // Helper function to build unified list view data from sessions and machines
 function buildSessionListViewData(
-    sessions: Record<string, Session>
+    sessions: Record<string, Session>,
+    pinnedSessionIds: readonly string[] = []
 ): SessionListViewItem[] {
-    // Separate active and inactive sessions
+    // Build pinned session order based on settings
+    const pinnedSessionsOrdered: Session[] = [];
+    const pinnedOrder = new Map<string, number>();
+    pinnedSessionIds.forEach((id, index) => {
+        const session = sessions[id];
+        if (session && !pinnedOrder.has(id)) {
+            pinnedOrder.set(id, index);
+            pinnedSessionsOrdered.push(session);
+        }
+    });
+
+    const pinnedIdSet = new Set(pinnedSessionsOrdered.map(session => session.id));
+
+    // Separate sessions into active/inactive buckets for remaining sessions
     const activeSessions: Session[] = [];
     const inactiveSessions: Session[] = [];
 
@@ -197,27 +225,32 @@ function buildSessionListViewData(
     });
 
     // Sort sessions by updated date (newest first)
-    // Round updatedAt to the start of each minute for stable sorting (reduces jumping)
     const roundToMinute = (timestamp: number) => Math.floor(timestamp / 60000) * 60000;
-    activeSessions.sort((a, b) => {
-        const roundedDiff = roundToMinute(b.updatedAt) - roundToMinute(a.updatedAt);
-        if (roundedDiff !== 0) return roundedDiff;
-        // Tiebreaker: use session ID for stable ordering within same minute
-        return a.id.localeCompare(b.id);
-    });
-    inactiveSessions.sort((a, b) => b.updatedAt - a.updatedAt);
+    const sortedActiveSessions = activeSessions
+        .filter(session => !pinnedIdSet.has(session.id))
+        .sort((a, b) => {
+            const roundedDiff = roundToMinute(b.updatedAt) - roundToMinute(a.updatedAt);
+            if (roundedDiff !== 0) return roundedDiff;
+            return a.id.localeCompare(b.id);
+        });
 
-    // Build unified list view data
+    const sortedInactiveSessions = inactiveSessions
+        .filter(session => !pinnedIdSet.has(session.id))
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+
     const listData: SessionListViewItem[] = [];
 
-    // Add active sessions as a single item at the top (if any)
-    if (activeSessions.length > 0) {
-        listData.push({ type: 'active-sessions', sessions: activeSessions });
+    // Add pinned sessions individually at the top
+    for (const session of pinnedSessionsOrdered) {
+        listData.push({ type: 'session', session });
     }
 
-    // Add inactive sessions as flat list (no date grouping)
-    for (const session of inactiveSessions) {
-        listData.push({ type: 'session', session: session });
+    if (sortedActiveSessions.length > 0) {
+        listData.push({ type: 'active-sessions', sessions: sortedActiveSessions });
+    }
+
+    for (const session of sortedInactiveSessions) {
+        listData.push({ type: 'session', session });
     }
 
     return listData;
@@ -404,7 +437,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Build new unified list view data
             const sessionListViewData = buildSessionListViewData(
-                mergedSessions
+                mergedSessions,
+                state.settings.pinnedSessions
             );
 
             // Update project manager with current sessions and machines
@@ -596,20 +630,35 @@ export const storage = create<StorageState>()((set, get) => {
                 }
             };
         }),
-        applySettingsLocal: (settings: Partial<Settings>) => set((state) => {
-            saveSettings(applySettings(state.settings, settings), state.settingsVersion ?? 0);
+        applySettingsLocal: (delta: Partial<Settings>) => set((state) => {
+
+            const nextSettings = applySettings(state.settings, delta);
+            saveSettings(nextSettings, state.settingsVersion ?? 0);
+
+            const shouldRebuildList = Object.prototype.hasOwnProperty.call(delta, 'pinnedSessions');
             return {
                 ...state,
-                settings: applySettings(state.settings, settings)
+                settings: nextSettings,
+                sessionListViewData: shouldRebuildList
+                    ? buildSessionListViewData(state.sessions, nextSettings.pinnedSessions)
+                    : state.sessionListViewData
             };
         }),
         applySettings: (settings: Settings, version: number) => set((state) => {
             if (state.settingsVersion === null || state.settingsVersion < version) {
                 saveSettings(settings, version);
+                const shouldRebuildList = !shallowArrayEqual(
+                    settings.pinnedSessions,
+                    state.settings.pinnedSessions
+                );
+
                 return {
                     ...state,
                     settings,
-                    settingsVersion: version
+                    settingsVersion: version,
+                    sessionListViewData: shouldRebuildList
+                        ? buildSessionListViewData(state.sessions, settings.pinnedSessions)
+                        : state.sessionListViewData
                 };
             } else {
                 return state;
@@ -715,7 +764,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Rebuild sessionListViewData to update the UI immediately
             const sessionListViewData = buildSessionListViewData(
-                updatedSessions
+                updatedSessions,
+                state.settings.pinnedSessions
             );
 
             return {
@@ -806,7 +856,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Rebuild sessionListViewData to reflect machine changes
             const sessionListViewData = buildSessionListViewData(
-                state.sessions
+                state.sessions,
+                state.settings.pinnedSessions
             );
 
             return {
@@ -836,7 +887,8 @@ export const storage = create<StorageState>()((set, get) => {
 
             // Rebuild sessionListViewData to reflect machine changes
             const sessionListViewData = buildSessionListViewData(
-                state.sessions
+                state.sessions,
+                state.settings.pinnedSessions
             );
 
             return {
@@ -909,7 +961,10 @@ export const storage = create<StorageState>()((set, get) => {
             saveSessionPermissionModes(modes);
             
             // Rebuild sessionListViewData without the deleted session
-            const sessionListViewData = buildSessionListViewData(remainingSessions);
+            const sessionListViewData = buildSessionListViewData(
+                remainingSessions,
+                state.settings.pinnedSessions
+            );
             
             return {
                 ...state,

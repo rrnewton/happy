@@ -15,7 +15,6 @@ import { storage } from '@/sync/storage';
 import { Modal } from '@/modal';
 import { CompactGitStatus } from './CompactGitStatus';
 import { ProjectGitStatus } from './ProjectGitStatus';
-import { t } from '@/text';
 import { useNavigateToSession } from '@/hooks/useNavigateToSession';
 
 const stylesheet = StyleSheet.create((theme, runtime) => ({
@@ -89,6 +88,12 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 4,
+    },
+    sessionTitleContent: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 8,
     },
     sessionTitle: {
         fontSize: 15,
@@ -207,26 +212,42 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
         shadowRadius: 3,
         elevation: 2,
     },
+    pinnedIndicator: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 0,
+        height: 0,
+        borderStyle: 'solid',
+        borderTopWidth: 20,
+        borderLeftWidth: 20,
+        borderTopColor: theme.colors.status.connected,
+        borderLeftColor: 'transparent',
+    },
 }));
 
 interface ActiveSessionsGroupProps {
     sessions: Session[];
     selectedSessionId?: string;
+    disableSorting?: boolean;
 }
 
 
-export function ActiveSessionsGroup({ sessions, selectedSessionId }: ActiveSessionsGroupProps) {
+export function ActiveSessionsGroup({ sessions, selectedSessionId, disableSorting = false }: ActiveSessionsGroupProps) {
     const styles = stylesheet;
 
     // Sort sessions by lastMessageAt (newest first) - flat list, no grouping
     // Fall back to createdAt if no messages yet
     const sortedSessions = React.useMemo(() => {
+        if (disableSorting) {
+            return sessions;
+        }
         return [...sessions].sort((a, b) => {
             const aTime = a.lastMessageAt ?? a.createdAt;
             const bTime = b.lastMessageAt ?? b.createdAt;
             return bTime - aTime;
         });
-    }, [sessions]);
+    }, [sessions, disableSorting]);
 
     return (
         <View style={styles.container}>
@@ -249,6 +270,11 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
     const sessionSubtitle = getSessionSubtitle(session);
     const navigateToSession = useNavigateToSession();
     const sessionLastReadAt = useSetting('sessionLastReadAt');
+    const pinnedSessions = useSetting('pinnedSessions');
+    const isPinned = React.useMemo(
+        () => pinnedSessions.includes(session.id),
+        [pinnedSessions, session.id]
+    );
 
     // Get machine for display name
     const machine = useMachine(session.metadata?.machineId || '');
@@ -284,13 +310,14 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
         <Pressable
             style={[
                 styles.sessionRow,
-                { marginHorizontal: 16, marginBottom: 8, borderRadius: 12 },
+                { marginHorizontal: 16, marginBottom: 8, borderRadius: 12, overflow: 'hidden' },
                 selected && styles.sessionRowSelected
             ]}
             onPress={() => {
                 navigateToSession(session.id);
             }}
         >
+            {isPinned && <View style={styles.pinnedIndicator} />}
             <View style={styles.sessionContent}>
                 {/* Line 1: Machine name + path */}
                 <View style={styles.sessionSubtitleRow}>
@@ -309,17 +336,19 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
 
                 {/* Line 2: Title (up to 2 lines) */}
                 <View style={styles.sessionTitleRow}>
-                    <Text
-                        style={[
-                            styles.sessionTitle,
-                            sessionStatus.isConnected ? styles.sessionTitleConnected : styles.sessionTitleDisconnected
-                        ]}
-                        numberOfLines={2}
-                    >
-                        {sessionName}
-                    </Text>
-                    {/* Unread indicator */}
-                    {hasUnreadMessages && <View style={styles.unreadDot} />}
+                    <View style={styles.sessionTitleContent}>
+                        <Text
+                            style={[
+                                styles.sessionTitle,
+                                sessionStatus.isConnected ? styles.sessionTitleConnected : styles.sessionTitleDisconnected
+                            ]}
+                            numberOfLines={2}
+                        >
+                            {sessionName}
+                        </Text>
+                        {/* Unread indicator */}
+                        {hasUnreadMessages && <View style={styles.unreadDot} />}
+                    </View>
                 </View>
 
                 {/* Line 3: Status with dot + timestamp */}

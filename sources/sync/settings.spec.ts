@@ -219,6 +219,7 @@ describe('settings', () => {
                 whisperVocabulary: null,
                 customSystemPrompt: null,
                 sessionLastReadAt: {},
+                pinnedSessions: [],
                 environmentSets: [],
                 wakapiEnabled: false,
                 wakapiApiUrl: null,

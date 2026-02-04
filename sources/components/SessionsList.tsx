@@ -72,6 +72,13 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
     const pathname = usePathname();
     const isTablet = useIsTablet();
     const selectable = isTablet;
+    const selectedSessionId = React.useMemo(() => {
+        if (isTablet && pathname.startsWith('/session/')) {
+            const parts = pathname.split('/');
+            return parts[2];
+        }
+        return undefined;
+    }, [isTablet, pathname]);
 
     // Pull-to-refresh state
     const [refreshing, setRefreshing] = React.useState(false);
@@ -100,7 +107,6 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                     filteredItems.push(item);
                 }
             } else if (item.type === 'active-sessions') {
-                // Filter active sessions array
                 const filteredSessions = item.sessions.filter(session =>
                     sessionMatchesSearch(session, searchQuery)
                 );
@@ -112,7 +118,6 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                     });
                 }
             } else {
-                // Keep other item types (project-group, etc.)
                 filteredItems.push(item);
             }
         }
@@ -150,7 +155,7 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
         }
     }, []);
 
-    const renderItem = React.useCallback(({ item, index }: { item: SessionListViewItem & { selected?: boolean }, index: number }) => {
+    const renderItem = React.useCallback(({ item }: { item: SessionListViewItem & { selected?: boolean } }) => {
         switch (item.type) {
             case 'header':
                 // Headers no longer used, but keeping for backward compatibility
@@ -163,17 +168,10 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                 );
 
             case 'active-sessions':
-                // Extract just the session ID from pathname (e.g., /session/abc123/file -> abc123)
-                let selectedId: string | undefined;
-                if (isTablet && pathname.startsWith('/session/')) {
-                    const parts = pathname.split('/');
-                    selectedId = parts[2]; // parts[0] is empty, parts[1] is 'session', parts[2] is the ID
-                }
-
                 return (
                     <ActiveSessionsGroup
                         sessions={item.sessions}
-                        selectedSessionId={selectedId}
+                        selectedSessionId={selectedSessionId}
                     />
                 );
 
@@ -197,7 +195,7 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
                     />
                 );
         }
-    }, [pathname, dataWithSelected]);
+    }, [dataWithSelected, selectedSessionId]);
 
 
     // Remove this section as we'll use FlatList for all items now
@@ -236,4 +234,3 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
         </View>
     );
 }
-
