@@ -339,6 +339,10 @@ export const zhHans: TranslationStructure = {
         inputPlaceholder: '输入消息...',
         searchPlaceholder: '搜索会话...',
         selectToolToViewDetails: '选择工具查看详情',
+        loadOlder: '加载更早的消息',
+        loadingHistory: '正在加载会话历史...',
+        historyLoadedAll: '所有消息已加载',
+        historyError: '加载更早的消息失败',
     },
 
     commandPalette: {

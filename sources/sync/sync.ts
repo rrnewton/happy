@@ -3,7 +3,7 @@ import { apiSocket } from '@/sync/apiSocket';
 import { AuthCredentials } from '@/auth/tokenStorage';
 import { Encryption } from '@/sync/encryption/encryption';
 import { decodeBase64, encodeBase64 } from '@/encryption/base64';
-import { storage } from './storage';
+import { storage, SessionHistoryState } from './storage';
 import { ApiEphemeralUpdateSchema, ApiMessage, ApiUpdateContainerSchema } from './apiTypes';
 import type { ApiEphemeralActivityUpdate } from './apiTypes';
 import { Session, Machine } from './storageTypes';
@@ -57,6 +57,7 @@ import { webNotificationManager } from '@/utils/webNotifications';
 class Sync {
     // Spawned agents (especially in spawn mode) can take noticeable time to connect.
     private static readonly SESSION_READY_TIMEOUT_MS = 10000;
+    private static readonly HISTORY_PAGE_SIZE = 150;
 
     encryption!: Encryption;
     serverID!: string;
@@ -1687,8 +1688,115 @@ class Sync {
 
         // Apply to storage
         this.applyMessages(sessionId, normalizedMessages);
+        this.updateHistoryFromPagination(sessionId, data?.pagination);
         log.log(`💬 fetchMessages completed for session ${sessionId} - processed ${normalizedMessages.length} messages`);
     }
+
+    private updateHistoryFromPagination(sessionId: string, pagination?: { hasMore?: boolean; nextCursor?: string | null; totalCount?: number | null }) {
+        const updates: Partial<SessionHistoryState> = {
+            isLoading: false,
+            error: null,
+        };
+
+        if (pagination) {
+            if (typeof pagination.hasMore === 'boolean') {
+                updates.hasMore = pagination.hasMore;
+            }
+            if ('nextCursor' in pagination) {
+                updates.nextCursor = pagination.nextCursor ?? null;
+            }
+            if (typeof pagination.totalCount === 'number') {
+                updates.totalCount = pagination.totalCount;
+            }
+        } else {
+            updates.hasMore = false;
+            updates.nextCursor = null;
+        }
+
+        storage.getState().updateSessionHistory(sessionId, updates);
+    }
+
+    loadMoreMessages = async (sessionId: string) => {
+        const state = storage.getState();
+        const sessionMessages = state.sessionMessages[sessionId];
+        const history = sessionMessages?.history;
+
+        if (!history || !history.hasMore || history.isLoading) {
+            return;
+        }
+
+        const cursor = history.nextCursor
+            ?? sessionMessages?.messages?.[sessionMessages.messages.length - 1]?.id
+            ?? null;
+
+        if (!cursor) {
+            storage.getState().updateSessionHistory(sessionId, {
+                hasMore: false,
+                nextCursor: null,
+                isLoading: false,
+            });
+            return;
+        }
+
+        storage.getState().updateSessionHistory(sessionId, {
+            isLoading: true,
+            error: null,
+        });
+
+        try {
+            const encryption = this.encryption.getSessionEncryption(sessionId);
+            if (!encryption) {
+                throw new Error(`Session ${sessionId} not found`);
+            }
+
+            let existingMessages = this.sessionReceivedMessages.get(sessionId);
+            if (!existingMessages) {
+                existingMessages = new Set<string>();
+                this.sessionReceivedMessages.set(sessionId, existingMessages);
+            }
+
+        const params = new URLSearchParams({
+            cursor,
+        });
+            const response = await apiSocket.request(`/v1/sessions/${sessionId}/messages/history?${params.toString()}`);
+            const data = await response.json();
+
+            const normalizedMessages: NormalizedMessage[] = [];
+            const apiMessages: ApiMessage[] = Array.isArray(data?.messages) ? data.messages : [];
+
+            const messagesToDecrypt: ApiMessage[] = [];
+            for (const msg of [...apiMessages].reverse()) {
+                if (!existingMessages.has(msg.id)) {
+                    messagesToDecrypt.push(msg);
+                }
+            }
+
+            const decryptedMessages = await encryption.decryptMessages(messagesToDecrypt);
+            for (const decrypted of decryptedMessages) {
+                if (decrypted) {
+                    existingMessages.add(decrypted.id);
+                    const normalized = normalizeRawMessage(decrypted.id, decrypted.localId, decrypted.createdAt, decrypted.content);
+                    if (normalized) {
+                        normalizedMessages.push(normalized);
+                    }
+                }
+            }
+
+            if (normalizedMessages.length > 0) {
+                this.applyMessages(sessionId, normalizedMessages);
+            }
+
+            this.updateHistoryFromPagination(sessionId, data?.pagination);
+            log.log(`↩️ Loaded ${normalizedMessages.length} older messages for session ${sessionId}`);
+        } catch (error) {
+            console.error(`Failed to load more messages for session ${sessionId}:`, error);
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            storage.getState().updateSessionHistory(sessionId, {
+                isLoading: false,
+                error: message,
+            });
+        }
+    };
 
     private registerPushToken = async () => {
         log.log('registerPushToken');

@@ -348,6 +348,10 @@ export const pl: TranslationStructure = {
         inputPlaceholder: 'Wpisz wiadomość...',
         searchPlaceholder: 'Szukaj sesji...',
         selectToolToViewDetails: 'Wybierz narzędzie, aby zobaczyć szczegóły',
+        loadOlder: 'Wczytaj starsze wiadomości',
+        loadingHistory: 'Ładowanie historii rozmowy...',
+        historyLoadedAll: 'Wszystkie wiadomości wczytane',
+        historyError: 'Nie udało się wczytać starszych wiadomości',
     },
 
     commandPalette: {

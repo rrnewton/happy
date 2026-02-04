@@ -17,18 +17,28 @@ export function useDemoMessages(messages: Message[]) {
         const sortedMessages = [...messages].sort((a, b) => b.createdAt - a.createdAt);
 
         // Write the demo messages to the hardcoded session
-        storage.setState((state) => ({
-            ...state,
-            sessionMessages: {
-                ...state.sessionMessages,
-                [DEMO_SESSION_ID]: {
-                    messages: sortedMessages,
-                    messagesMap: messagesMap,
-                    reducerState: createReducer(),
-                    isLoaded: true
+        storage.setState((state) => {
+            const existingHistory = state.sessionMessages[DEMO_SESSION_ID]?.history;
+            return {
+                ...state,
+                sessionMessages: {
+                    ...state.sessionMessages,
+                    [DEMO_SESSION_ID]: {
+                        messages: sortedMessages,
+                        messagesMap,
+                        reducerState: createReducer(),
+                        isLoaded: true,
+                        history: existingHistory ?? {
+                            hasMore: false,
+                            nextCursor: null,
+                            totalCount: sortedMessages.length,
+                            isLoading: false,
+                            error: null
+                        }
+                    }
                 }
-            }
-        }));
+            };
+        });
 
         // Cleanup function to remove the demo session
         return () => {

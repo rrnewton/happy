@@ -336,6 +336,10 @@ export const en = {
         inputPlaceholder: 'Type a message ...',
         searchPlaceholder: 'Search sessions...',
         selectToolToViewDetails: 'Select a tool to view details',
+        loadOlder: 'Load older messages',
+        loadingHistory: 'Loading conversation history...',
+        historyLoadedAll: 'All messages loaded',
+        historyError: 'Failed to load older messages',
     },
 
     commandPalette: {
