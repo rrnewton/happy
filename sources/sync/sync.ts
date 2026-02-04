@@ -1686,7 +1686,7 @@ class Sync {
         // console.log('messages', JSON.stringify(normalizedMessages));
 
         // Apply to storage
-        this.applyMessages(sessionId, normalizedMessages);
+        this.applyMessages(sessionId, normalizedMessages, data.pagination);
         log.log(`💬 fetchMessages completed for session ${sessionId} - processed ${normalizedMessages.length} messages`);
     }
 
