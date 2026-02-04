@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Message } from "./typesMessage";
 
 //
 // Agent states
@@ -167,4 +168,21 @@ export interface GitStatus {
     aheadCount?: number; // Commits ahead of upstream
     behindCount?: number; // Commits behind upstream
     stashCount?: number; // Number of stash entries
+}
+
+//
+// Pagination
+//
+
+export interface PaginationState {
+    hasMore: boolean;
+    nextCursor: string | null;
+    totalCount: number;
+    isLoadingMore: boolean;
+}
+
+export interface SessionMessagesState {
+    messages: Message[];
+    isLoaded: boolean;
+    pagination?: PaginationState;
 }
