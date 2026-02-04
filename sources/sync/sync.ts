@@ -793,6 +793,74 @@ class Sync {
         return this.sessionsSync.invalidateAndAwait();
     }
 
+    fetchOlderMessages = async (sessionId: string): Promise<void> => {
+        const currentState = storage.getState().sessionMessages[sessionId];
+
+        // Guard against concurrent loads or no more messages
+        if (!currentState?.pagination?.hasMore || currentState.pagination.isLoadingMore) {
+            console.log('fetchOlderMessages: skipping (hasMore=false or already loading)');
+            return;
+        }
+
+        log.log(`📜 fetchOlderMessages starting for session ${sessionId}`);
+
+        // Set loading state
+        this.setPaginationLoading(sessionId, true);
+
+        try {
+            const cursor = currentState.pagination.nextCursor;
+            if (!cursor) {
+                console.error('fetchOlderMessages: nextCursor is null but hasMore is true');
+                return;
+            }
+
+            // Get encryption
+            const encryption = this.encryption.getSessionEncryption(sessionId);
+            if (!encryption) {
+                console.error(`Session ${sessionId} not found`);
+                return;
+            }
+
+            // Request paginated messages
+            const response = await apiSocket.request(
+                `/v1/sessions/${sessionId}/messages/history?cursor=${encodeURIComponent(cursor)}&limit=150`
+            );
+            const data = await response.json();
+
+            // Filter out already-received messages
+            const existingMessages = this.sessionReceivedMessages.get(sessionId) || new Set();
+            const messagesToDecrypt = (data.messages as ApiMessage[]).filter(
+                msg => !existingMessages.has(msg.id)
+            );
+
+            log.log(`📜 fetchOlderMessages: decrypting ${messagesToDecrypt.length} new messages`);
+
+            // Decrypt new batch
+            const decryptedMessages = await encryption.decryptMessages(messagesToDecrypt);
+
+            // Normalize messages
+            const normalizedMessages: NormalizedMessage[] = [];
+            for (const msg of decryptedMessages) {
+                if (msg) {
+                    const normalized = normalizeRawMessage(msg.id, msg.localId, msg.createdAt, msg.content);
+                    if (normalized) {
+                        normalizedMessages.push(normalized);
+                    }
+                }
+            }
+
+            log.log(`📜 fetchOlderMessages: normalized ${normalizedMessages.length} messages`);
+
+            // Merge with existing messages
+            this.applyOlderMessages(sessionId, normalizedMessages, data.pagination);
+
+            log.log(`📜 fetchOlderMessages completed for session ${sessionId}`);
+        } catch (error) {
+            console.error('Failed to fetch older messages:', error);
+            this.setPaginationLoading(sessionId, false);
+        }
+    }
+
     public getCredentials() {
         return this.credentials;
     }
