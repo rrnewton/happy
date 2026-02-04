@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { useShallow } from 'zustand/react/shallow'
-import { Session, Machine, GitStatus } from "./storageTypes";
+import { Session, Machine, GitStatus, PaginationState } from "./storageTypes";
 import { createReducer, reducer, ReducerState } from "./reducer/reducer";
 import { Message } from "./typesMessage";
 import { NormalizedMessage } from "./typesRaw";
@@ -996,6 +996,13 @@ export function useSessionMessages(sessionId: string): { messages: Message[], is
             messages: session?.messages ?? emptyArray,
             isLoaded: session?.isLoaded ?? false
         };
+    }));
+}
+
+export function useSessionPagination(sessionId: string): PaginationState | undefined {
+    return storage(useShallow((state) => {
+        const session = state.sessionMessages[sessionId];
+        return session?.pagination;
     }));
 }
 
