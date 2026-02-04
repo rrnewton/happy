@@ -1690,6 +1690,66 @@ class Sync {
         log.log(`💬 fetchMessages completed for session ${sessionId} - processed ${normalizedMessages.length} messages`);
     }
 
+    private setPaginationLoading = (sessionId: string, isLoading: boolean) => {
+        storage.setState((state) => {
+            const session = state.sessionMessages[sessionId];
+            if (!session?.pagination) return state;
+
+            return {
+                ...state,
+                sessionMessages: {
+                    ...state.sessionMessages,
+                    [sessionId]: {
+                        ...session,
+                        pagination: {
+                            ...session.pagination,
+                            isLoadingMore: isLoading
+                        }
+                    }
+                }
+            };
+        });
+    }
+
+    private applyOlderMessages = (
+        sessionId: string,
+        messages: NormalizedMessage[],
+        pagination: { hasMore: boolean; nextCursor: string | null; totalCount: number }
+    ) => {
+        storage.setState((state) => {
+            const session = state.sessionMessages[sessionId];
+            if (!session) return state;
+
+            // Add to received messages set
+            const existingMessages = this.sessionReceivedMessages.get(sessionId);
+            messages.forEach(msg => existingMessages?.add(msg.id));
+
+            // Merge and maintain sort order (newest first)
+            const messagesMap = new Map(session.messages.map(m => [m.id, m]));
+            messages.forEach(msg => messagesMap.set(msg.id, msg));
+
+            const mergedMessages = Array.from(messagesMap.values())
+                .sort((a, b) => b.createdAt - a.createdAt);
+
+            return {
+                ...state,
+                sessionMessages: {
+                    ...state.sessionMessages,
+                    [sessionId]: {
+                        ...session,
+                        messages: mergedMessages,
+                        pagination: {
+                            hasMore: pagination.hasMore,
+                            nextCursor: pagination.nextCursor,
+                            totalCount: pagination.totalCount,
+                            isLoadingMore: false
+                        }
+                    }
+                }
+            };
+        });
+    }
+
     private registerPushToken = async () => {
         log.log('registerPushToken');
         // Only register on mobile platforms
