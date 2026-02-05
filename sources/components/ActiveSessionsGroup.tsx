@@ -229,29 +229,16 @@ const stylesheet = StyleSheet.create((theme, runtime) => ({
 interface ActiveSessionsGroupProps {
     sessions: Session[];
     selectedSessionId?: string;
-    disableSorting?: boolean;
 }
 
 
-export function ActiveSessionsGroup({ sessions, selectedSessionId, disableSorting = false }: ActiveSessionsGroupProps) {
+export function ActiveSessionsGroup({ sessions, selectedSessionId }: ActiveSessionsGroupProps) {
     const styles = stylesheet;
 
-    // Sort sessions by lastMessageAt (newest first) - flat list, no grouping
-    // Fall back to createdAt if no messages yet
-    const sortedSessions = React.useMemo(() => {
-        if (disableSorting) {
-            return sessions;
-        }
-        return [...sessions].sort((a, b) => {
-            const aTime = a.lastMessageAt ?? a.createdAt;
-            const bTime = b.lastMessageAt ?? b.createdAt;
-            return bTime - aTime;
-        });
-    }, [sessions, disableSorting]);
-
+    // Sessions are already sorted by storage.ts - just use them as-is
     return (
         <View style={styles.container}>
-            {sortedSessions.map((session, index) => (
+            {sessions.map((session, index) => (
                 <FlatSessionRow
                     key={session.id}
                     session={session}
