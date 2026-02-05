@@ -70,12 +70,16 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                 }
             } else if (item.type === 'active-sessions') {
                 // Sort active sessions by lastMessageAt to match ActiveSessionsGroup display order
+                // Round to minute for stable sorting, with session.id as tiebreaker
+                const roundToMinute = (timestamp: number) => Math.floor(timestamp / 60000) * 60000;
                 const sortedActiveSessions = [...item.sessions]
                     .filter(session => sessionMatchesSearch(session, searchQuery))
                     .sort((a, b) => {
                         const aTime = a.lastMessageAt ?? a.createdAt;
                         const bTime = b.lastMessageAt ?? b.createdAt;
-                        return bTime - aTime;
+                        const roundedDiff = roundToMinute(bTime) - roundToMinute(aTime);
+                        if (roundedDiff !== 0) return roundedDiff;
+                        return a.id.localeCompare(b.id);
                     });
                 result.push(...sortedActiveSessions);
             }
