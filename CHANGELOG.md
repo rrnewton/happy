@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 7 - 2026-02-05
+
+This update improves session list stability and organization with pinning functionality and refined sorting behavior.
+
+- Added session pinning feature allowing users to pin important sessions to the top of the list
+- Fixed stable sorting for active sessions - sessions updated within the same minute now maintain consistent order
+- Improved session list organization with visual pinned indicator on pinned sessions
+- Enhanced session info screen with pin/unpin toggle in Quick Actions
+
 ## Version 6 - 2025-12-30
 
 This update focuses on enhanced debugging capabilities, improved keyboard navigation, and better web experience with analytics and visual polish.
