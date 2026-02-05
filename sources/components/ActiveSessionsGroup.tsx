@@ -238,14 +238,18 @@ export function ActiveSessionsGroup({ sessions, selectedSessionId, disableSortin
 
     // Sort sessions by lastMessageAt (newest first) - flat list, no grouping
     // Fall back to createdAt if no messages yet
+    // Round to minute for stable sorting, with session.id as tiebreaker
     const sortedSessions = React.useMemo(() => {
         if (disableSorting) {
             return sessions;
         }
+        const roundToMinute = (timestamp: number) => Math.floor(timestamp / 60000) * 60000;
         return [...sessions].sort((a, b) => {
             const aTime = a.lastMessageAt ?? a.createdAt;
             const bTime = b.lastMessageAt ?? b.createdAt;
-            return bTime - aTime;
+            const roundedDiff = roundToMinute(bTime) - roundToMinute(aTime);
+            if (roundedDiff !== 0) return roundedDiff;
+            return a.id.localeCompare(b.id);
         });
     }, [sessions, disableSorting]);
 
