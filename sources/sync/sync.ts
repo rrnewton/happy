@@ -1683,7 +1683,9 @@ class Sync {
             }
         }
         console.log('Batch decrypted and normalized messages in', Date.now() - start, 'ms');
-        console.log('normalizedMessages', JSON.stringify(normalizedMessages));
+        if (__DEV__) {
+            console.log('normalizedMessages count', sessionId, normalizedMessages.length);
+        }
         // console.log('messages', JSON.stringify(normalizedMessages));
 
         // Apply to storage
@@ -1908,7 +1910,9 @@ class Sync {
 
                     // Update messages
                     if (lastMessage) {
-                        console.log('🔄 Sync: Applying message:', JSON.stringify(lastMessage));
+                        if (__DEV__) {
+                            console.log('🔄 Sync: Applying message:', lastMessage.id, lastMessage.role);
+                        }
                         this.applyMessages(updateData.body.sid, [lastMessage]);
                         let hasMutableTool = false;
                         if (lastMessage.role === 'agent' && lastMessage.content[0] && lastMessage.content[0].type === 'tool-result') {
@@ -1942,6 +1946,10 @@ class Sync {
 
             // Clear any cached git status
             gitStatusSync.clearForSession(sessionId);
+
+            // Clear local message caches for this session
+            this.sessionReceivedMessages.delete(sessionId);
+            this.messagesSync.delete(sessionId);
 
             log.log(`🗑️ Session ${sessionId} deleted from local storage`);
         } else if (updateData.body.t === 'update-session') {

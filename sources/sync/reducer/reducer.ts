@@ -200,6 +200,7 @@ export function createReducer(): ReducerState {
 };
 
 const ENABLE_LOGGING = false;
+const INCLUDE_API_MESSAGES = __DEV__;
 
 export type ReducerResult = {
     messages: Message[];
@@ -654,7 +655,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                 subAgentInvocation: null,
                 meta: msg.meta,
                 images: images.length > 0 ? images : undefined,
-                apiMessage: msg.apiMessage,
+                apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
             });
 
             // Track both localId and messageId
@@ -693,7 +694,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                         thinking: null,
                         subAgentInvocation: null,
                         meta: msg.meta,
-                        apiMessage: msg.apiMessage,
+                        apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                     });
                     changed.add(mid);
                 } else if (c.type === 'thinking') {
@@ -709,7 +710,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                         thinking: { thinking: c.thinking, signature: c.signature },
                         subAgentInvocation: null,
                         meta: msg.meta,
-                        apiMessage: msg.apiMessage,
+                        apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                     });
                     changed.add(mid);
                 }
@@ -787,7 +788,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                                     result: null,
                                 },
                                 meta: msg.meta,
-                                apiMessage: msg.apiMessage,
+                                apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                             });
                             state.toolIdToMessageId.set(c.id, mid);
                             changed.add(mid);
@@ -841,7 +842,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                             thinking: null,
                             subAgentInvocation: null,
                             meta: msg.meta,
-                            apiMessage: msg.apiMessage,
+                            apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                         });
 
                         state.toolIdToMessageId.set(c.id, mid);
@@ -885,7 +886,9 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                     // Handle sub-agent invocation results
                     if (message.subAgentInvocation) {
                         message.subAgentInvocation.result = typeof c.content === 'string' ? c.content : JSON.stringify(c.content);
-                        message.subAgentInvocation.resultApiMessage = msg.apiMessage;
+                        if (INCLUDE_API_MESSAGES) {
+                            message.subAgentInvocation.resultApiMessage = msg.apiMessage;
+                        }
                         changed.add(messageId);
                         continue;
                     }
@@ -902,7 +905,9 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                     message.tool.state = c.is_error ? 'error' : 'completed';
                     message.tool.result = c.content;
                     message.tool.completedAt = msg.createdAt;
-                    message.tool.resultApiMessage = msg.apiMessage; // Store the tool result's API message
+                    if (INCLUDE_API_MESSAGES) {
+                        message.tool.resultApiMessage = msg.apiMessage; // Store the tool result's API message
+                    }
 
                     // Update permission data if provided by backend
                     if (c.permissions) {
@@ -969,7 +974,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                 thinking: null,
                 subAgentInvocation: null,
                 meta: msg.meta,
-                apiMessage: msg.apiMessage,
+                apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
             };
             state.messages.set(mid, userMsg);
             existingSidechain.push(userMsg);
@@ -989,7 +994,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                         thinking: null,
                         subAgentInvocation: null,
                         meta: msg.meta,
-                        apiMessage: msg.apiMessage,
+                        apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                     };
                     state.messages.set(mid, textMsg);
                     existingSidechain.push(textMsg);
@@ -1035,7 +1040,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                         thinking: null,
                         subAgentInvocation: null,
                         meta: msg.meta,
-                        apiMessage: msg.apiMessage,
+                        apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
                     };
                     state.messages.set(mid, toolMsg);
                     existingSidechain.push(toolMsg);
@@ -1053,7 +1058,9 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                             sidechainMessage.tool.state = c.is_error ? 'error' : 'completed';
                             sidechainMessage.tool.result = c.content;
                             sidechainMessage.tool.completedAt = msg.createdAt;
-                            sidechainMessage.tool.resultApiMessage = msg.apiMessage; // Store the tool result's API message
+                            if (INCLUDE_API_MESSAGES) {
+                                sidechainMessage.tool.resultApiMessage = msg.apiMessage; // Store the tool result's API message
+                            }
                             
                             // Update permission data if provided by backend
                             if (c.permissions) {
@@ -1156,7 +1163,7 @@ export function reducer(state: ReducerState, messages: NormalizedMessage[], agen
                 thinking: null,
                 subAgentInvocation: null,
                 meta: msg.meta,
-                apiMessage: msg.apiMessage,
+                apiMessage: INCLUDE_API_MESSAGES ? msg.apiMessage : undefined,
             });
             changed.add(mid);
         }
