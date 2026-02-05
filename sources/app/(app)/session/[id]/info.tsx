@@ -67,18 +67,6 @@ function SessionInfoContent({ session }: { session: Session }) {
     const sessionName = getSessionName(session);
     const sessionStatus = useSessionStatus(session);
     const pinnedSessions = useSetting('pinnedSessions');
-    const resumeTarget = React.useMemo(() => {
-        if (!session.metadata?.machineId) {
-            return null;
-        }
-        if (session.metadata?.claudeSessionId) {
-            return { sessionId: session.metadata.claudeSessionId, agent: 'claude' as const };
-        }
-        if (session.metadata?.codexSessionId) {
-            return { sessionId: session.metadata.codexSessionId, agent: 'codex' as const };
-        }
-        return null;
-    }, [session.metadata?.machineId, session.metadata?.claudeSessionId, session.metadata?.codexSessionId]);
     
     // Check if CLI version is outdated
     const isCliOutdated = session.metadata?.version && !isVersionSupported(session.metadata.version, MINIMUM_CLI_VERSION);
@@ -96,16 +84,6 @@ function SessionInfoContent({ session }: { session: Session }) {
             Modal.alert(t('common.error'), t('sessionInfo.failedToCopySessionId'));
         }
     }, [session]);
-
-    const handleCopyCodexSessionId = useCallback(async () => {
-        if (!session?.metadata?.codexSessionId) return;
-        try {
-            await Clipboard.setStringAsync(session.metadata.codexSessionId);
-            Modal.alert(t('common.success'), t('sessionInfo.codexSessionIdCopied'));
-        } catch (error) {
-            Modal.alert(t('common.error'), t('sessionInfo.failedToCopyCodexSessionId'));
-        }
-    }, [session?.metadata?.codexSessionId]);
 
     const handleCopyMetadata = useCallback(async () => {
         if (!session?.metadata) return;
@@ -277,14 +255,6 @@ function SessionInfoContent({ session }: { session: Session }) {
                             }}
                         />
                     )}
-                    {session.metadata?.codexSessionId && (
-                        <Item
-                            title={t('sessionInfo.codexSessionId')}
-                            subtitle={`${session.metadata.codexSessionId.substring(0, 8)}...${session.metadata.codexSessionId.substring(session.metadata.codexSessionId.length - 8)}`}
-                            icon={<Ionicons name="sparkles-outline" size={29} color="#0A84FF" />}
-                            onPress={handleCopyCodexSessionId}
-                        />
-                    )}
                     <Item
                         title={t('sessionInfo.connectionStatus')}
                         detail={sessionStatus.isConnected ? t('status.online') : t('status.offline')}
@@ -335,12 +305,12 @@ function SessionInfoContent({ session }: { session: Session }) {
                             onPress={handleArchiveSession}
                         />
                     )}
-                    {resumeTarget && session.metadata?.machineId && (
+                    {session.metadata?.claudeSessionId && session.metadata?.machineId && (
                         <Item
                             title={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSession') : t('sessionInfo.continueFromHere')}
                             subtitle={sessionStatus.isConnected && session.active ? t('sessionInfo.forkSessionSubtitle') : t('sessionInfo.continueFromHereSubtitle')}
                             icon={<Ionicons name={sessionStatus.isConnected && session.active ? "git-branch-outline" : "play-outline"} size={29} color="#34C759" />}
-                            onPress={() => router.push(`/new?agent=${resumeTarget.agent}&resumeClaudeSessionId=${resumeTarget.sessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
+                            onPress={() => router.push(`/new?resumeClaudeSessionId=${session.metadata!.claudeSessionId}&selectedMachineId=${session.metadata!.machineId}&selectedPathParam=${encodeURIComponent(session.metadata!.path || '')}`)}
                         />
                     )}
                     <Item
