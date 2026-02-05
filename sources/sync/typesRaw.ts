@@ -238,6 +238,7 @@ export type NormalizedMessage = ({
 };
 
 export function normalizeRawMessage(id: string, localId: string | null, createdAt: number, raw: RawRecord): NormalizedMessage | null {
+    const includeApiMessage = __DEV__;
     let parsed = rawRecordSchema.safeParse(raw);
     if (!parsed.success) {
         return null;
@@ -266,15 +267,22 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
             normalizedContent = raw.content;
         }
 
-        // Extract text for apiMessage (handle both single text and array formats)
-        let apiMessageContent: string;
-        if (Array.isArray(raw.content)) {
-            // Array content - find the text item
-            const textItem = raw.content.find(item => item.type === 'text');
-            apiMessageContent = textItem?.text ?? '';
-        } else {
-            // Single text content
-            apiMessageContent = raw.content.text;
+        let apiMessage: { role: 'user'; content: string } | undefined;
+        if (includeApiMessage) {
+            // Extract text for apiMessage (handle both single text and array formats)
+            let apiMessageContent: string;
+            if (Array.isArray(raw.content)) {
+                // Array content - find the text item
+                const textItem = raw.content.find(item => item.type === 'text');
+                apiMessageContent = textItem?.text ?? '';
+            } else {
+                // Single text content
+                apiMessageContent = raw.content.text;
+            }
+            apiMessage = {
+                role: 'user',
+                content: apiMessageContent
+            };
         }
 
         return {
@@ -285,10 +293,7 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
             content: normalizedContent,
             isSidechain: false,
             meta: raw.meta,
-            apiMessage: {
-                role: 'user',
-                content: apiMessageContent
-            }
+            apiMessage
         };
     }
     if (raw.role === 'agent') {
@@ -345,7 +350,7 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
                     content,
                     meta: raw.meta,
                     usage: raw.content.data.message.usage,
-                    apiMessage: raw.content.data.message
+                    apiMessage: includeApiMessage ? raw.content.data.message : undefined
                 };
             } else if (raw.content.data.type === 'user') {
                 if (!raw.content.data.uuid) {
@@ -366,7 +371,7 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
                             uuid: raw.content.data.uuid,
                             prompt: raw.content.data.message.content
                         }],
-                        apiMessage: raw.content.data.message
+                        apiMessage: includeApiMessage ? raw.content.data.message : undefined
                     };
                 }
 
@@ -382,7 +387,7 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
                             type: 'text',
                             text: raw.content.data.message.content
                         },
-                        apiMessage: raw.content.data.message
+                        apiMessage: includeApiMessage ? raw.content.data.message : undefined
                     };
                 }
 
@@ -424,7 +429,7 @@ export function normalizeRawMessage(id: string, localId: string | null, createdA
                     isSidechain: raw.content.data.isSidechain ?? false,
                     content,
                     meta: raw.meta,
-                    apiMessage: raw.content.data.message
+                    apiMessage: includeApiMessage ? raw.content.data.message : undefined
                 };
             }
         }
