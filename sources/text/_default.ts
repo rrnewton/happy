@@ -695,6 +695,15 @@ export const en = {
         apiKeyCredentialsDescription: 'Enter your OpenAI API key to enable voice transcription. Your key is stored securely and only used for Whisper API calls.',
         getApiKey: 'Get API Key',
         whisperHint: 'Voice transcription uses OpenAI Whisper API. Usage is billed to your OpenAI account.',
+        // Custom API URL
+        customApiUrl: 'Custom API URL',
+        optional: 'Optional',
+        customApiUrlPlaceholder: 'https://your-api.example.com/v1/audio/transcriptions',
+        customApiUrlHint: 'Override the default OpenAI API endpoint with your custom Whisper-compatible API URL. Leave empty to use OpenAI.',
+        // Custom model
+        customModel: 'Custom Model',
+        customModelPlaceholder: 'whisper-1',
+        customModelHint: 'Specify which Whisper model to use. Common options: whisper-1 (default), whisper-large-v3, or other compatible models. Leave empty to use the default.',
         // Custom vocabulary
         vocabularyTitle: 'Custom Vocabulary',
         vocabularyDescription: 'Add words or phrases that Whisper should recognize. This improves transcription accuracy for technical terms, names, or domain-specific vocabulary.',

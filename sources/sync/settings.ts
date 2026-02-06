@@ -48,6 +48,8 @@ export const SettingsSchema = z.object({
     lastUsedModelMode: z.string().nullable().describe('Last selected model mode for new sessions'),
     // OpenAI voice transcription configuration
     openaiApiKey: z.string().nullable().describe('OpenAI API key for Whisper voice transcription'),
+    whisperApiUrl: z.string().nullable().describe('Custom Whisper API URL (defaults to OpenAI if not set)'),
+    whisperModel: z.string().nullable().describe('Whisper model to use (defaults to whisper-1)'),
     whisperVocabulary: z.string().nullable().describe('Custom vocabulary for Whisper transcription (comma or newline separated words/phrases)'),
     // Custom system prompt appended to all messages
     customSystemPrompt: z.string().nullable().describe('Custom system prompt appended to all messages sent to the AI'),
@@ -108,6 +110,8 @@ export const settingsDefaults: Settings = {
     lastUsedPermissionMode: null,
     lastUsedModelMode: null,
     openaiApiKey: null,
+    whisperApiUrl: null,
+    whisperModel: null,
     whisperVocabulary: null,
     customSystemPrompt: null,
     sessionLastReadAt: {},

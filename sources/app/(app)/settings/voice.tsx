@@ -23,10 +23,14 @@ function VoiceSettingsScreen() {
     const headerHeight = useHeaderHeight();
     const [voiceAssistantLanguage] = useSettingMutable('voiceAssistantLanguage');
     const [savedApiKey, setSavedApiKey] = useSettingMutable('openaiApiKey');
+    const [savedApiUrl, setSavedApiUrl] = useSettingMutable('whisperApiUrl');
+    const [savedModel, setSavedModel] = useSettingMutable('whisperModel');
     const [savedVocabulary, setSavedVocabulary] = useSettingMutable('whisperVocabulary');
 
     // Local state for input fields
     const [apiKeyInput, setApiKeyInput] = useState(savedApiKey || '');
+    const [apiUrlInput, setApiUrlInput] = useState(savedApiUrl || '');
+    const [modelInput, setModelInput] = useState(savedModel || '');
     const [vocabularyInput, setVocabularyInput] = useState(savedVocabulary || '');
 
     // Show/hide API key
@@ -41,6 +45,20 @@ function VoiceSettingsScreen() {
             setSavedApiKey(apiKeyInput.trim() || null);
         }
     }, [apiKeyInput, savedApiKey, setSavedApiKey]);
+
+    // Save API URL when user leaves the field
+    const handleApiUrlBlur = useCallback(() => {
+        if (apiUrlInput.trim() !== (savedApiUrl || '')) {
+            setSavedApiUrl(apiUrlInput.trim() || null);
+        }
+    }, [apiUrlInput, savedApiUrl, setSavedApiUrl]);
+
+    // Save model when user leaves the field
+    const handleModelBlur = useCallback(() => {
+        if (modelInput.trim() !== (savedModel || '')) {
+            setSavedModel(modelInput.trim() || null);
+        }
+    }, [modelInput, savedModel, setSavedModel]);
 
     // Save vocabulary when user leaves the field
     const handleVocabularyBlur = useCallback(() => {
@@ -58,10 +76,12 @@ function VoiceSettingsScreen() {
 
         storage.getState().applySettingsLocal({
             openaiApiKey: apiKeyInput.trim(),
+            whisperApiUrl: apiUrlInput.trim() || null,
+            whisperModel: modelInput.trim() || null,
         });
 
         Modal.alert(t('common.success'), t('settingsVoice.credentialsSaved'));
-    }, [apiKeyInput]);
+    }, [apiKeyInput, apiUrlInput, modelInput]);
 
     const getApiKeyStatusText = () => {
         if (savedApiKey) {
@@ -147,6 +167,43 @@ function VoiceSettingsScreen() {
                     </View>
 
                     <Text style={styles.hintText}>{t('settingsVoice.whisperHint')}</Text>
+
+                    {/* Custom API URL */}
+                    <View style={[styles.labelRow, { marginTop: 16 }]}>
+                        <Text style={styles.labelText}>{t('settingsVoice.customApiUrl').toUpperCase()}</Text>
+                        <Text style={[styles.helpText, { color: theme.colors.textSecondary }]}>{t('settingsVoice.optional')}</Text>
+                    </View>
+                    <TextInput
+                        style={[styles.textInputFlex, { color: theme.colors.input.text, backgroundColor: theme.colors.input.background, marginBottom: 8 }]}
+                        value={apiUrlInput}
+                        onChangeText={setApiUrlInput}
+                        onBlur={handleApiUrlBlur}
+                        placeholder={t('settingsVoice.customApiUrlPlaceholder')}
+                        placeholderTextColor={theme.colors.input.placeholder}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        spellCheck={false}
+                        keyboardType="url"
+                    />
+                    <Text style={styles.hintText}>{t('settingsVoice.customApiUrlHint')}</Text>
+
+                    {/* Custom Model */}
+                    <View style={[styles.labelRow, { marginTop: 16 }]}>
+                        <Text style={styles.labelText}>{t('settingsVoice.customModel').toUpperCase()}</Text>
+                        <Text style={[styles.helpText, { color: theme.colors.textSecondary }]}>{t('settingsVoice.optional')}</Text>
+                    </View>
+                    <TextInput
+                        style={[styles.textInputFlex, { color: theme.colors.input.text, backgroundColor: theme.colors.input.background, marginBottom: 8 }]}
+                        value={modelInput}
+                        onChangeText={setModelInput}
+                        onBlur={handleModelBlur}
+                        placeholder={t('settingsVoice.customModelPlaceholder')}
+                        placeholderTextColor={theme.colors.input.placeholder}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        spellCheck={false}
+                    />
+                    <Text style={styles.hintText}>{t('settingsVoice.customModelHint')}</Text>
 
                     {/* Save Button */}
                     <View style={styles.saveButtonContainer}>

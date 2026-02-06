@@ -296,13 +296,15 @@ export function useWhisperTranscription(
         }
 
         try {
+            // Get settings once at the start
+            const settings = storage.getState().settings;
+
             // Shared parameters for upload
             const parameters: Record<string, string> = {
-                model: 'whisper-1',
+                model: settings.whisperModel || 'whisper-1',
             };
 
             // Add language hint if configured
-            const settings = storage.getState().settings;
             if (settings.voiceAssistantLanguage) {
                 const languageCode = getWhisperLanguageCode(settings.voiceAssistantLanguage);
                 if (languageCode) {
@@ -334,7 +336,10 @@ export function useWhisperTranscription(
             }
             Object.entries(parameters).forEach(([key, value]) => formData.append(key, value));
 
-            const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            // Use custom API URL if configured, otherwise default to OpenAI
+            const apiUrl = settings.whisperApiUrl || 'https://api.openai.com/v1/audio/transcriptions';
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
