@@ -440,7 +440,14 @@ export const ca: TranslationStructure = {
         deleteActiveSessionWarning: 'La sessió activa s\'arxivarà primer i després s\'eliminarà permanentment. Aquesta acció no es pot desfer.',
         failedToDeleteSession: 'Error en eliminar la sessió',
         sessionDeleted: 'Sessió eliminada amb èxit',
-        
+        customizeTitle: 'Personalitza el títol',
+        customizeTitleSubtitle: 'Estableix un nom personalitzat per a aquesta sessió',
+        enterCustomTitle: 'Introdueix un títol personalitzat',
+        enterTitlePlaceholder: 'Introdueix un títol per a aquesta sessió',
+        titleUpdated: 'Títol actualitzat correctament',
+        removeCustomTitle: 'Elimina el títol personalitzat',
+        removeCustomTitleSubtitle: 'Restableix al títol predeterminat',
+
     },
 
     components: {

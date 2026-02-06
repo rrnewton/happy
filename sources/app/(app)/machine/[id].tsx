@@ -10,7 +10,7 @@ import { Ionicons, Octicons } from '@expo/vector-icons';
 import type { Session } from '@/sync/storageTypes';
 import { machineStopDaemon, machineUpdateMetadata, machinePing } from '@/sync/ops';
 import { Modal } from '@/modal';
-import { formatPathRelativeToHome, getSessionName, getSessionSubtitle } from '@/utils/sessionUtils';
+import { formatPathRelativeToHome, useSessionName, getSessionSubtitle } from '@/utils/sessionUtils';
 import { isMachineOnline, getMachineStatusText } from '@/utils/machineUtils';
 import { sync } from '@/sync/sync';
 import { useUnistyles, StyleSheet } from 'react-native-unistyles';
@@ -19,6 +19,19 @@ import { useNavigateToSession } from '@/hooks/useNavigateToSession';
 import { machineSpawnNewSession } from '@/sync/ops';
 import { resolveAbsolutePath } from '@/utils/pathUtils';
 import { MultiTextInput, type MultiTextInputHandle } from '@/components/MultiTextInput';
+
+// Helper component for session items that need custom titles
+const SessionItem = React.memo(({ session, onPress }: { session: Session; onPress: () => void }) => {
+    const sessionName = useSessionName(session);
+    return (
+        <Item
+            title={sessionName}
+            subtitle={getSessionSubtitle(session)}
+            onPress={onPress}
+            rightElement={<Ionicons name="chevron-forward" size={20} color="#C7C7CC" />}
+        />
+    );
+});
 
 const styles = StyleSheet.create((theme) => ({
     pathInputContainer: {
@@ -585,12 +598,10 @@ export default function MachineDetailScreen() {
                 {previousSessions.length > 0 && (
                     <ItemGroup title={'Previous Sessions (up to 5 most recent)'}>
                         {previousSessions.map(session => (
-                            <Item
+                            <SessionItem
                                 key={session.id}
-                                title={getSessionName(session)}
-                                subtitle={getSessionSubtitle(session)}
+                                session={session}
                                 onPress={() => navigateToSession(session.id)}
-                                rightElement={<Ionicons name="chevron-forward" size={20} color="#C7C7CC" />}
                             />
                         ))}
                     </ItemGroup>

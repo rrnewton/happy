@@ -33,6 +33,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
     const sessions = storage(useShallow((state) => state.sessions));
     const machines = storage(useShallow((state) => state.machines));
     const commandPaletteEnabled = storage(useShallow((state) => state.localSettings.commandPaletteEnabled));
+    const customSessionTitles = storage(useShallow((state) => state.settings.customSessionTitles));
     const navigateToSession = useNavigateToSession();
 
     // Get current route info to determine if we're on a session page
@@ -65,7 +66,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
         for (const item of sessionListViewData) {
             if (item.type === 'session') {
-                if (sessionMatchesSearch(item.session, searchQuery)) {
+                if (sessionMatchesSearch(item.session, searchQuery, customSessionTitles)) {
                     result.push(item.session);
                 }
             } else if (item.type === 'active-sessions') {
@@ -73,7 +74,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                 // Round to minute for stable sorting, with session.id as tiebreaker
                 const roundToMinute = (timestamp: number) => Math.floor(timestamp / 60000) * 60000;
                 const sortedActiveSessions = [...item.sessions]
-                    .filter(session => sessionMatchesSearch(session, searchQuery))
+                    .filter(session => sessionMatchesSearch(session, searchQuery, customSessionTitles))
                     .sort((a, b) => {
                         const aTime = a.lastMessageAt ?? a.createdAt;
                         const bTime = b.lastMessageAt ?? b.createdAt;
@@ -85,7 +86,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
             }
         }
         return result;
-    }, [sessionListViewData, searchQuery]);
+    }, [sessionListViewData, searchQuery, customSessionTitles]);
 
     // Define available commands
     const commands = useMemo((): Command[] => {
@@ -165,7 +166,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
         activeSessions.forEach(session => {
             // Use getSessionName for proper title (summary text or last path segment)
-            const sessionName = getSessionName(session);
+            const sessionName = getSessionName(session, customSessionTitles);
             // Build subtitle with path and machine name
             const sessionPath = getSessionSubtitle(session);
             const machine = session.metadata?.machineId ? machines[session.metadata.machineId] : undefined;
@@ -188,7 +189,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
         // Current session commands (only show when on a session page)
         if (currentSession && currentSessionId) {
-            const sessionName = getSessionName(currentSession);
+            const sessionName = getSessionName(currentSession, customSessionTitles);
 
             // Voice recording toggle (only when not transcribing)
             if (voiceStatus !== 'transcribing') {
@@ -329,7 +330,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
         }
 
         return cmds;
-    }, [router, logout, sessions, machines, currentSession, currentSessionId, navigateToSession, voiceStatus]);
+    }, [router, logout, sessions, machines, currentSession, currentSessionId, navigateToSession, voiceStatus, customSessionTitles]);
 
     const showCommandPalette = useCallback(() => {
         if (Platform.OS !== 'web' || !commandPaletteEnabled) return;

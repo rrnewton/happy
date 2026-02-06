@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList, RefreshControl } from 'react-native';
 import { Text } from '@/components/StyledText';
 import { usePathname } from 'expo-router';
-import { SessionListViewItem } from '@/sync/storage';
+import { SessionListViewItem, useSetting } from '@/sync/storage';
 import { sessionMatchesSearch } from '@/utils/sessionSearch';
 import { ActiveSessionsGroup, FlatSessionRow } from './ActiveSessionsGroup';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -66,6 +66,7 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
     const styles = stylesheet;
     const { theme } = useUnistyles();
     const safeArea = useSafeAreaInsets();
+    const customSessionTitles = useSetting('customSessionTitles');
     // When searching, show all sessions (including archived) regardless of hideInactiveSessions setting
     const isSearching = searchQuery.trim().length > 0;
     const rawData = useVisibleSessionListViewData({ showAllSessions: isSearching });
@@ -103,12 +104,12 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
 
         for (const item of rawData) {
             if (item.type === 'session') {
-                if (sessionMatchesSearch(item.session, searchQuery)) {
+                if (sessionMatchesSearch(item.session, searchQuery, customSessionTitles)) {
                     filteredItems.push(item);
                 }
             } else if (item.type === 'active-sessions') {
                 const filteredSessions = item.sessions.filter(session =>
-                    sessionMatchesSearch(session, searchQuery)
+                    sessionMatchesSearch(session, searchQuery, customSessionTitles)
                 );
 
                 if (filteredSessions.length > 0) {
@@ -123,7 +124,7 @@ export function SessionsList({ searchQuery = '' }: SessionsListProps) {
         }
 
         return filteredItems;
-    }, [rawData, searchQuery]);
+    }, [rawData, searchQuery, customSessionTitles]);
 
     const dataWithSelected = selectable ? React.useMemo(() => {
         return data?.map(item => ({

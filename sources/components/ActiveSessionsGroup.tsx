@@ -4,7 +4,7 @@ import { Text } from '@/components/StyledText';
 import { useRouter } from 'expo-router';
 import { Session, Machine } from '@/sync/storageTypes';
 import { Ionicons } from '@expo/vector-icons';
-import { getSessionName, useSessionStatus, formatPathRelativeToHome, getSessionSubtitle, formatLastSeen } from '@/utils/sessionUtils';
+import { getSessionName, useSessionName, useSessionStatus, formatPathRelativeToHome, getSessionSubtitle, formatLastSeen } from '@/utils/sessionUtils';
 import { Typography } from '@/constants/Typography';
 import { StatusDot } from './StatusDot';
 import { useAllMachines, useSetting, useMachine } from '@/sync/storage';
@@ -270,7 +270,7 @@ export function ActiveSessionsGroup({ sessions, selectedSessionId, disableSortin
 export const FlatSessionRow = React.memo(({ session, selected }: { session: Session; selected?: boolean }) => {
     const styles = stylesheet;
     const sessionStatus = useSessionStatus(session);
-    const sessionName = getSessionName(session);
+    const sessionName = useSessionName(session);
     const sessionSubtitle = getSessionSubtitle(session);
     const navigateToSession = useNavigateToSession();
     const sessionLastReadAt = useSetting('sessionLastReadAt');
@@ -406,7 +406,7 @@ export const FlatSessionRow = React.memo(({ session, selected }: { session: Sess
 const CompactSessionRow = React.memo(({ session, selected, showBorder }: { session: Session; selected?: boolean; showBorder?: boolean }) => {
     const styles = stylesheet;
     const sessionStatus = useSessionStatus(session);
-    const sessionName = getSessionName(session);
+    const sessionName = useSessionName(session);
     const navigateToSession = useNavigateToSession();
 
     return (

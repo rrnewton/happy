@@ -7,7 +7,7 @@ import { Item } from '@/components/Item';
 import { ItemGroup } from '@/components/ItemGroup';
 import { ItemList } from '@/components/ItemList';
 import { useSession, useIsDataReady, useSetting } from '@/sync/storage';
-import { getSessionName, useSessionStatus, formatOSPlatform, formatPathRelativeToHome } from '@/utils/sessionUtils';
+import { getSessionName, useSessionName, useSessionStatus, formatOSPlatform, formatPathRelativeToHome } from '@/utils/sessionUtils';
 import * as Clipboard from 'expo-clipboard';
 import { Modal } from '@/modal';
 import { sessionKill, sessionDelete } from '@/sync/ops';
@@ -64,9 +64,10 @@ function SessionInfoContent({ session }: { session: Session }) {
     const { theme } = useUnistyles();
     const router = useRouter();
     const devModeEnabled = __DEV__;
-    const sessionName = getSessionName(session);
+    const sessionName = useSessionName(session);
     const sessionStatus = useSessionStatus(session);
     const pinnedSessions = useSetting('pinnedSessions');
+    const customSessionTitles = useSetting('customSessionTitles');
     
     // Check if CLI version is outdated
     const isCliOutdated = session.metadata?.version && !isVersionSupported(session.metadata.version, MINIMUM_CLI_VERSION);
@@ -174,6 +175,38 @@ function SessionInfoContent({ session }: { session: Session }) {
             Modal.alert(t('common.error'), t('common.error'));
         }
     }, []);
+
+    const handleCustomizeTitle = useCallback(async () => {
+        const currentTitle = customSessionTitles[session.id] || '';
+        const title = await Modal.prompt(
+            t('sessionInfo.enterCustomTitle'),
+            t('sessionInfo.enterTitlePlaceholder'),
+            {
+                placeholder: t('sessionInfo.enterTitlePlaceholder'),
+                defaultValue: currentTitle,
+                cancelText: t('common.cancel'),
+                confirmText: t('common.save')
+            }
+        );
+
+        if (title && title.trim()) {
+            sync.applySettings({
+                customSessionTitles: {
+                    ...customSessionTitles,
+                    [session.id]: title.trim()
+                }
+            });
+            Modal.alert(t('common.success'), t('sessionInfo.titleUpdated'));
+        }
+    }, [session.id, customSessionTitles]);
+
+    const handleRemoveCustomTitle = useCallback(() => {
+        const { [session.id]: _, ...rest } = customSessionTitles;
+        sync.applySettings({ customSessionTitles: rest });
+        Modal.alert(t('common.success'), t('sessionInfo.titleUpdated'));
+    }, [session.id, customSessionTitles]);
+
+    const hasCustomTitle = customSessionTitles[session.id] !== undefined;
 
     return (
         <>
@@ -283,6 +316,20 @@ function SessionInfoContent({ session }: { session: Session }) {
 
                 {/* Quick Actions */}
                 <ItemGroup title={t('sessionInfo.quickActions')}>
+                    <Item
+                        title={t('sessionInfo.customizeTitle')}
+                        subtitle={hasCustomTitle ? sessionName : t('sessionInfo.customizeTitleSubtitle')}
+                        icon={<Ionicons name="create-outline" size={29} color="#007AFF" />}
+                        onPress={handleCustomizeTitle}
+                    />
+                    {hasCustomTitle && (
+                        <Item
+                            title={t('sessionInfo.removeCustomTitle')}
+                            subtitle={t('sessionInfo.removeCustomTitleSubtitle')}
+                            icon={<Ionicons name="close-circle-outline" size={29} color="#FF9500" />}
+                            onPress={handleRemoveCustomTitle}
+                        />
+                    )}
                     <Item
                         title={isPinned ? t('session.unpinSession') : t('session.pinSession')}
                         subtitle={isPinned ? t('session.pinned') : undefined}

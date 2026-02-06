@@ -442,7 +442,14 @@ export const zhHans: TranslationStructure = {
         deleteActiveSessionWarning: '活动会话将先被归档，然后永久删除。此操作无法撤销。',
         failedToDeleteSession: '删除会话失败',
         sessionDeleted: '会话删除成功',
-        
+        customizeTitle: '自定义标题',
+        customizeTitleSubtitle: '为此会话设置自定义名称',
+        enterCustomTitle: '输入自定义标题',
+        enterTitlePlaceholder: '为此会话输入标题',
+        titleUpdated: '标题更新成功',
+        removeCustomTitle: '移除自定义标题',
+        removeCustomTitleSubtitle: '重置为默认标题',
+
     },
 
     components: {

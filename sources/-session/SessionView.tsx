@@ -49,6 +49,7 @@ export const SessionView = React.memo((props: { id: string }) => {
     const headerHeight = useHeaderHeight();
     const [showDebugPanel, setShowDebugPanel] = React.useState(false);
     const isDesktop = rt.breakpoint === 'lg' || rt.breakpoint === 'xl';
+    const customSessionTitles = useSetting('customSessionTitles');
 
     // Compute header props based on session state
     const headerProps = useMemo(() => {
@@ -72,11 +73,11 @@ export const SessionView = React.memo((props: { id: string }) => {
 
         // Normal state - show session info
         return {
-            title: getSessionName(session),
+            title: getSessionName(session, customSessionTitles),
             subtitle: session.metadata?.path ? formatPathRelativeToHome(session.metadata.path, session.metadata?.homeDir) : undefined,
             onInfoPress: () => router.push(`/session/${sessionId}/info`),
         };
-    }, [session, isDataReady, sessionId, router]);
+    }, [session, isDataReady, sessionId, router, customSessionTitles]);
 
     // Handle debug button press - toggle on desktop, navigate on mobile
     const handleDebugPress = React.useCallback(() => {

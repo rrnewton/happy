@@ -55,6 +55,7 @@ export const SettingsSchema = z.object({
     // Used for unread indicators, synced across devices
     sessionLastReadAt: z.record(z.string(), z.number()).describe('Last read timestamp per session for unread indicators'),
     pinnedSessions: z.array(z.string()).describe('Pinned session IDs that should stay at the top of the session list'),
+    customSessionTitles: z.record(z.string(), z.string()).describe('Custom titles for sessions, keyed by sessionId'),
     // Environment variable sets for session configuration
     environmentSets: z.array(EnvironmentSetSchema).describe('Named sets of environment variables for sessions'),
     // Wakapi integration settings
@@ -111,6 +112,7 @@ export const settingsDefaults: Settings = {
     customSystemPrompt: null,
     sessionLastReadAt: {},
     pinnedSessions: [],
+    customSessionTitles: {},
     environmentSets: [],
     wakapiEnabled: false,
     wakapiApiUrl: null,

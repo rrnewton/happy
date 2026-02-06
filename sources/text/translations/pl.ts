@@ -451,6 +451,13 @@ export const pl: TranslationStructure = {
         deleteActiveSessionWarning: 'Aktywna sesja zostanie najpierw zarchiwizowana, a następnie trwale usunięta. Ta operacja jest nieodwracalna.',
         failedToDeleteSession: 'Nie udało się usunąć sesji',
         sessionDeleted: 'Sesja została pomyślnie usunięta',
+        customizeTitle: 'Dostosuj tytuł',
+        customizeTitleSubtitle: 'Ustaw niestandardową nazwę dla tej sesji',
+        enterCustomTitle: 'Wprowadź niestandardowy tytuł',
+        enterTitlePlaceholder: 'Wprowadź tytuł dla tej sesji',
+        titleUpdated: 'Tytuł zaktualizowany pomyślnie',
+        removeCustomTitle: 'Usuń niestandardowy tytuł',
+        removeCustomTitleSubtitle: 'Przywróć domyślny tytuł',
     },
 
     components: {

@@ -439,7 +439,13 @@ export const en = {
         deleteActiveSessionWarning: 'This will archive the active session and then permanently delete it. This action cannot be undone.',
         failedToDeleteSession: 'Failed to delete session',
         sessionDeleted: 'Session deleted successfully',
-        
+        customizeTitle: 'Customize Title',
+        customizeTitleSubtitle: 'Set a custom name for this session',
+        enterCustomTitle: 'Enter Custom Title',
+        enterTitlePlaceholder: 'Enter a title for this session',
+        titleUpdated: 'Title updated successfully',
+        removeCustomTitle: 'Remove Custom Title',
+        removeCustomTitleSubtitle: 'Reset to default title',
     },
 
     components: {

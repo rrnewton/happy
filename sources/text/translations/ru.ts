@@ -400,6 +400,13 @@ export const ru: TranslationStructure = {
         deleteActiveSessionWarning: 'Активная сессия будет сначала архивирована, а затем безвозвратно удалена. Это действие нельзя отменить.',
         failedToDeleteSession: 'Не удалось удалить сессию',
         sessionDeleted: 'Сессия успешно удалена',
+        customizeTitle: 'Изменить название',
+        customizeTitleSubtitle: 'Задать своё название для этой сессии',
+        enterCustomTitle: 'Введите название',
+        enterTitlePlaceholder: 'Введите название для этой сессии',
+        titleUpdated: 'Название успешно обновлено',
+        removeCustomTitle: 'Удалить название',
+        removeCustomTitleSubtitle: 'Сбросить к названию по умолчанию',
     },
 
     components: {

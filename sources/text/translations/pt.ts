@@ -440,7 +440,14 @@ export const pt: TranslationStructure = {
         deleteActiveSessionWarning: 'A sessão ativa será arquivada primeiro e depois excluída permanentemente. Esta ação não pode ser desfeita.',
         failedToDeleteSession: 'Falha ao excluir sessão',
         sessionDeleted: 'Sessão excluída com sucesso',
-        
+        customizeTitle: 'Personalizar título',
+        customizeTitleSubtitle: 'Definir um nome personalizado para esta sessão',
+        enterCustomTitle: 'Inserir título personalizado',
+        enterTitlePlaceholder: 'Digite um título para esta sessão',
+        titleUpdated: 'Título atualizado com sucesso',
+        removeCustomTitle: 'Remover título personalizado',
+        removeCustomTitleSubtitle: 'Redefinir para o título padrão',
+
     },
 
     components: {

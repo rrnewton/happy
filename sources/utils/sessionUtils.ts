@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Session } from '@/sync/storageTypes';
 import { t } from '@/text';
+import { useSetting } from '@/sync/storage';
 
 export type SessionState = 'disconnected' | 'thinking' | 'waiting' | 'permission_required';
 
@@ -75,8 +76,14 @@ export function useSessionStatus(session: Session): SessionStatus {
 /**
  * Extracts a display name from a session's metadata path.
  * Returns the last segment of the path, or 'unknown' if no path is available.
+ * Checks custom titles first, then summary, then path.
  */
-export function getSessionName(session: Session): string {
+export function getSessionName(session: Session, customTitles?: Record<string, string>): string {
+    // Check for custom title first
+    if (customTitles && customTitles[session.id]) {
+        return customTitles[session.id];
+    }
+
     if (session.metadata?.summary) {
         return session.metadata.summary.text;
     } else if (session.metadata) {
@@ -85,6 +92,14 @@ export function getSessionName(session: Session): string {
         return lastSegment;
     }
     return t('status.unknown');
+}
+
+/**
+ * Hook version of getSessionName that automatically uses custom titles from settings.
+ */
+export function useSessionName(session: Session): string {
+    const customTitles = useSetting('customSessionTitles');
+    return React.useMemo(() => getSessionName(session, customTitles), [session, customTitles]);
 }
 
 /**

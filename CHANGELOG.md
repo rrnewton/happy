@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 8 - 2026-02-06
+
+This update introduces custom session titles, allowing you to give meaningful names to your coding sessions for better organization and quick identification.
+
+- Added custom session title feature - set personalized names for any session from the session info screen
+- Custom titles appear throughout the app: session list, headers, search results, and command palette
+- Added "Customize Title" and "Remove Custom Title" options in Quick Actions for easy access
+- Session titles are synced across all your devices for consistent organization
+- Custom titles are searchable - find sessions by their custom name instantly
+
 ## Version 7 - 2026-02-05
 
 This update improves session list stability and organization with pinning functionality, refined sorting behavior, and optimized debug data handling.
