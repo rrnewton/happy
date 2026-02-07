@@ -212,8 +212,8 @@ export const AskUserQuestionView = React.memo<ToolViewProps>(({ tool, sessionId 
 
     // Parse answers from tool result if available
     // Format: "User has answered your questions: "header1"="value1", "header2"="value2". You can now..."
-    const parseAnswersFromResult = React.useCallback((result: string | undefined): Record<string, string> | null => {
-        if (!result) return null;
+    const parseAnswersFromResult = React.useCallback((result: any): Record<string, string> | null => {
+        if (!result || typeof result !== 'string') return null;
         const match = result.match(/User has answered your questions: (.+)\. You can now/);
         if (!match) return null;
 
