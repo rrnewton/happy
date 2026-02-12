@@ -689,6 +689,8 @@ function SessionViewLoaded({ sessionId, session, showDebugPanel }: { sessionId: 
             uploadingImageIds={uploadingImageIds}
             onPaste={handlePaste}
             onFileDrop={handleFileDrop}
+            // Allow more vertical space on desktop layout to match /new screen
+            maxHeight={300}
         />
     );
 
