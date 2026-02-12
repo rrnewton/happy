@@ -22,9 +22,15 @@ export function useVisibleSessionListViewData(options?: UseVisibleSessionListVie
             return data;
         }
 
+        // When hideInactiveSessions is enabled, the server already filters to active sessions
+        // via /v2/sessions/active, but we still filter here for:
+        // 1. Backwards compatibility
+        // 2. Removing empty project groups
+        // 3. Edge cases where inactive sessions might be in the list
+        // Note: We no longer show pinned sessions if they're inactive (per user preference)
+
         const filtered: SessionListViewItem[] = [];
         let pendingProjectGroup: SessionListViewItem | null = null;
-        const pinnedSet = new Set(pinnedSessionIds);
 
         for (const item of data) {
             if (item.type === 'project-group') {
@@ -33,8 +39,8 @@ export function useVisibleSessionListViewData(options?: UseVisibleSessionListVie
             }
 
             if (item.type === 'session') {
-                const isPinned = pinnedSet.has(item.session.id);
-                if (item.session.active || isPinned) {
+                // Only show active sessions (pinned sessions are no longer shown if inactive)
+                if (item.session.active) {
                     if (pendingProjectGroup) {
                         filtered.push(pendingProjectGroup);
                         pendingProjectGroup = null;

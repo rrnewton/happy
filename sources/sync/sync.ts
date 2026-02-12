@@ -553,6 +553,11 @@ class Sync {
             }
         }
 
+        // Refresh sessions if hideInactiveSessions changed (to switch between /v1/sessions and /v2/sessions/active)
+        if ('hideInactiveSessions' in delta) {
+            this.sessionsSync.invalidate();
+        }
+
         // Invalidate settings sync
         this.settingsSync.invalidate();
     }
@@ -708,7 +713,12 @@ class Sync {
         if (!this.credentials) return;
 
         const API_ENDPOINT = getServerUrl();
-        const response = await fetch(`${API_ENDPOINT}/v1/sessions`, {
+
+        // Check if we should only fetch active sessions (optimization when hideInactiveSessions is enabled)
+        const hideInactiveSessions = storage.getState().settings.hideInactiveSessions;
+        const endpoint = hideInactiveSessions ? '/v2/sessions/active' : '/v1/sessions';
+
+        const response = await fetch(`${API_ENDPOINT}${endpoint}`, {
             headers: {
                 'Authorization': `Bearer ${this.credentials.token}`,
                 'Content-Type': 'application/json'
