@@ -40,6 +40,8 @@ interface MultiTextInputProps {
     onSelectionChange?: (selection: { start: number; end: number }) => void;
     onStateChange?: (state: TextInputState) => void;
     onPaste?: (event: ClipboardEvent) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
 }
 
 export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextInputProps>((props, ref) => {
@@ -225,6 +227,8 @@ export const MultiTextInput = React.forwardRef<MultiTextInputHandle, MultiTextIn
                 onChange={handleChange}
                 onSelect={handleSelect}
                 onKeyDown={handleKeyDown}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
                 maxRows={maxRows}
                 autoCapitalize="sentences"
                 autoCorrect="off"

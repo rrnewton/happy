@@ -905,11 +905,9 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                     style={[
                         styles.unifiedPanel,
                         isDragOver && { borderColor: theme.colors.textLink, borderWidth: 2 },
-                        // In terminal UI mode, dim the border when not focused
-                        theme.colors.terminalUI.useBorders && !isDragOver && {
-                            borderColor: isFocused
-                                ? theme.colors.terminalUI.borderColor
-                                : theme.colors.terminalUI.borderColor + '40' // Add 40 for 25% opacity
+                        // In terminal UI mode, adjust border opacity based on focus state
+                        !isDragOver && theme.colors.terminalUI.useBorders && !isFocused && {
+                            borderColor: theme.colors.terminalUI.borderColor + '80' // 50% opacity when not focused
                         }
                     ]}
                 >
