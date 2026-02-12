@@ -90,8 +90,39 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
     // Define available commands
     const commands = useMemo((): Command[] => {
-        const cmds: Command[] = [
-            // Navigation commands
+        const cmds: Command[] = [];
+
+        // Add active sessions for quick switching at the very top
+        // Sort by lastMessageAt (most recent first), filter out current session
+        const activeSessions = Object.values(sessions)
+            .filter(session => session.active && session.id !== currentSessionId)
+            .sort((a, b) => (b.lastMessageAt ?? b.createdAt) - (a.lastMessageAt ?? a.createdAt));
+
+        activeSessions.forEach(session => {
+            // Use getSessionName for proper title (summary text or last path segment)
+            const sessionName = getSessionName(session, customSessionTitles);
+            // Build subtitle with path and machine name
+            const sessionPath = getSessionSubtitle(session);
+            const machine = session.metadata?.machineId ? machines[session.metadata.machineId] : undefined;
+            const machineName = machine?.metadata?.displayName || machine?.metadata?.host || '';
+            const subtitle = machineName ? `${sessionPath} · ${machineName}` : sessionPath;
+
+            cmds.push({
+                id: `session-${session.id}`,
+                title: sessionName,
+                subtitle,
+                // Include machine name for searching (will be used by searchMeta)
+                searchMeta: `${sessionName} ${sessionPath} ${machineName}`.toLowerCase(),
+                icon: 'pulse-outline',
+                category: 'Active Sessions',
+                action: () => {
+                    navigateToSession(session.id);
+                }
+            });
+        });
+
+        // Navigation commands
+        cmds.push(
             {
                 id: 'new-session',
                 title: 'New Session',
@@ -156,36 +187,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
                     storage.getState().applyLocalSettings({ sidebarCollapsed: !localSettings.sidebarCollapsed });
                 }
             },
-        ];
-
-        // Add active sessions for quick switching
-        // Sort by lastMessageAt (most recent first), then filter to only active sessions
-        const activeSessions = Object.values(sessions)
-            .filter(session => session.active)
-            .sort((a, b) => (b.lastMessageAt ?? b.createdAt) - (a.lastMessageAt ?? a.createdAt));
-
-        activeSessions.forEach(session => {
-            // Use getSessionName for proper title (summary text or last path segment)
-            const sessionName = getSessionName(session, customSessionTitles);
-            // Build subtitle with path and machine name
-            const sessionPath = getSessionSubtitle(session);
-            const machine = session.metadata?.machineId ? machines[session.metadata.machineId] : undefined;
-            const machineName = machine?.metadata?.displayName || machine?.metadata?.host || '';
-            const subtitle = machineName ? `${sessionPath} · ${machineName}` : sessionPath;
-
-            cmds.push({
-                id: `session-${session.id}`,
-                title: sessionName,
-                subtitle,
-                // Include machine name for searching (will be used by searchMeta)
-                searchMeta: `${sessionName} ${sessionPath} ${machineName}`.toLowerCase(),
-                icon: 'pulse-outline',
-                category: 'Active Sessions',
-                action: () => {
-                    navigateToSession(session.id);
-                }
-            });
-        });
+        );
 
         // Current session commands (only show when on a session page)
         if (currentSession && currentSessionId) {

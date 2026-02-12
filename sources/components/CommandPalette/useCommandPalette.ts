@@ -26,7 +26,17 @@ export function useCommandPalette(commands: Command[], onClose: () => void) {
                 grouped['Active Sessions'] = grouped['Active Sessions'].slice(0, 3);
             }
 
-            return Object.entries(grouped).map(([title, cmds]) => ({
+            // Define category order - Active Sessions first, then the rest
+            const categoryOrder = ['Active Sessions', 'Sessions', 'Navigation', 'Current Session', 'System', 'Developer', 'General'];
+            const sortedEntries = categoryOrder
+                .filter(cat => grouped[cat])
+                .map(cat => [cat, grouped[cat]] as [string, Command[]]);
+
+            // Add any categories not in the predefined order at the end
+            const remainingCategories = Object.entries(grouped)
+                .filter(([cat]) => !categoryOrder.includes(cat));
+
+            return [...sortedEntries, ...remainingCategories].map(([title, cmds]) => ({
                 id: title.toLowerCase().replace(/\s+/g, '-'),
                 title,
                 commands: cmds
@@ -65,7 +75,17 @@ export function useCommandPalette(commands: Command[], onClose: () => void) {
             return acc;
         }, {} as Record<string, Command[]>);
 
-        return Object.entries(grouped).map(([title, cmds]) => ({
+        // Define category order - Active Sessions first, then the rest
+        const categoryOrder = ['Active Sessions', 'Sessions', 'Navigation', 'Current Session', 'System', 'Developer', 'General', 'Results'];
+        const sortedEntries = categoryOrder
+            .filter(cat => grouped[cat])
+            .map(cat => [cat, grouped[cat]] as [string, Command[]]);
+
+        // Add any categories not in the predefined order at the end
+        const remainingCategories = Object.entries(grouped)
+            .filter(([cat]) => !categoryOrder.includes(cat));
+
+        return [...sortedEntries, ...remainingCategories].map(([title, cmds]) => ({
             id: title.toLowerCase().replace(/\s+/g, '-'),
             title,
             commands: cmds

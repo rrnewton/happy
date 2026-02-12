@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 9 - 2026-02-13
+
+This update enhances the command palette experience by prioritizing active sessions for faster navigation between your most recent work.
+
+- Improved command palette (⌘K) to show active sessions at the very top for instant access
+- Active sessions are now sorted by recency, with most recently used sessions appearing first
+- Current session is automatically filtered out from the active sessions list
+- Enhanced workflow: press ⌘K then Enter to quickly switch between your two most recent sessions
+- Streamlined session switching for faster context changes during development
+
 ## Version 8 - 2026-02-06
 
 This update introduces custom session titles, allowing you to give meaningful names to your coding sessions for better organization and quick identification.

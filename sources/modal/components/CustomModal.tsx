@@ -24,19 +24,11 @@ export function CustomModal({ config, onClose }: CustomModalProps) {
     );
 }
 
-// Helper component to manage CommandPalette animation state
+// Helper component for CommandPalette modal wrapper
 function CommandPaletteWithAnimation({ config, onClose }: CustomModalProps) {
-    const [isClosing, setIsClosing] = React.useState(false);
-    
-    const handleClose = React.useCallback(() => {
-        setIsClosing(true);
-        // Wait for animation to complete before unmounting
-        setTimeout(onClose, 200);
-    }, [onClose]);
-    
     return (
-        <CommandPaletteModal visible={!isClosing} onClose={onClose}>
-            <CommandPalette {...config.props} onClose={handleClose} />
+        <CommandPaletteModal visible={true} onClose={onClose}>
+            <CommandPalette {...config.props} onClose={onClose} />
         </CommandPaletteModal>
     );
 }

@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "version": 9,
+      "date": "2026-02-13",
+      "summary": "This update enhances the command palette experience by prioritizing active sessions for faster navigation between your most recent work.",
+      "changes": [
+        "Improved command palette (⌘K) to show active sessions at the very top for instant access",
+        "Active sessions are now sorted by recency, with most recently used sessions appearing first",
+        "Current session is automatically filtered out from the active sessions list",
+        "Enhanced workflow: press ⌘K then Enter to quickly switch between your two most recent sessions",
+        "Streamlined session switching for faster context changes during development"
+      ],
+      "rawMarkdown": "## Version 9 - 2026-02-13\n\n\nThis update enhances the command palette experience by prioritizing active sessions for faster navigation between your most recent work.\n\n- Improved command palette (⌘K) to show active sessions at the very top for instant access\n- Active sessions are now sorted by recency, with most recently used sessions appearing first\n- Current session is automatically filtered out from the active sessions list\n- Enhanced workflow: press ⌘K then Enter to quickly switch between your two most recent sessions\n- Streamlined session switching for faster context changes during development"
+    },
+    {
       "version": 8,
       "date": "2026-02-06",
       "summary": "This update introduces custom session titles, allowing you to give meaningful names to your coding sessions for better organization and quick identification.",
@@ -109,5 +122,5 @@
       "rawMarkdown": "## Version 1 - 2025-05-12\n\n\nWelcome to Happy - your secure, encrypted mobile companion for Claude Code. This inaugural release establishes the foundation for private, powerful AI interactions on the go.\n\n- Implemented end-to-end encrypted session management ensuring complete privacy\n- Integrated intelligent voice assistant with natural conversation capabilities\n- Added experimental file manager with syntax highlighting and tree navigation\n- Built seamless real-time synchronization across all your devices\n- Established native support for iOS, Android, and responsive web interfaces"
     }
   ],
-  "latestVersion": 8
+  "latestVersion": 9
 }
