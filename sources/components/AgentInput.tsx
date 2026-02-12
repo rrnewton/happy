@@ -343,6 +343,8 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
     const [isSwitchingToRemote, setIsSwitchingToRemote] = React.useState(false);
     // Drag and drop state (web only)
     const [isDragOver, setIsDragOver] = React.useState(false);
+    // Focus state for border highlight
+    const [isFocused, setIsFocused] = React.useState(false);
     const dropZoneRef = React.useRef<View>(null);
     const shakerRef = React.useRef<ShakeInstance>(null);
     const inputRef = React.useRef<MultiTextInputHandle>(null);
@@ -902,7 +904,13 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                     ref={dropZoneRef}
                     style={[
                         styles.unifiedPanel,
-                        isDragOver && { borderColor: theme.colors.textLink, borderWidth: 2 }
+                        isDragOver && { borderColor: theme.colors.textLink, borderWidth: 2 },
+                        // In terminal UI mode, dim the border when not focused
+                        theme.colors.terminalUI.useBorders && !isDragOver && {
+                            borderColor: isFocused
+                                ? theme.colors.terminalUI.borderColor
+                                : theme.colors.terminalUI.borderColor + '40' // Add 40 for 25% opacity
+                        }
                     ]}
                 >
                     {/* Recording status bar - shows when recording/transcribing */}
@@ -936,6 +944,8 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                             onStateChange={handleInputStateChange}
                             maxHeight={props.maxHeight ?? 120}
                             onPaste={props.onPaste}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
                         />
                     </View>
 

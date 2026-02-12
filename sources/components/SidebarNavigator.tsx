@@ -5,7 +5,6 @@ import { useIsTablet } from '@/utils/responsive';
 import { SidebarView } from './SidebarView';
 import { useWindowDimensions, Platform } from 'react-native';
 import { useLocalSetting } from '@/sync/storage';
-import { SidebarToggleButton } from './SidebarToggleButton';
 import { usePathname } from 'expo-router';
 
 export const SidebarNavigator = React.memo(() => {
@@ -70,16 +69,10 @@ export const SidebarNavigator = React.memo(() => {
         []
     );
 
-    // Show toggle button when sidebar is effectively collapsed
-    const showToggleButton = auth.isAuthenticated && isTablet && isWeb && effectiveCollapsed;
-
     return (
-        <>
-            <Drawer
-                screenOptions={drawerNavigationOptions}
-                drawerContent={showPermanentDrawer ? drawerContent : undefined}
-            />
-            {showToggleButton && <SidebarToggleButton />}
-        </>
+        <Drawer
+            screenOptions={drawerNavigationOptions}
+            drawerContent={showPermanentDrawer ? drawerContent : undefined}
+        />
     )
 });

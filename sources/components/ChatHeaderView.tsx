@@ -52,7 +52,7 @@ export const ChatHeaderView: React.FC<ChatHeaderViewProps> = ({
                         color={theme.colors.header.tint}
                     />
                 </Pressable>
-                
+
                 <View style={styles.titleContainer}>
                     <Text
                         numberOfLines={1}
