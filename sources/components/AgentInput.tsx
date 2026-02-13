@@ -1,6 +1,6 @@
 import { Ionicons, Octicons } from '@expo/vector-icons';
 import * as React from 'react';
-import { View, Platform, useWindowDimensions, ViewStyle, Text, ActivityIndicator, TouchableWithoutFeedback, Image as RNImage, Pressable } from 'react-native';
+import { View, Platform, useWindowDimensions, ViewStyle, Text, ActivityIndicator, TouchableWithoutFeedback, Image as RNImage, Pressable, AppState } from 'react-native';
 import { Image } from 'expo-image';
 import { useResponsiveMaxWidth } from './layout';
 import { MultiTextInput, KeyPressEvent } from './MultiTextInput';
@@ -345,12 +345,25 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
     const [isDragOver, setIsDragOver] = React.useState(false);
     // Focus state for border highlight
     const [isFocused, setIsFocused] = React.useState(false);
+    // App state for border dimming when app is backgrounded
+    const [isAppActive, setIsAppActive] = React.useState(true);
     const dropZoneRef = React.useRef<View>(null);
     const shakerRef = React.useRef<ShakeInstance>(null);
     const inputRef = React.useRef<MultiTextInputHandle>(null);
 
     // Forward ref to the MultiTextInput
     React.useImperativeHandle(ref, () => inputRef.current!, []);
+
+    // Track app state to dim border when app is backgrounded
+    React.useEffect(() => {
+        const subscription = AppState.addEventListener('change', (nextAppState) => {
+            setIsAppActive(nextAppState === 'active');
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
     // Autocomplete state - track text and selection together
     const [inputState, setInputState] = React.useState<TextInputState>({
@@ -905,9 +918,9 @@ export const AgentInput = React.memo(React.forwardRef<MultiTextInputHandle, Agen
                     style={[
                         styles.unifiedPanel,
                         isDragOver && { borderColor: theme.colors.textLink, borderWidth: 2 },
-                        // In terminal UI mode, adjust border opacity based on focus state
-                        !isDragOver && theme.colors.terminalUI.useBorders && !isFocused && {
-                            borderColor: theme.colors.terminalUI.borderColor + '80' // 50% opacity when not focused
+                        // In terminal UI mode, adjust border opacity based on focus state and app state
+                        !isDragOver && theme.colors.terminalUI.useBorders && (!isFocused || !isAppActive) && {
+                            borderColor: theme.colors.terminalUI.borderColor + '80' // 50% opacity when not focused or app is backgrounded
                         }
                     ]}
                 >
