@@ -251,7 +251,7 @@ function ThinkingBlock(props: {
     <View style={styles.thinkingContainer}>
       <Pressable style={styles.thinkingHeader} onPress={() => setExpanded(!expanded)}>
         <View style={styles.thinkingIconContainer}>
-          <Octicons name="light-bulb" size={14} color={styles.thinkingLabel.color} />
+          <Octicons name="light-bulb" size={16} color={styles.thinkingLabel.color} />
         </View>
         <Text style={styles.thinkingLabel} numberOfLines={1}>
           {t('message.thinking')}{'  '}
@@ -401,29 +401,31 @@ const styles = StyleSheet.create((theme) => ({
   thinkingHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 2,
+    gap: 8,
+    paddingVertical: 4,
   },
   thinkingIconContainer: {
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
   thinkingLabel: {
     color: theme.colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
+    fontWeight: '500',
     flex: 1,
   },
   thinkingPreview: {
+    fontWeight: '400',
     opacity: 0.5,
   },
   thinkingText: {
     color: theme.colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     opacity: 0.7,
     marginTop: 4,
-    marginLeft: 22,
+    marginLeft: 28,
   },
   subAgentContainer: {
     marginHorizontal: 16,

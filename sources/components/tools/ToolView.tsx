@@ -94,20 +94,20 @@ export const ToolView = React.memo<ToolViewProps>((props) => {
 
     // Inline tools render as a subtle collapsible line (like thinking blocks)
     if (knownTool?.inline || isMCP) {
-        // Use smaller, muted icon for inline rendering
+        // Use muted icon for inline rendering
         if (tool.name === 'CodexBash' && tool.input?.parsed_cmd && Array.isArray(tool.input.parsed_cmd) && tool.input.parsed_cmd.length > 0) {
             const parsedCmd = tool.input.parsed_cmd[0];
             if (parsedCmd.type === 'read') {
-                icon = <Octicons name="eye" size={14} color={theme.colors.textSecondary} />;
+                icon = <Octicons name="eye" size={16} color={theme.colors.textSecondary} />;
             } else if (parsedCmd.type === 'write') {
-                icon = <Octicons name="file-diff" size={14} color={theme.colors.textSecondary} />;
+                icon = <Octicons name="file-diff" size={16} color={theme.colors.textSecondary} />;
             } else {
-                icon = <Octicons name="terminal" size={14} color={theme.colors.textSecondary} />;
+                icon = <Octicons name="terminal" size={16} color={theme.colors.textSecondary} />;
             }
         } else if (isMCP) {
-            icon = <Ionicons name="extension-puzzle-outline" size={14} color={theme.colors.textSecondary} />;
+            icon = <Ionicons name="extension-puzzle-outline" size={16} color={theme.colors.textSecondary} />;
         } else if (knownTool && typeof knownTool.icon === 'function') {
-            icon = knownTool.icon(14, theme.colors.textSecondary);
+            icon = knownTool.icon(16, theme.colors.textSecondary);
         }
         return <InlineToolView title={toolTitle} tool={tool} icon={icon} metadata={props.metadata} messages={props.messages ?? []} sessionId={sessionId} />;
     }
@@ -371,18 +371,19 @@ const styles = StyleSheet.create((theme) => ({
     inlineHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
-        paddingVertical: 2,
+        gap: 8,
+        paddingVertical: 4,
     },
     inlineIconContainer: {
-        width: 16,
-        height: 16,
+        width: 20,
+        height: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },
     inlineLabel: {
         color: theme.colors.textSecondary,
-        fontSize: 13,
+        fontSize: 15,
+        fontWeight: '500',
         flex: 1,
     },
     inlineContent: {
