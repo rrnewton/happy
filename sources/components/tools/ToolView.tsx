@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { Text, View, TouchableOpacity, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Ionicons, Octicons } from '@expo/vector-icons';
 import { getToolViewComponent } from './views/_all';
@@ -64,16 +64,52 @@ export const ToolView = React.memo<ToolViewProps>((props) => {
     let toolTitle = tool.name;
     
     // Special handling for MCP tools
+    let isMCP = false;
     if (tool.name.startsWith('mcp__')) {
         toolTitle = formatMCPTitle(tool.name);
         icon = <Ionicons name="extension-puzzle-outline" size={18} color={theme.colors.textSecondary} />;
         minimal = true;
+        isMCP = true;
     } else if (knownTool?.title) {
         if (typeof knownTool.title === 'function') {
             toolTitle = knownTool.title({ tool, metadata: props.metadata });
         } else {
             toolTitle = knownTool.title;
         }
+    }
+
+    // Resolve icon early (needed for both inline and card rendering)
+    if (tool.name === 'CodexBash' && tool.input?.parsed_cmd && Array.isArray(tool.input.parsed_cmd) && tool.input.parsed_cmd.length > 0) {
+        const parsedCmd = tool.input.parsed_cmd[0];
+        if (parsedCmd.type === 'read') {
+            icon = <Octicons name="eye" size={18} color={theme.colors.text} />;
+        } else if (parsedCmd.type === 'write') {
+            icon = <Octicons name="file-diff" size={18} color={theme.colors.text} />;
+        } else {
+            icon = <Octicons name="terminal" size={18} color={theme.colors.text} />;
+        }
+    } else if (knownTool && typeof knownTool.icon === 'function') {
+        icon = knownTool.icon(18, theme.colors.text);
+    }
+
+    // Inline tools render as a subtle collapsible line (like thinking blocks)
+    if (knownTool?.inline || isMCP) {
+        // Use smaller, muted icon for inline rendering
+        if (tool.name === 'CodexBash' && tool.input?.parsed_cmd && Array.isArray(tool.input.parsed_cmd) && tool.input.parsed_cmd.length > 0) {
+            const parsedCmd = tool.input.parsed_cmd[0];
+            if (parsedCmd.type === 'read') {
+                icon = <Octicons name="eye" size={14} color={theme.colors.textSecondary} />;
+            } else if (parsedCmd.type === 'write') {
+                icon = <Octicons name="file-diff" size={14} color={theme.colors.textSecondary} />;
+            } else {
+                icon = <Octicons name="terminal" size={14} color={theme.colors.textSecondary} />;
+            }
+        } else if (isMCP) {
+            icon = <Ionicons name="extension-puzzle-outline" size={14} color={theme.colors.textSecondary} />;
+        } else if (knownTool && typeof knownTool.icon === 'function') {
+            icon = knownTool.icon(14, theme.colors.textSecondary);
+        }
+        return <InlineToolView title={toolTitle} tool={tool} icon={icon} metadata={props.metadata} messages={props.messages ?? []} sessionId={sessionId} />;
     }
 
     if (knownTool && typeof knownTool.extractSubtitle === 'function') {
@@ -89,21 +125,6 @@ export const ToolView = React.memo<ToolViewProps>((props) => {
             minimal = knownTool.minimal;
         }
     }
-    
-    // Special handling for CodexBash to determine icon based on parsed_cmd
-    if (tool.name === 'CodexBash' && tool.input?.parsed_cmd && Array.isArray(tool.input.parsed_cmd) && tool.input.parsed_cmd.length > 0) {
-        const parsedCmd = tool.input.parsed_cmd[0];
-        if (parsedCmd.type === 'read') {
-            icon = <Octicons name="eye" size={18} color={theme.colors.text} />;
-        } else if (parsedCmd.type === 'write') {
-            icon = <Octicons name="file-diff" size={18} color={theme.colors.text} />;
-        } else {
-            icon = <Octicons name="terminal" size={18} color={theme.colors.text} />;
-        }
-    } else if (knownTool && typeof knownTool.icon === 'function') {
-        icon = knownTool.icon(18, theme.colors.text);
-    }
-    
     if (knownTool && typeof knownTool.noStatus === 'boolean') {
         noStatus = knownTool.noStatus;
     }
@@ -255,6 +276,32 @@ export const ToolView = React.memo<ToolViewProps>((props) => {
     );
 });
 
+function InlineToolView(props: { title: string; tool: ToolCall; icon: React.ReactNode; metadata: Metadata | null; messages: Message[]; sessionId?: string }) {
+    const [expanded, setExpanded] = React.useState(false);
+
+    const SpecificToolView = getToolViewComponent(props.tool.name);
+
+    return (
+        <View style={styles.inlineContainer}>
+            <Pressable style={styles.inlineHeader} onPress={() => setExpanded(!expanded)}>
+                <View style={styles.inlineIconContainer}>{props.icon}</View>
+                <Text style={styles.inlineLabel} numberOfLines={1}>{props.title}</Text>
+            </Pressable>
+            {expanded && (
+                <View style={styles.inlineContent}>
+                    {SpecificToolView ? (
+                        <SpecificToolView tool={props.tool} metadata={props.metadata} messages={props.messages} sessionId={props.sessionId} />
+                    ) : props.tool.result ? (
+                        <Text style={styles.inlineText}>
+                            {typeof props.tool.result === 'string' ? props.tool.result : JSON.stringify(props.tool.result, null, 2)}
+                        </Text>
+                    ) : null}
+                </View>
+            )}
+        </View>
+    );
+}
+
 function ElapsedView(props: { from: number }) {
     const { from } = props;
     const elapsed = useElapsedTime(from);
@@ -316,6 +363,36 @@ const styles = StyleSheet.create((theme) => ({
         fontSize: 13,
         color: theme.colors.textSecondary,
         marginTop: 2,
+    },
+    inlineContainer: {
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+    },
+    inlineHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingVertical: 2,
+    },
+    inlineIconContainer: {
+        width: 16,
+        height: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inlineLabel: {
+        color: theme.colors.textSecondary,
+        fontSize: 13,
+        flex: 1,
+    },
+    inlineContent: {
+        marginTop: 4,
+        marginLeft: 22,
+    },
+    inlineText: {
+        color: theme.colors.textSecondary,
+        fontSize: 13,
+        opacity: 0.7,
     },
     content: {
         paddingHorizontal: 12,

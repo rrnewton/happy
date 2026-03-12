@@ -1,6 +1,7 @@
 import * as React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Octicons } from '@expo/vector-icons';
 import { MarkdownView } from "./markdown/MarkdownView";
 import { t } from '@/text';
 import { Message, UserTextMessage, AgentTextMessage, ToolCallMessage, ThinkingMessage, SubAgentInvocation } from "@/sync/typesMessage";
@@ -244,10 +245,22 @@ function ToolCallBlock(props: {
 function ThinkingBlock(props: {
   message: ThinkingMessage;
 }) {
+  const [expanded, setExpanded] = React.useState(false);
+
   return (
     <View style={styles.thinkingContainer}>
-      <Text style={styles.thinkingLabel}>💭 {t('message.thinking')}</Text>
-      <Text style={styles.thinkingText}>{props.message.thinking}</Text>
+      <Pressable style={styles.thinkingHeader} onPress={() => setExpanded(!expanded)}>
+        <View style={styles.thinkingIconContainer}>
+          <Octicons name="light-bulb" size={14} color={styles.thinkingLabel.color} />
+        </View>
+        <Text style={styles.thinkingLabel} numberOfLines={1}>
+          {t('message.thinking')}{'  '}
+          {!expanded && <Text style={styles.thinkingPreview}>{props.message.thinking}</Text>}
+        </Text>
+      </Pressable>
+      {expanded && (
+        <Text style={styles.thinkingText}>{props.message.thinking}</Text>
+      )}
     </View>
   );
 }
@@ -382,30 +395,35 @@ const styles = StyleSheet.create((theme) => ({
   },
   thinkingContainer: {
     marginHorizontal: 16,
-    marginBottom: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: theme.colors.thinkingBackground,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.textLink,
+    marginBottom: 2,
+    paddingVertical: 2,
+  },
+  thinkingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 2,
+  },
+  thinkingIconContainer: {
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   thinkingLabel: {
-    color: theme.colors.text,
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 4,
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    flex: 1,
+  },
+  thinkingPreview: {
+    opacity: 0.5,
   },
   thinkingText: {
-    color: theme.colors.text,
-    fontSize: 14,
-    opacity: 0.8,
-  },
-  thinkingSignature: {
-    color: theme.colors.agentEventText,
-    fontSize: 10,
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    opacity: 0.7,
     marginTop: 4,
-    fontFamily: 'monospace',
+    marginLeft: 22,
   },
   subAgentContainer: {
     marginHorizontal: 16,

@@ -54,6 +54,7 @@ export const knownTools = {
         },
         icon: ICON_TERMINAL,
         minimal: true,
+        inline: true,
         hideDefaultError: true,
         isMutable: true,
         input: z.object({
@@ -94,6 +95,7 @@ export const knownTools = {
         },
         icon: ICON_SEARCH,
         minimal: true,
+        inline: true,
         input: z.object({
             pattern: z.string().describe('The glob pattern to match files against'),
             path: z.string().optional().describe('The directory to search in')
@@ -112,8 +114,9 @@ export const knownTools = {
             }
             return 'Search Content';
         },
-        icon: ICON_READ,
+        icon: ICON_SEARCH,
         minimal: true,
+        inline: true,
         input: z.object({
             pattern: z.string().describe('The regular expression pattern to search for'),
             path: z.string().optional().describe('File or directory to search in'),
@@ -147,6 +150,7 @@ export const knownTools = {
         },
         icon: ICON_SEARCH,
         minimal: true,
+        inline: true,
         input: z.object({
             path: z.string().describe('The absolute path to the directory to list'),
             ignore: z.array(z.string()).optional().describe('List of glob patterns to ignore')
@@ -183,6 +187,7 @@ export const knownTools = {
             return t('tools.names.readFile');
         },
         minimal: true,
+        inline: true,
         icon: ICON_READ,
         input: z.object({
             file_path: z.string().describe('The absolute path to the file to read'),
@@ -208,6 +213,7 @@ export const knownTools = {
             return t('tools.names.editFile');
         },
         icon: ICON_EDIT,
+        inline: true,
         isMutable: true,
         input: z.object({
             file_path: z.string().describe('The absolute path to the file to modify'),
@@ -229,6 +235,7 @@ export const knownTools = {
             return t('tools.names.editFile');
         },
         icon: ICON_EDIT,
+        inline: true,
         isMutable: true,
         input: z.object({
             file_path: z.string().describe('The absolute path to the file to modify'),
@@ -259,6 +266,7 @@ export const knownTools = {
             return t('tools.names.writeFile');
         },
         icon: ICON_EDIT,
+        inline: true,
         isMutable: true,
         input: z.object({
             file_path: z.string().describe('The absolute path to the file to write'),
@@ -279,6 +287,7 @@ export const knownTools = {
         },
         icon: ICON_WEB,
         minimal: true,
+        inline: true,
         input: z.object({
             url: z.string().url().describe('The URL to fetch content from'),
             prompt: z.string().describe('The prompt to run on the fetched content')
@@ -305,6 +314,7 @@ export const knownTools = {
         },
         icon: ICON_READ,
         minimal: true,
+        inline: true,
         input: z.object({
             notebook_path: z.string().describe('The absolute path to the Jupyter notebook file'),
             cell_id: z.string().optional().describe('The ID of a specific cell to read')
@@ -319,6 +329,7 @@ export const knownTools = {
             return t('tools.names.editNotebook');
         },
         icon: ICON_EDIT,
+        inline: true,
         isMutable: true,
         input: z.object({
             notebook_path: z.string().describe('The absolute path to the notebook file'),
@@ -340,19 +351,7 @@ export const knownTools = {
         title: t('tools.names.todoList'),
         icon: ICON_TODO,
         noStatus: true,
-        minimal: (opts: { metadata: Metadata | null, tool: ToolCall, messages?: Message[] }) => {
-            // Check if there are todos in the input
-            if (opts.tool.input?.todos && Array.isArray(opts.tool.input.todos) && opts.tool.input.todos.length > 0) {
-                return false; // Has todos, show expanded
-            }
-            
-            // Check if there are todos in the result
-            if (opts.tool.result?.newTodos && Array.isArray(opts.tool.result.newTodos) && opts.tool.result.newTodos.length > 0) {
-                return false; // Has todos, show expanded
-            }
-            
-            return true; // No todos, render as minimal
-        },
+        inline: true,
         input: z.object({
             todos: z.array(z.object({
                 content: z.string().describe('The todo item content'),
@@ -392,6 +391,7 @@ export const knownTools = {
         },
         icon: ICON_WEB,
         minimal: true,
+        inline: true,
         input: z.object({
             query: z.string().min(2).describe('The search query to use'),
             allowed_domains: z.array(z.string()).optional().describe('Only include results from these domains'),
@@ -410,9 +410,9 @@ export const knownTools = {
     'CodexBash': {
         title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
             // Check if this is a single read command
-            if (opts.tool.input?.parsed_cmd && 
-                Array.isArray(opts.tool.input.parsed_cmd) && 
-                opts.tool.input.parsed_cmd.length === 1 && 
+            if (opts.tool.input?.parsed_cmd &&
+                Array.isArray(opts.tool.input.parsed_cmd) &&
+                opts.tool.input.parsed_cmd.length === 1 &&
                 opts.tool.input.parsed_cmd[0].type === 'read' &&
                 opts.tool.input.parsed_cmd[0].name) {
                 // Display the file name being read
@@ -423,6 +423,7 @@ export const knownTools = {
         },
         icon: ICON_TERMINAL,
         minimal: true,
+        inline: true,
         hideDefaultError: true,
         isMutable: true,
         input: z.object({
@@ -496,6 +497,7 @@ export const knownTools = {
         },
         icon: ICON_REASONING,
         minimal: true,
+        inline: true,
         input: z.object({
             title: z.string().describe('The title of the reasoning')
         }).partial().loose(),
@@ -514,6 +516,7 @@ export const knownTools = {
         title: t('tools.names.applyChanges'),
         icon: ICON_EDIT,
         minimal: true,
+        inline: true,
         hideDefaultError: true,
         input: z.object({
             auto_approved: z.boolean().optional().describe('Whether changes were auto-approved'),
@@ -567,7 +570,7 @@ export const knownTools = {
     'CodexDiff': {
         title: t('tools.names.viewDiff'),
         icon: ICON_EDIT,
-        minimal: false,  // Show full diff view
+        inline: true,
         hideDefaultError: true,
         noStatus: true,  // Always successful, stateless like Task
         input: z.object({
@@ -593,6 +596,21 @@ export const knownTools = {
         extractDescription: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
             return t('tools.desc.showingDiff');
         }
+    },
+    'ToolSearch': {
+        title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
+            if (typeof opts.tool.input?.query === 'string') {
+                return opts.tool.input.query;
+            }
+            return 'ToolSearch';
+        },
+        icon: ICON_SEARCH,
+        minimal: true,
+        inline: true,
+        input: z.object({
+            query: z.string().describe('Query to find deferred tools'),
+            max_results: z.number().optional().describe('Maximum number of results')
+        }).partial().loose(),
     },
     'AskUserQuestion': {
         title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
@@ -639,6 +657,7 @@ export const knownTools = {
     input?: z.ZodObject<any>;
     result?: z.ZodObject<any>;
     minimal?: boolean | ((opts: { metadata: Metadata | null, tool: ToolCall, messages?: Message[] }) => boolean);
+    inline?: boolean;
     extractDescription?: (opts: { metadata: Metadata | null, tool: ToolCall }) => string;
     extractSubtitle?: (opts: { metadata: Metadata | null, tool: ToolCall }) => string | null;
     extractStatus?: (opts: { metadata: Metadata | null, tool: ToolCall }) => string | null;
