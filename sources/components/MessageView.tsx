@@ -363,7 +363,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 4,
     maxWidth: '100%',
   },
   imagesContainer: {
@@ -373,8 +373,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   agentMessageContainer: {
     marginHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 16,
+    marginBottom: 4,
     alignSelf: 'flex-start',
   },
   agentEventContainer: {
@@ -388,14 +387,16 @@ const styles = StyleSheet.create((theme) => ({
   },
   toolContainer: {
     marginHorizontal: 8,
+    marginVertical: 1,
   },
   debugText: {
     color: theme.colors.agentEventText,
     fontSize: 12,
   },
   thinkingContainer: {
-    marginHorizontal: 16,
-    marginBottom: 2,
+    marginHorizontal: 8,
+    marginVertical: 1,
+    paddingHorizontal: 8,
     paddingVertical: 2,
   },
   thinkingHeader: {

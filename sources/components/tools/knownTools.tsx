@@ -17,6 +17,8 @@ const ICON_EXIT = (size: number = 24, color: string = '#000') => <Ionicons name=
 const ICON_TODO = (size: number = 24, color: string = '#000') => <Ionicons name="bulb-outline" size={size} color={color} />;
 const ICON_REASONING = (size: number = 24, color: string = '#000') => <Octicons name="light-bulb" size={size} color={color} />;
 const ICON_QUESTION = (size: number = 24, color: string = '#000') => <Ionicons name="help-circle-outline" size={size} color={color} />;
+const ICON_SKILL = (size: number = 24, color: string = '#000') => <Ionicons name="flash-outline" size={size} color={color} />;
+const ICON_AGENT = (size: number = 24, color: string = '#000') => <Octicons name="dependabot" size={size} color={color} />;
 
 export const knownTools = {
     'Task': {
@@ -610,6 +612,59 @@ export const knownTools = {
         input: z.object({
             query: z.string().describe('Query to find deferred tools'),
             max_results: z.number().optional().describe('Maximum number of results')
+        }).partial().loose(),
+    },
+    'Skill': {
+        title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
+            if (typeof opts.tool.input?.skill === 'string') {
+                return opts.tool.input.skill;
+            }
+            return 'Skill';
+        },
+        icon: ICON_SKILL,
+        minimal: true,
+        inline: true,
+        input: z.object({
+            skill: z.string().describe('The skill name to invoke'),
+            args: z.string().optional().describe('Arguments for the skill')
+        }).partial().loose(),
+    },
+    'Agent': {
+        title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
+            if (typeof opts.tool.input?.prompt === 'string') {
+                const prompt = opts.tool.input.prompt;
+                return prompt.length > 60 ? prompt.substring(0, 60) + '...' : prompt;
+            }
+            return 'Agent';
+        },
+        icon: ICON_AGENT,
+        minimal: true,
+        inline: true,
+        input: z.object({
+            prompt: z.string().describe('The prompt for the agent'),
+            subagent_type: z.string().optional().describe('Type of agent')
+        }).partial().loose(),
+    },
+    'EnterPlanMode': {
+        title: t('tools.names.planProposal'),
+        icon: ICON_EXIT,
+        minimal: true,
+        inline: true,
+        input: z.object({}).partial().loose()
+    },
+    'SendMessage': {
+        title: (opts: { metadata: Metadata | null, tool: ToolCall }) => {
+            if (typeof opts.tool.input?.text === 'string') {
+                const text = opts.tool.input.text;
+                return text.length > 60 ? text.substring(0, 60) + '...' : text;
+            }
+            return 'SendMessage';
+        },
+        icon: ICON_QUESTION,
+        minimal: true,
+        inline: true,
+        input: z.object({
+            text: z.string().describe('The message text')
         }).partial().loose(),
     },
     'AskUserQuestion': {
